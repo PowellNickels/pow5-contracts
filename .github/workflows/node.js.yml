@@ -64,6 +64,7 @@ jobs:
         with:
           path: |
             contracts/depends
+            contracts/interfaces
           key: restore-contract-depends-${{ hashFiles('tools/build-depends.sh', 'tools/depends/**') }}
 
       - name: Restore smart contract artifacts

@@ -15,8 +15,20 @@
 import fs from "fs";
 import * as hardhat from "hardhat";
 
-import { WRAPPED_NATIVE_TOKEN_CONTRACT } from "../contracts/depends";
-import { TEST_ERC1155_ENUMERABLE_CONTRACT } from "../contracts/testing";
+import {
+  UNISWAP_V3_FACTORY_CONTRACT,
+  UNISWAP_V3_NFT_DESCRIPTOR_CONTRACT,
+  UNISWAP_V3_NFT_MANAGER_CONTRACT,
+  UNISWAP_V3_STAKER_CONTRACT,
+  WRAPPED_NATIVE_TOKEN_CONTRACT,
+  WRAPPED_NATIVE_USDC_POOL_CONTRACT,
+  WRAPPED_NATIVE_USDC_POOL_FACTORY_CONTRACT,
+} from "../contracts/depends";
+import {
+  TEST_ERC1155_ENUMERABLE_CONTRACT,
+  TEST_LIQUIDITY_MATH_CONTRACT,
+  USDC_CONTRACT,
+} from "../contracts/testing";
 import { AddressBook } from "../interfaces";
 import baseAddresses from "./base.json";
 import mainnetAddresses from "./mainnet.json";
@@ -41,9 +53,49 @@ async function getAddressBook(networkName: string): Promise<AddressBook> {
       TEST_ERC1155_ENUMERABLE_CONTRACT,
       networkName,
     ),
+    testLiquidityMath: await getContractAddress(
+      "testLiquidityMath",
+      TEST_LIQUIDITY_MATH_CONTRACT,
+      networkName,
+    ),
+    uniswapV3Factory: await getContractAddress(
+      "uniswapV3Factory",
+      UNISWAP_V3_FACTORY_CONTRACT,
+      networkName,
+    ),
+    uniswapV3NftDescriptor: await getContractAddress(
+      "uniswapV3NftDescriptor",
+      UNISWAP_V3_NFT_DESCRIPTOR_CONTRACT,
+      networkName,
+    ),
+    uniswapV3NftManager: await getContractAddress(
+      "uniswapV3NftManager",
+      UNISWAP_V3_NFT_MANAGER_CONTRACT,
+      networkName,
+    ),
+    uniswapV3Staker: await getContractAddress(
+      "uniswapV3Staker",
+      UNISWAP_V3_STAKER_CONTRACT,
+      networkName,
+    ),
+    usdcToken: await getContractAddress(
+      "usdcToken",
+      USDC_CONTRACT,
+      networkName,
+    ),
     wrappedNativeToken: await getContractAddress(
       "wrappedNativeToken",
       WRAPPED_NATIVE_TOKEN_CONTRACT,
+      networkName,
+    ),
+    wrappedNativeUsdcPool: await getContractAddress(
+      "wrappedNativeUsdcPool",
+      WRAPPED_NATIVE_USDC_POOL_CONTRACT,
+      networkName,
+    ),
+    wrappedNativeUsdcPoolFactory: await getContractAddress(
+      "wrappedNativeUsdcPoolFactory",
+      WRAPPED_NATIVE_USDC_POOL_FACTORY_CONTRACT,
       networkName,
     ),
   };

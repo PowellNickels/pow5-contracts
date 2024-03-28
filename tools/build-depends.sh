@@ -56,27 +56,52 @@ mkdir -p "${INTERFACE_DIR}"
 #
 
 source "${DEPENDS_DIR}/canonical-weth/package.sh"
+source "${DEPENDS_DIR}/openzeppelin-v3/package.sh"
+source "${DEPENDS_DIR}/uniswap-lib/package.sh"
+source "${DEPENDS_DIR}/uniswap-v3-core/package.sh"
+source "${DEPENDS_DIR}/uniswap-v3-periphery/package.sh"
+source "${DEPENDS_DIR}/uniswap-v3-staker/package.sh"
 
 #
 # Checkout dependencies
 #
 
 checkout_canonical_weth
+checkout_openzeppelin_v3
+checkout_uniswap_lib
+checkout_uniswap_v3_core
+checkout_uniswap_v3_periphery
+checkout_uniswap_v3_staker
 
 #
 # Patch dependencies
 #
 
 patch_canonical_weth
+patch_openzeppelin_v3
+patch_uniswap_lib
+patch_uniswap_v3_core
+patch_uniswap_v3_periphery
+patch_uniswap_v3_staker
 
 #
 # Build dependencies
 #
 
 build_canonical_weth
+build_openzeppelin_v3
+build_uniswap_lib
+build_uniswap_v3_core
+build_uniswap_v3_periphery
+build_uniswap_v3_staker
 
 #
 # Install dependencies
 #
 
 install_canonical_weth
+install_openzeppelin_v3
+install_uniswap_lib
+install_uniswap_v3_core
+install_uniswap_v3_periphery
+install_uniswap_v3_staker

@@ -44,6 +44,12 @@ devDependencies:
   axios:
     specifier: 1.6.8
     version: 1.6.8(debug@4.3.4)
+  base64-sol:
+    specifier: ^1.1.0
+    version: 1.1.0
+  bignumber.js:
+    specifier: ^9.1.2
+    version: 9.1.2
   chai:
     specifier: ^4.4.1
     version: 4.4.1
@@ -1547,8 +1553,16 @@ packages:
       safe-buffer: 5.2.1
     dev: true
 
+  /base64-sol@1.1.0:
+    resolution: {integrity: sha512-mksLxtFyBcXd3LYK5UxyMj29YR//zoaeXpJaKRbnLQC0E99oCJl7VpKaJDXWAuTvnhxBU9XNYzhxSL8umsrxWg==}
+    dev: true
+
   /bech32@1.1.4:
     resolution: {integrity: sha512-s0IrSOzLlbvX7yp4WBfPITzpAU8sqQcpsmwXDiKwrG4r491vwCO/XpejasRNl0piBMe/DvP4Tz0mIS/X1DPJBQ==}
+    dev: true
+
+  /bignumber.js@9.1.2:
+    resolution: {integrity: sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug==}
     dev: true
 
   /binary-extensions@2.3.0:

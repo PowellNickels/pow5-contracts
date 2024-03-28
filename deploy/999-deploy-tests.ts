@@ -12,7 +12,10 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction, DeployOptions } from "hardhat-deploy/types";
 
-import { TEST_ERC1155_ENUMERABLE_CONTRACT } from "../src/contracts/testing";
+import {
+  TEST_ERC1155_ENUMERABLE_CONTRACT,
+  TEST_LIQUIDITY_MATH_CONTRACT,
+} from "../src/contracts/testing";
 
 //
 // Deploy test contracts
@@ -28,9 +31,19 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
     log: true,
   };
 
+  //
   // Deploy TestERC1155Enumerable
+  //
+
   console.log(`Deploying ${TEST_ERC1155_ENUMERABLE_CONTRACT}`);
   await deployments.deploy(TEST_ERC1155_ENUMERABLE_CONTRACT, opts);
+
+  //
+  // Deploy TestLiquidityMath
+  //
+
+  console.log(`Deploying ${TEST_LIQUIDITY_MATH_CONTRACT}`);
+  await deployments.deploy(TEST_LIQUIDITY_MATH_CONTRACT, opts);
 };
 
 export default func;

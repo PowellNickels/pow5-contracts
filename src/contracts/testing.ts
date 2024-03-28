@@ -11,8 +11,19 @@
 
 // Contract ABIs and artifacts (sort by path)
 import testErc1155EnumerableAbi from "../abi/contracts/test/token/extensions/TestERC1155Enumerable.sol/TestERC1155Enumerable.json";
+import usdcTokenAbi from "../abi/contracts/test/token/USDC.sol/USDC.json";
+import testLiquidityMathAbi from "../abi/contracts/test/utils/math/TestLiquidityMath.sol/TestLiquidityMath.json";
 
 // Contract names (sort by constant)
 const TEST_ERC1155_ENUMERABLE_CONTRACT = "TestERC1155Enumerable";
+const TEST_LIQUIDITY_MATH_CONTRACT = "TestLiquidityMath";
+const USDC_CONTRACT = "USDC";
 
-export { testErc1155EnumerableAbi, TEST_ERC1155_ENUMERABLE_CONTRACT };
+export {
+  testErc1155EnumerableAbi,
+  testLiquidityMathAbi,
+  usdcTokenAbi,
+  TEST_ERC1155_ENUMERABLE_CONTRACT,
+  TEST_LIQUIDITY_MATH_CONTRACT,
+  USDC_CONTRACT,
+};

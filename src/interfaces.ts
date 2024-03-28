@@ -18,13 +18,29 @@ import { ethers } from "ethers";
 // Address book interface
 interface AddressBook {
   testErc1155Enumerable?: string;
+  testLiquidityMath?: string;
+  uniswapV3Factory?: string;
+  uniswapV3NftDescriptor?: string;
+  uniswapV3NftManager?: string;
+  uniswapV3Staker?: string;
+  usdcToken?: string;
   wrappedNativeToken?: string;
+  wrappedNativeUsdcPool?: string;
+  wrappedNativeUsdcPoolFactory?: string;
 }
 
 // Contract instances
 interface ContractLibrary {
   testErc1155EnumerableContract: ethers.Contract;
+  testLiquidityMathContract: ethers.Contract;
+  uniswapV3FactoryContract: ethers.Contract;
+  uniswapV3NftDescriptorContract: ethers.Contract;
+  uniswapV3NftManagerContract: ethers.Contract;
+  uniswapV3StakerContract: ethers.Contract;
+  usdcTokenContract: ethers.Contract;
   wrappedNativeTokenContract: ethers.Contract;
+  wrappedNativeUsdcPoolContract: ethers.Contract;
+  wrappedNativeUsdcPoolFactoryContract: ethers.Contract;
 }
 
 export { AddressBook, ContractLibrary };

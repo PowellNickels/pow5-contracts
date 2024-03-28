@@ -27,13 +27,13 @@ const config: HardhatUserConfig = {
     hardhat: {
       accounts: mnemonic ? { mnemonic } : undefined,
       allowUnlimitedContractSize: true,
-      tags: ["ChainID", "TestTokens", "Tests"],
+      tags: ["ChainID", "TestTokens", "UniswapV3", "LiquidityPools", "Tests"],
     },
     localhost: {
       url: "http://localhost:8545",
       accounts: mnemonic ? { mnemonic } : undefined,
       allowUnlimitedContractSize: true,
-      tags: ["ChainID", "TestTokens", "Tests"],
+      tags: ["ChainID", "TestTokens", "UniswapV3", "LiquidityPools", "Tests"],
     },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.PROJECT_ID}`,

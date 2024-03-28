@@ -14,6 +14,7 @@ import { DeployFunction, DeployOptions } from "hardhat-deploy/types";
 
 import { getAddressBook } from "../src/addresses/addressBook";
 import { WRAPPED_NATIVE_TOKEN_CONTRACT } from "../src/contracts/depends";
+import { USDC_CONTRACT } from "../src/contracts/testing";
 import { AddressBook } from "../src/interfaces";
 
 //
@@ -50,6 +51,15 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
     console.log(`Deploying ${WRAPPED_NATIVE_TOKEN_CONTRACT}`);
     const tx = await deployments.deploy(WRAPPED_NATIVE_TOKEN_CONTRACT, opts);
     addressBook.wrappedNativeToken = tx.address;
+  }
+
+  // Deploy USDC token
+  if (addressBook.usdcToken) {
+    console.log(`Using ${USDC_CONTRACT} at ${addressBook.usdcToken}`);
+  } else {
+    console.log(`Deploying ${USDC_CONTRACT}`);
+    const tx = await deployments.deploy(USDC_CONTRACT, opts);
+    addressBook.usdcToken = tx.address;
   }
 };
 

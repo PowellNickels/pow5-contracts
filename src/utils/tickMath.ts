@@ -9,10 +9,12 @@
  * See the file LICENSE.txt for more information.
  */
 
-// Contract ABIs and artifacts (sort by path)
-import uniV3PoolFactoryAbi from "../abi/contracts/src/utils/helpers/UniV3PoolFactory.sol/UniV3PoolFactory.json";
+function getMinTick(tickSpacing: number): number {
+  return Math.ceil(-887272 / tickSpacing) * tickSpacing;
+}
 
-// Contract names (sort by constant)
-const UNI_V3_POOL_FACTORY_CONTRACT = "UniV3PoolFactory";
+function getMaxTick(tickSpacing: number): number {
+  return Math.floor(887272 / tickSpacing) * tickSpacing;
+}
 
-export { uniV3PoolFactoryAbi, UNI_V3_POOL_FACTORY_CONTRACT };
+export { getMaxTick, getMinTick };
