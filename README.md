@@ -46,6 +46,12 @@ pnpm lint
 pnpm format
 ```
 
+#### Build smart contract dependencies
+
+```bash
+pnpm depends
+```
+
 #### Compile smart contracts and typescript sources
 
 ```bash

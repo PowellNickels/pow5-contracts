@@ -18,11 +18,13 @@ import { ethers } from "ethers";
 // Address book interface
 interface AddressBook {
   testErc1155Enumerable?: string;
+  wrappedNativeToken?: string;
 }
 
 // Contract instances
 interface ContractLibrary {
   testErc1155EnumerableContract: ethers.Contract;
+  wrappedNativeTokenContract: ethers.Contract;
 }
 
 export { AddressBook, ContractLibrary };

@@ -28,7 +28,8 @@
     "build": "pnpm build:solidity && pnpm build:typescript",
     "build:solidity": "hardhat compile",
     "build:typescript": "tsc",
-    "clean": "rimraf artifacts cache deployments/hardhat deployments/localhost dist node_modules src/abi src/types",
+    "clean": "rimraf artifacts cache contracts/depends deployments/hardhat deployments/localhost dist node_modules src/abi src/types tools/repos",
+    "depends": "bash tools/build-depends.sh",
     "deploy": "pnpm deploy:development",
     "deploy:base": "hardhat deploy --network base --export export/abi/base.json",
     "deploy:development": "hardhat deploy --network hardhat",
@@ -43,7 +44,7 @@
     "lint:prettier": "prettier --check .",
     "lint:slither": "slither .",
     "lint:solhint": "solhint 'contracts/src/**/*.sol' 'contracts/test/**/*.sol' --max-warnings 0",
-    "package": "pnpm build && pnpm export",
+    "package": "pnpm depends && pnpm build && pnpm export",
     "start": "hardhat node",
     "test": "hardhat test"
   },

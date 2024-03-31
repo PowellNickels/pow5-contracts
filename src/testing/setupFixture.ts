@@ -16,7 +16,8 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeploymentsExtension } from "hardhat-deploy/types";
 import { getUnnamedSigners } from "hardhat-deploy-ethers/dist/src/helpers";
 
-import { getAddressBook } from "../addressBook";
+import { getAddressBook } from "../addresses/addressBook";
+import { wrappedNativeTokenAbi } from "../contracts/depends";
 import { testErc1155EnumerableAbi } from "../contracts/testing";
 import { AddressBook, ContractLibrary } from "../interfaces";
 
@@ -47,9 +48,15 @@ async function setupFixture(
     testErc1155EnumerableAbi,
     beneficiary,
   );
+  const wrappedNativeTokenContract = new ethers.Contract(
+    addressBook.wrappedNativeToken!,
+    wrappedNativeTokenAbi,
+    beneficiary,
+  );
 
   return {
     testErc1155EnumerableContract,
+    wrappedNativeTokenContract,
   };
 }
 

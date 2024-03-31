@@ -10,7 +10,9 @@
  */
 
 // Contract ABIs and artifacts (sort by path)
+import wrappedNativeTokenAbi from "../abi/contracts/depends/canonical-weth/WETH9.sol/WETH9.json";
 
 // Contract names (sort by constant)
+const WRAPPED_NATIVE_TOKEN_CONTRACT = "WETH";
 
-export {};
+export { wrappedNativeTokenAbi, WRAPPED_NATIVE_TOKEN_CONTRACT };

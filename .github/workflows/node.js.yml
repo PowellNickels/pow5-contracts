@@ -58,6 +58,14 @@ jobs:
             ~/.cache/hardhat-nodejs
           key: restore-solc-${{ hashFiles('hardhat.config.ts') }}
 
+      - name: Restore smart contract dependencies
+        id: restore-contract-depends
+        uses: actions/cache@v4
+        with:
+          path: |
+            contracts/depends
+          key: restore-contract-depends-${{ hashFiles('tools/build-depends.sh', 'tools/depends/**') }}
+
       - name: Restore smart contract artifacts
         id: restore-contract-artifacts
         uses: actions/cache@v4
@@ -66,7 +74,7 @@ jobs:
             artifacts
             src/abi
             src/types
-          key: restore-contract-artifacts-${{ hashFiles('contracts/**') }}
+          key: restore-contract-artifacts-${{ hashFiles('contracts/**', 'tools/build-depends.sh', 'tools/depends/**') }}
 
       - name: Restore Python virtual environment
         id: restore-python-venv
@@ -101,6 +109,10 @@ jobs:
 
       - name: pnpm audit-ci
         run: pnpm audit-ci
+
+      - name: pnpm depends
+        if: steps.restore-contract-depends.outputs.cache-hit != 'true'
+        run: pnpm depends
 
       - name: pnpm lint:prettier
         run: pnpm lint:prettier

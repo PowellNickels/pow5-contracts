@@ -15,10 +15,11 @@
 import fs from "fs";
 import * as hardhat from "hardhat";
 
-import baseAddresses from "./addresses/base.json";
-import mainnetAddresses from "./addresses/mainnet.json";
-import { TEST_ERC1155_ENUMERABLE_CONTRACT } from "./contracts/testing";
-import { AddressBook } from "./interfaces";
+import { WRAPPED_NATIVE_TOKEN_CONTRACT } from "../contracts/depends";
+import { TEST_ERC1155_ENUMERABLE_CONTRACT } from "../contracts/testing";
+import { AddressBook } from "../interfaces";
+import baseAddresses from "./base.json";
+import mainnetAddresses from "./mainnet.json";
 
 //
 // Address book instance
@@ -40,6 +41,11 @@ async function getAddressBook(networkName: string): Promise<AddressBook> {
       TEST_ERC1155_ENUMERABLE_CONTRACT,
       networkName,
     ),
+    wrappedNativeToken: await getContractAddress(
+      "wrappedNativeToken",
+      WRAPPED_NATIVE_TOKEN_CONTRACT,
+      networkName,
+    ),
   };
 }
 
@@ -51,7 +57,7 @@ function loadDeployment(
     const deployment = JSON.parse(
       fs
         .readFileSync(
-          `${__dirname}/../deployments/${networkName}/${contractName}.json`,
+          `${__dirname}/../../deployments/${networkName}/${contractName}.json`,
         )
         .toString(),
     );
@@ -112,7 +118,7 @@ function writeAddress(
   console.log(`Deployed ${contractName} to ${address}`);
 
   // Write the file
-  const addressFile = `${__dirname}/../deployments/${networkName}/${contractName}.json`;
+  const addressFile = `${__dirname}/../../deployments/${networkName}/${contractName}.json`;
   fs.writeFileSync(addressFile, JSON.stringify({ address, abi }, undefined, 2));
 
   // Save the address
