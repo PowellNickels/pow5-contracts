@@ -17,6 +17,7 @@ import { DeploymentsExtension } from "hardhat-deploy/types";
 import { getUnnamedSigners } from "hardhat-deploy-ethers/dist/src/helpers";
 
 import { getAddressBook } from "../addressBook";
+import { testErc1155EnumerableAbi } from "../contracts/testing";
 import { AddressBook, ContractLibrary } from "../interfaces";
 
 //
@@ -41,8 +42,14 @@ async function setupFixture(
   const addressBook: AddressBook = await getAddressBook(networkName);
 
   // Construct the contracts for beneficiary wallet
+  const testErc1155EnumerableContract = new ethers.Contract(
+    addressBook.testErc1155Enumerable!,
+    testErc1155EnumerableAbi,
+    beneficiary,
+  );
 
   return {
+    testErc1155EnumerableContract,
   };
 }
 

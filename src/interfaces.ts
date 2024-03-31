@@ -17,10 +17,12 @@ import { ethers } from "ethers";
 
 // Address book interface
 interface AddressBook {
+  testErc1155Enumerable?: string;
 }
 
 // Contract instances
 interface ContractLibrary {
+  testErc1155EnumerableContract: ethers.Contract;
 }
 
 export { AddressBook, ContractLibrary };

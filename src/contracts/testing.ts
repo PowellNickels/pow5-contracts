@@ -10,7 +10,9 @@
  */
 
 // Contract ABIs and artifacts (sort by path)
+import testErc1155EnumerableAbi from "../abi/contracts/test/token/extensions/TestERC1155Enumerable.sol/TestERC1155Enumerable.json";
 
 // Contract names (sort by constant)
+const TEST_ERC1155_ENUMERABLE_CONTRACT = "TestERC1155Enumerable";
 
-export {};
+export { testErc1155EnumerableAbi, TEST_ERC1155_ENUMERABLE_CONTRACT };

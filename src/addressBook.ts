@@ -17,6 +17,7 @@ import * as hardhat from "hardhat";
 
 import baseAddresses from "./addresses/base.json";
 import mainnetAddresses from "./addresses/mainnet.json";
+import { TEST_ERC1155_ENUMERABLE_CONTRACT } from "./contracts/testing";
 import { AddressBook } from "./interfaces";
 
 //
@@ -34,6 +35,11 @@ const addressBook: { [networkName: string]: AddressBook } = {
 
 async function getAddressBook(networkName: string): Promise<AddressBook> {
   return {
+    testErc1155Enumerable: await getContractAddress(
+      "testErc1155Enumerable",
+      TEST_ERC1155_ENUMERABLE_CONTRACT,
+      networkName,
+    ),
   };
 }
 
