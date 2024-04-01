@@ -17,16 +17,25 @@ import { DeploymentsExtension } from "hardhat-deploy/types";
 import { getUnnamedSigners } from "hardhat-deploy-ethers/dist/src/helpers";
 
 import {
+  defiManagerAbi,
+  dutchAuctionAbi,
+  erc20InterestFarmAbi,
+  liquidityForgeAbi,
+  lpNftStakeFarmAbi,
   lpPow1TokenAbi,
   lpPow5TokenAbi,
   lpSftAbi,
+  lpSftLendFarmAbi,
   noPow5TokenAbi,
   pow1TokenAbi,
   pow5TokenAbi,
+  reverseRepoAbi,
   uniV3PoolerAbi,
   uniV3PoolFactoryAbi,
+  uniV3StakeFarmAbi,
   uniV3StakerAbi,
   uniV3SwapperAbi,
+  yieldHarvestAbi,
 } from "../contracts/hardhat/dapp";
 import {
   uniswapV3FactoryAbi,
@@ -39,6 +48,7 @@ import {
 import {
   testErc1155EnumerableAbi,
   testLiquidityMathAbi,
+  testRewardMathAbi,
   testTickMathAbi,
   usdcTokenAbi,
 } from "../contracts/hardhat/testing";
@@ -68,6 +78,21 @@ async function setupFixture(
   const addressBook: AddressBook = await getAddressBook(networkName);
 
   // Construct the contracts for beneficiary wallet
+  const defiManagerContract = new ethers.Contract(
+    addressBook.defiManager!,
+    defiManagerAbi,
+    beneficiary,
+  );
+  const dutchAuctionContract = new ethers.Contract(
+    addressBook.dutchAuction!,
+    dutchAuctionAbi,
+    beneficiary,
+  );
+  const liquidityForgeContract = new ethers.Contract(
+    addressBook.liquidityForge!,
+    liquidityForgeAbi,
+    beneficiary,
+  );
   const lpPow1TokenContract = new ethers.Contract(
     addressBook.lpPow1Token!,
     lpPow1TokenAbi,
@@ -86,6 +111,16 @@ async function setupFixture(
   const noPow5TokenContract = new ethers.Contract(
     addressBook.noPow5Token!,
     noPow5TokenAbi,
+    beneficiary,
+  );
+  const pow1LpNftStakeFarmContract = new ethers.Contract(
+    addressBook.pow1LpNftStakeFarm!,
+    lpNftStakeFarmAbi,
+    beneficiary,
+  );
+  const pow1LpSftLendFarmContract = new ethers.Contract(
+    addressBook.pow1LpSftLendFarm!,
+    lpSftLendFarmAbi,
     beneficiary,
   );
   const pow1PoolContract = new ethers.Contract(
@@ -118,6 +153,16 @@ async function setupFixture(
     pow1TokenAbi,
     beneficiary,
   );
+  const pow5InterestFarmContract = new ethers.Contract(
+    addressBook.pow5InterestFarm!,
+    erc20InterestFarmAbi,
+    beneficiary,
+  );
+  const pow5LpNftStakeFarmContract = new ethers.Contract(
+    addressBook.pow5LpNftStakeFarm!,
+    uniV3StakeFarmAbi,
+    beneficiary,
+  );
   const pow5PoolContract = new ethers.Contract(
     addressBook.pow5Pool!,
     uniswapV3PoolAbi,
@@ -148,6 +193,11 @@ async function setupFixture(
     pow5TokenAbi,
     beneficiary,
   );
+  const reverseRepoContract = new ethers.Contract(
+    addressBook.reverseRepo!,
+    reverseRepoAbi,
+    beneficiary,
+  );
   const testErc1155EnumerableContract = new ethers.Contract(
     addressBook.testErc1155Enumerable!,
     testErc1155EnumerableAbi,
@@ -156,6 +206,11 @@ async function setupFixture(
   const testLiquidityMathContract = new ethers.Contract(
     addressBook.testLiquidityMath!,
     testLiquidityMathAbi,
+    beneficiary,
+  );
+  const testRewardMathContract = new ethers.Contract(
+    addressBook.testRewardMath!,
+    testRewardMathAbi,
     beneficiary,
   );
   const testTickMathContract = new ethers.Contract(
@@ -203,26 +258,40 @@ async function setupFixture(
     uniV3PoolFactoryAbi,
     beneficiary,
   );
+  const yieldHarvestContract = new ethers.Contract(
+    addressBook.yieldHarvest!,
+    yieldHarvestAbi,
+    beneficiary,
+  );
 
   return {
+    defiManagerContract,
+    dutchAuctionContract,
+    liquidityForgeContract,
     lpPow1TokenContract,
     lpPow5TokenContract,
     lpSftContract,
     noPow5TokenContract,
+    pow1LpNftStakeFarmContract,
+    pow1LpSftLendFarmContract,
     pow1PoolContract,
     pow1PoolerContract,
     pow1PoolFactoryContract,
     pow1StakerContract,
     pow1SwapperContract,
     pow1TokenContract,
+    pow5InterestFarmContract,
+    pow5LpNftStakeFarmContract,
     pow5PoolContract,
     pow5PoolerContract,
     pow5PoolFactoryContract,
     pow5StakerContract,
     pow5SwapperContract,
     pow5TokenContract,
+    reverseRepoContract,
     testErc1155EnumerableContract,
     testLiquidityMathContract,
+    testRewardMathContract,
     testTickMathContract,
     uniswapV3FactoryContract,
     uniswapV3NftDescriptorContract,
@@ -232,6 +301,7 @@ async function setupFixture(
     wrappedNativeTokenContract,
     wrappedNativeUsdcPoolContract,
     wrappedNativeUsdcPoolFactoryContract,
+    yieldHarvestContract,
   };
 }
 

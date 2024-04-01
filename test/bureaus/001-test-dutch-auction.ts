@@ -1,0 +1,881 @@
+/*
+ * Copyright (C) 2024 Powell Nickels
+ * https://github.com/PowellNickels/pow5-contracts
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * See the file LICENSE.txt for more information.
+ */
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
+import chai from "chai";
+import { Contract, ContractTransactionResponse, ethers } from "ethers";
+import * as hardhat from "hardhat";
+
+import { DutchAuctionContract } from "../../src/contracts/bureaus/dutchAuctionContract";
+import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
+import { ETH_PRICE } from "../../src/testing/defiMetrics";
+import { setupFixture } from "../../src/testing/setupFixture";
+import {
+  INITIAL_LPPOW1_AMOUNT,
+  INITIAL_LPPOW1_WETH_VALUE,
+  INITIAL_POW1_PRICE,
+  INITIAL_POW1_SUPPLY,
+  INITIAL_POW5_PRICE,
+  LPPOW1_DECIMALS,
+  POW1_DECIMALS,
+} from "../../src/utils/constants";
+import { encodePriceSqrt } from "../../src/utils/fixedMath";
+import { extractJSONFromURI } from "../../src/utils/lpNftUtils";
+
+// Setup Hardhat
+const setupTest = hardhat.deployments.createFixture(setupFixture);
+
+//
+// Test parameters
+//
+
+// Initial amount of WETH to deposit into the Dutch Auction
+const INITIAL_WETH_AMOUNT: bigint =
+  ethers.parseEther(INITIAL_LPPOW1_WETH_VALUE.toString()) / BigInt(ETH_PRICE); // $100 in WETH
+
+// Remaining dust balances after depositing into LP pool
+const LPPOW1_POW1_DUST: bigint = 462n;
+const LPPOW1_WETH_DUST: bigint = 0n;
+
+// Token ID of initial minted LP-NFT/L-SFT
+const LPPOW1_LPNFT_TOKEN_ID: bigint = 1n;
+
+// Amount of POW1 and WETH dust to give to the Dutch Auction
+const POW1_DUST_AMOUNT: bigint = 989_687_999n; // About 1 billionth of a POW1
+const WETH_DUST_AMOUNT: bigint =
+  ethers.parseEther("0.01") / BigInt(ETH_PRICE) / 1_000_000_000n; // 1 billionth of a cent of WETH
+
+// Maximum amount of loss in the auction due to entering/exiting Uniswap pool
+const MAX_LOSS_AMOUNT: bigint = 35n; // 35 units of dust of either token
+
+// Amount of WETH to deposit in the first auction
+const AUCTION_WETH_AMOUNT: bigint =
+  ethers.parseEther("1000") / BigInt(ETH_PRICE); // $1,000 in ETH
+
+// Amount of LPPOW1 minted in the first auction
+const AUCTION_LPPOW1_AMOUNT: bigint = 42_010_720_703_278_063_107n; // 42 LPPOW1
+
+// Token ID of the first LP-NFT/LP-SFT sold at auction
+const AUCTION_LPNFT_TOKEN_ID: bigint = 2n;
+
+//
+// Debug parameters
+//
+
+// Debug option to print the LP-NFT's image data URI
+const DEBUG_PRINT_LPNFT_IMAGE: boolean = false;
+
+//
+// Test cases
+//
+
+describe("Bureau 1: Dutch Auction", () => {
+  //////////////////////////////////////////////////////////////////////////////
+  // Fixture Constants
+  //////////////////////////////////////////////////////////////////////////////
+
+  const ERC20_ISSUER_ROLE: string =
+    ethers.encodeBytes32String("ERC20_ISSUER_ROLE");
+  const LPSFT_ISSUER_ROLE: string =
+    ethers.encodeBytes32String("LPSFT_ISSUER_ROLE");
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Fixture state
+  //////////////////////////////////////////////////////////////////////////////
+
+  let deployer: SignerWithAddress;
+  let beneficiary: SignerWithAddress;
+  let contracts: ContractLibraryEthers;
+  let pow1IsToken0: boolean;
+
+  let dutchAuctionContract: DutchAuctionContract;
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Mocha setup
+  //////////////////////////////////////////////////////////////////////////////
+
+  before(async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    // Use ethers to get the accounts
+    const signers: SignerWithAddress[] = await hardhat.ethers.getSigners();
+    deployer = signers[0];
+    beneficiary = signers[1];
+
+    // A single fixture is used for the test suite
+    contracts = await setupTest();
+
+    // Set up the Dutch Auction contract for deployer
+    dutchAuctionContract = new DutchAuctionContract(deployer, {
+      dutchAuction: await contracts.dutchAuctionContract.getAddress(),
+    });
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Obtain W-ETH to initialize DutchAuction
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should obtain W-ETH to initialize DutchAuction", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const { wrappedNativeTokenContract } = contracts;
+
+    // Deposit ETH into W-ETH
+    const tx: ContractTransactionResponse = await (
+      wrappedNativeTokenContract.connect(deployer) as Contract
+    ).deposit({
+      value: INITIAL_WETH_AMOUNT,
+    });
+    await tx.wait();
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Grant LPPOW1 issuer role to LPSFT
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should grant LPPOW1 issuer role to LPSFT", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const { lpPow1TokenContract, lpSftContract } = contracts;
+
+    // Grant ERC-20 issuer role to LP-SFT
+    const tx: ContractTransactionResponse = await (
+      lpPow1TokenContract.connect(deployer) as Contract
+    ).grantRole(ERC20_ISSUER_ROLE, await lpSftContract.getAddress());
+    await tx.wait();
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Grant LP-SFT minter role to LPPOW1 stake farm
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should grant LP-SFT minter role to LPPOW1 stake farm", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const { lpSftContract, pow1LpNftStakeFarmContract } = contracts;
+
+    // Grant LP-SFT minter role to LPPOW1 stake farm
+    const tx: ContractTransactionResponse = await (
+      lpSftContract.connect(deployer) as Contract
+    ).grantRole(
+      LPSFT_ISSUER_ROLE,
+      await pow1LpNftStakeFarmContract.getAddress(),
+    );
+    await tx.wait();
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Get pool token order
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should get pool token order for LPPOW5", async function (): Promise<void> {
+    const { pow1PoolerContract } = contracts;
+
+    // Get pool token order
+    pow1IsToken0 = await pow1PoolerContract.gameIsToken0();
+    chai.expect(pow1IsToken0).to.be.a("boolean");
+
+    console.log(
+      `    POW1 is ${pow1IsToken0 ? "token0" : "token1"} ($${INITIAL_POW1_PRICE})`,
+    );
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Initialize the LPPOW1 pool
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should initialize the LPPOW1 pool", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const { pow1PoolContract } = contracts;
+
+    // The initial sqrt price [sqrt(amountToken1/amountToken0)] as a Q64.96 value
+    const INITIAL_PRICE: bigint = encodePriceSqrt(
+      pow1IsToken0 ? INITIAL_WETH_AMOUNT : INITIAL_POW1_SUPPLY,
+      pow1IsToken0 ? INITIAL_POW1_SUPPLY : INITIAL_WETH_AMOUNT,
+    );
+
+    // Initialize the Uniswap V3 pool
+    const tx: ContractTransactionResponse =
+      await pow1PoolContract.initialize(INITIAL_PRICE);
+    await tx.wait();
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Approve the Dutch Auction spending POW1 and WETH
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should approve Dutch Auction to spend POW1", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const { pow1TokenContract, dutchAuctionContract } = contracts;
+
+    // Approve Dutch Auction spending POW1 for deployer
+    const tx: ContractTransactionResponse = await (
+      pow1TokenContract.connect(deployer) as Contract
+    ).approve(await dutchAuctionContract.getAddress(), INITIAL_POW1_SUPPLY);
+    await tx.wait();
+  });
+
+  it("should approve Dutch Auction to spend WETH", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const { wrappedNativeTokenContract, dutchAuctionContract } = contracts;
+
+    // Approve Dutch Auction spending WETH
+    const tx: ContractTransactionResponse = await (
+      wrappedNativeTokenContract.connect(deployer) as Contract
+    ).approve(await dutchAuctionContract.getAddress(), INITIAL_WETH_AMOUNT);
+    await tx.wait();
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Initialize the Dutch Auction
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should initialize DutchAuction", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    // Calculate DeFi metrics
+    const pow1Value: string = ethers.formatUnits(
+      INITIAL_POW1_SUPPLY / BigInt(1 / INITIAL_POW1_PRICE),
+      POW1_DECIMALS,
+    );
+    const wethValue: string = ethers.formatEther(
+      INITIAL_WETH_AMOUNT * BigInt(ETH_PRICE),
+    );
+
+    // Log DeFi metrics
+    console.log(
+      `    Depositing: ${ethers.formatUnits(
+        INITIAL_LPPOW1_AMOUNT,
+        LPPOW1_DECIMALS,
+      )} POW1 ($${pow1Value})`,
+    );
+    console.log(
+      `    Depositing: ${ethers
+        .formatEther(INITIAL_WETH_AMOUNT)
+        .toLocaleString()} ETH ($${wethValue})`,
+    );
+
+    // Initialize DutchAuction
+    await dutchAuctionContract.initialize(
+      INITIAL_POW1_SUPPLY, // gameTokenAmount
+      INITIAL_WETH_AMOUNT, // assetTokenAmount
+      await beneficiary.getAddress(), // receiver
+    );
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Check token balances
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should check LP-SFT POW1 balance", async function (): Promise<void> {
+    const { defiManagerContract } = contracts;
+
+    // Check LP-SFT POW1 balance
+    const pow1Balance: bigint = await defiManagerContract.pow1Balance(
+      LPPOW1_LPNFT_TOKEN_ID,
+    );
+
+    // Calculate DeFi properties
+    const pow1Value: string = ethers.formatUnits(
+      pow1Balance / BigInt(1 / INITIAL_POW1_PRICE),
+      POW1_DECIMALS,
+    );
+
+    // Log LP-SFT POW1 balance
+    console.log(
+      `    LP-SFT POW1 dust: ${parseInt(
+        pow1Balance.toString(),
+      ).toLocaleString()} POW1 wei ($${pow1Value.toLocaleString()})`,
+    );
+
+    chai.expect(pow1Balance).to.equal(LPPOW1_POW1_DUST);
+  });
+
+  it("should check beneficiary WETH balance", async function (): Promise<void> {
+    const { wrappedNativeTokenContract } = contracts;
+
+    // Check WETH balance
+    const wethBalance: bigint = await wrappedNativeTokenContract.balanceOf(
+      await beneficiary.getAddress(),
+    );
+
+    // Log WETH balance
+    if (LPPOW1_WETH_DUST > 0n) {
+      console.log(
+        `    Beneficiary WETH balance: ${ethers
+          .formatEther(wethBalance)
+          .toLocaleString()} WETH`,
+      );
+    }
+
+    chai.expect(wethBalance).to.equal(LPPOW1_WETH_DUST);
+  });
+
+  it("should log Uniswap pool reserves", async function (): Promise<void> {
+    const { pow1PoolContract, pow1TokenContract, wrappedNativeTokenContract } =
+      contracts;
+
+    // Get Uniswap pool reserves
+    const pow1Balance: bigint = await pow1TokenContract.balanceOf(
+      await pow1PoolContract.getAddress(),
+    );
+    const wethBalance: bigint = await wrappedNativeTokenContract.balanceOf(
+      await pow1PoolContract.getAddress(),
+    );
+
+    // Log Uniswap pool reserves
+    console.log(
+      `    Pool POW1 reserves: ${ethers
+        .formatUnits(pow1Balance, POW1_DECIMALS)
+        .toLocaleString()} POW1 ($${ethers.formatUnits(
+        (BigInt(100 * INITIAL_POW1_PRICE) * pow1Balance) / 100n,
+      )})`,
+    );
+    console.log(
+      `    Pool WETH reserves: ${ethers
+        .formatEther(wethBalance)
+        .toLocaleString()} WETH ($${ethers
+        .formatEther(BigInt(ETH_PRICE) * wethBalance)
+        .toLocaleString()})`,
+    );
+
+    chai.expect(pow1Balance).to.equal(INITIAL_POW1_SUPPLY - LPPOW1_POW1_DUST);
+    chai.expect(wethBalance).to.equal(INITIAL_WETH_AMOUNT - LPPOW1_WETH_DUST);
+  });
+
+  it("should check initial LP-SFT LPPOW1 balance", async function (): Promise<void> {
+    const { defiManagerContract } = contracts;
+
+    // Check LP-SFT LPPOW1 balance
+    const lpPow1Balance: bigint = await defiManagerContract.lpPow1Balance(
+      LPPOW1_LPNFT_TOKEN_ID,
+    );
+
+    // Calculate DeFi properties
+    const lpPow1Price: number = INITIAL_POW5_PRICE;
+    const lpPow1Value: string = ethers.formatUnits(
+      lpPow1Balance / BigInt(1 / lpPow1Price),
+      LPPOW1_DECIMALS,
+    );
+
+    // Log LP-SFT LPPOW1 balance
+    console.log(
+      `    Initial LP-SFT LPPOW1 balance: ${ethers
+        .formatUnits(lpPow1Balance, LPPOW1_DECIMALS)
+        .toLocaleString()} LPPOW1 ($${lpPow1Value.toLocaleString()})`,
+    );
+
+    chai.expect(lpPow1Balance).to.equal(INITIAL_LPPOW1_AMOUNT);
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Check LPPOW1 total supply
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should check LPPOW1 total supply", async function (): Promise<void> {
+    const { lpPow1TokenContract } = contracts;
+
+    // Check total supply
+    const totalSupply: bigint = await lpPow1TokenContract.totalSupply();
+    chai.expect(totalSupply).to.equal(INITIAL_LPPOW1_AMOUNT);
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Check LP-SFT properties
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should verify LP-SFT ownership", async function (): Promise<void> {
+    const { lpSftContract } = contracts;
+
+    // Get owner
+    const owner: string = await lpSftContract.ownerOf(LPPOW1_LPNFT_TOKEN_ID);
+    chai.expect(owner).to.equal(await beneficiary.getAddress());
+  });
+
+  it("should check POW1 LP-SFT properties", async function (): Promise<void> {
+    this.timeout(10 * 1000);
+
+    const { lpSftContract } = contracts;
+
+    // Check total supply
+    const totalSupply: bigint = await lpSftContract.totalSupply();
+    chai.expect(totalSupply).to.equal(1n);
+
+    // Test ownerOf()
+    const owner: string = await lpSftContract.ownerOf(LPPOW1_LPNFT_TOKEN_ID);
+    chai.expect(owner).to.equal(await beneficiary.getAddress());
+
+    // Test getTokenIds()
+    const beneficiaryTokenIds: bigint[] = await lpSftContract.getTokenIds(
+      await beneficiary.getAddress(),
+    );
+    chai.expect(beneficiaryTokenIds.length).to.equal(1);
+    chai.expect(beneficiaryTokenIds[0]).to.equal(LPPOW1_LPNFT_TOKEN_ID);
+
+    // Check token URI
+    const nftTokenUri: string = await lpSftContract.uri(LPPOW1_LPNFT_TOKEN_ID);
+
+    // Check that data URI has correct mime type
+    chai.expect(nftTokenUri).to.match(/data:application\/json;base64,.+/);
+
+    // Content should be valid JSON and structure
+    const nftContent = extractJSONFromURI(nftTokenUri);
+    if (!nftContent) {
+      throw new Error("Failed to extract JSON from URI");
+    }
+    chai.expect(nftContent).to.haveOwnProperty("name").is.a("string");
+    chai.expect(nftContent).to.haveOwnProperty("description").is.a("string");
+    chai.expect(nftContent).to.haveOwnProperty("image").is.a("string");
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Obtain WETH dust
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should obtain WETH dust", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const { wrappedNativeTokenContract } = contracts;
+
+    // Deposit ETH into W-ETH
+    const tx: ContractTransactionResponse = await (
+      wrappedNativeTokenContract.connect(deployer) as Contract
+    ).deposit({
+      value: WETH_DUST_AMOUNT * 2n,
+    });
+    await tx.wait();
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Obtain POW1 dust
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should approve POW1Swapper to spend WETH", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const { pow1SwapperContract, wrappedNativeTokenContract } = contracts;
+
+    // Approve POW1Swapper spending WETH
+    const tx: ContractTransactionResponse = await (
+      wrappedNativeTokenContract.connect(deployer) as Contract
+    ).approve(await pow1SwapperContract.getAddress(), WETH_DUST_AMOUNT);
+    await tx.wait();
+  });
+
+  it("should swap WETH dust for POW1 dust", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const { pow1SwapperContract } = contracts;
+
+    // Swap WETH for POW1
+    const tx: ContractTransactionResponse = await (
+      pow1SwapperContract.connect(deployer) as Contract
+    ).buyGameToken(WETH_DUST_AMOUNT, await deployer.getAddress());
+    await tx.wait();
+  });
+
+  it("should check POW1 balance", async function (): Promise<void> {
+    const { pow1TokenContract } = contracts;
+
+    // Check POW1 balance
+    const pow1Balance: bigint = await pow1TokenContract.balanceOf(
+      await deployer.getAddress(),
+    );
+
+    // Calculate DeFi properties
+    const pow1Value: string = ethers.formatUnits(
+      pow1Balance / BigInt(1 / INITIAL_POW1_PRICE),
+      POW1_DECIMALS,
+    );
+
+    // Log DeFi properties
+    console.log(
+      `    Bought ${pow1Balance.toLocaleString()} POW1 ($${pow1Value})`,
+    );
+
+    chai.expect(pow1Balance).to.equal(POW1_DUST_AMOUNT);
+  });
+
+  it("should log Uniswap pool reserves", async function (): Promise<void> {
+    const { pow1PoolContract, pow1TokenContract, wrappedNativeTokenContract } =
+      contracts;
+
+    // Get Uniswap pool reserves
+    const pow1Balance: bigint = await pow1TokenContract.balanceOf(
+      await pow1PoolContract.getAddress(),
+    );
+    const wethBalance: bigint = await wrappedNativeTokenContract.balanceOf(
+      await pow1PoolContract.getAddress(),
+    );
+
+    // Log Uniswap pool reserves
+    console.log(
+      `    Pool POW1 reserves: ${ethers
+        .formatUnits(pow1Balance, POW1_DECIMALS)
+        .toLocaleString()} POW1 ($${ethers.formatUnits(
+        (BigInt(100 * INITIAL_POW1_PRICE) * pow1Balance) / 100n,
+      )})`,
+    );
+    console.log(
+      `    Pool WETH reserves: ${ethers
+        .formatEther(wethBalance)
+        .toLocaleString()} WETH ($${ethers
+        .formatEther(BigInt(ETH_PRICE) * wethBalance)
+        .toLocaleString()})`,
+    );
+
+    chai
+      .expect(pow1Balance)
+      .to.equal(INITIAL_POW1_SUPPLY - LPPOW1_POW1_DUST - POW1_DUST_AMOUNT);
+    chai
+      .expect(wethBalance)
+      .to.equal(INITIAL_WETH_AMOUNT - LPPOW1_WETH_DUST + WETH_DUST_AMOUNT);
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Transfer POW1 and W-ETH dust to DutchAuction
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should transfer POW1 dust to DutchAuction", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const { pow1TokenContract, dutchAuctionContract } = contracts;
+
+    // Transfer POW1 dust to Dutch Auction
+    const tx: ContractTransactionResponse = await (
+      pow1TokenContract.connect(deployer) as Contract
+    ).transfer(await dutchAuctionContract.getAddress(), POW1_DUST_AMOUNT);
+    await tx.wait();
+  });
+
+  it("should transfer WETH dust to DutchAuction", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const { wrappedNativeTokenContract, dutchAuctionContract } = contracts;
+
+    // Transfer WETH to Dutch Auction
+    const tx: ContractTransactionResponse = await (
+      wrappedNativeTokenContract.connect(deployer) as Contract
+    ).transfer(await dutchAuctionContract.getAddress(), WETH_DUST_AMOUNT);
+    await tx.wait();
+  });
+
+  it("should log DutchAuction balances", async function (): Promise<void> {
+    const {
+      dutchAuctionContract,
+      pow1TokenContract,
+      wrappedNativeTokenContract,
+    } = contracts;
+
+    // Log Dutch Auction balances
+    const pow1Balance: bigint = await pow1TokenContract.balanceOf(
+      await dutchAuctionContract.getAddress(),
+    );
+    const wethBalance: bigint = await wrappedNativeTokenContract.balanceOf(
+      await dutchAuctionContract.getAddress(),
+    );
+
+    console.log(
+      `    Auction POW1 balance: ${ethers
+        .formatUnits(pow1Balance, POW1_DECIMALS)
+        .toLocaleString()} POW1 ($${ethers.formatUnits(
+        (BigInt(100 * INITIAL_POW1_PRICE) * pow1Balance) / 100n,
+      )})`,
+    );
+    console.log(
+      `    Auction WETH balance: ${ethers
+        .formatEther(wethBalance)
+        .toLocaleString()} WETH ($${ethers
+        .formatEther(BigInt(ETH_PRICE) * wethBalance)
+        .toLocaleString()})`,
+    );
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Set new auction
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should set new auction", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    // Set new auction
+    await dutchAuctionContract.setAuction(
+      0, // slot
+      ethers.parseUnits("1", 18), // targetPrice = 1 bips scaled by 1e18
+      ethers.parseUnits("0.5", 18), // priceDecayConstant = 50% scaled by 1e18
+      MAX_LOSS_AMOUNT, // maxLossWei
+    );
+  });
+
+  it("should log DutchAuction balances", async function (): Promise<void> {
+    const {
+      dutchAuctionContract,
+      pow1TokenContract,
+      wrappedNativeTokenContract,
+    } = contracts;
+
+    // Log Dutch Auction balances
+    const pow1Balance: bigint = await pow1TokenContract.balanceOf(
+      await dutchAuctionContract.getAddress(),
+    );
+    const wethBalance: bigint = await wrappedNativeTokenContract.balanceOf(
+      await dutchAuctionContract.getAddress(),
+    );
+
+    console.log(
+      `    Auction POW1 balance: ${ethers
+        .formatUnits(pow1Balance, POW1_DECIMALS)
+        .toLocaleString()} POW1 ($${ethers.formatUnits(
+        (BigInt(100 * INITIAL_POW1_PRICE) * pow1Balance) / 100n,
+      )})`,
+    );
+    console.log(
+      `    Auction WETH balance: ${ethers
+        .formatEther(wethBalance)
+        .toLocaleString()} WETH ($${ethers
+        .formatEther(BigInt(ETH_PRICE) * wethBalance)
+        .toLocaleString()})`,
+    );
+  });
+
+  it("should log Uniswap pool reserves", async function (): Promise<void> {
+    const { pow1PoolContract, pow1TokenContract, wrappedNativeTokenContract } =
+      contracts;
+
+    // Log Uniswap pool reserves
+    const pow1Balance: bigint = await pow1TokenContract.balanceOf(
+      await pow1PoolContract.getAddress(),
+    );
+    const wethBalance: bigint = await wrappedNativeTokenContract.balanceOf(
+      await pow1PoolContract.getAddress(),
+    );
+
+    console.log(
+      `    Pool POW1 reserves: ${ethers
+        .formatUnits(pow1Balance, POW1_DECIMALS)
+        .toLocaleString()} POW1 ($${ethers.formatUnits(
+        (BigInt(100 * INITIAL_POW1_PRICE) * pow1Balance) / 100n,
+      )})`,
+    );
+    console.log(
+      `    Pool WETH reserves: ${ethers
+        .formatEther(wethBalance)
+        .toLocaleString()} WETH ($${ethers
+        .formatEther(BigInt(ETH_PRICE) * wethBalance)
+        .toLocaleString()})`,
+    );
+  });
+
+  it("should check first POW1 LP-SFT price", async function (): Promise<void> {
+    const { dutchAuctionContract } = contracts;
+
+    // Get the price of the first LP-SFT
+    const price: bigint = await dutchAuctionContract.getPrice(
+      0, // slot
+    );
+    console.log(
+      `    First LP-SFT tip: ${ethers
+        .formatUnits(price, 18)
+        .toLocaleString()} bips (${ethers
+        .formatUnits(price, 20)
+        .toLocaleString()}%)`,
+    );
+
+    chai.expect(price).to.equal(ethers.parseUnits("1", 18));
+  });
+
+  it("should check auction LPPOW1 LP-NFT properties", async function (): Promise<void> {
+    this.timeout(10 * 1000);
+
+    const { dutchAuctionContract, uniswapV3NftManagerContract } = contracts;
+
+    // Check total supply
+    const totalSupply: bigint = await uniswapV3NftManagerContract.totalSupply();
+    chai.expect(totalSupply).to.equal(2n);
+
+    // Test ownerOf()
+    const owner: string = await uniswapV3NftManagerContract.ownerOf(
+      AUCTION_LPNFT_TOKEN_ID,
+    );
+    chai.expect(owner).to.equal(await dutchAuctionContract.getAddress());
+
+    // Check token URI
+    const nftTokenUri: string = await uniswapV3NftManagerContract.tokenURI(
+      AUCTION_LPNFT_TOKEN_ID,
+    );
+
+    // Check that data URI has correct mime type
+    chai.expect(nftTokenUri).to.match(/data:application\/json;base64,.+/);
+
+    // Content should be valid JSON and structure
+    const nftContent = extractJSONFromURI(nftTokenUri);
+    if (!nftContent) {
+      throw new Error("Failed to extract JSON from URI");
+    }
+    chai.expect(nftContent).to.haveOwnProperty("name").is.a("string");
+    chai.expect(nftContent).to.haveOwnProperty("description").is.a("string");
+    chai.expect(nftContent).to.haveOwnProperty("image").is.a("string");
+
+    if (DEBUG_PRINT_LPNFT_IMAGE) {
+      console.log(`    LP-NFT image: ${nftContent.image}`);
+    }
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Obtain WETH for first auction
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should obtain WETH to purchase LP-SFT", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const { wrappedNativeTokenContract } = contracts;
+
+    // Deposit ETH into W-ETH
+    const tx: ContractTransactionResponse =
+      await wrappedNativeTokenContract.deposit({
+        value: AUCTION_WETH_AMOUNT,
+      });
+    await tx.wait();
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Purchase LP-SFT
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should approve DutchAuction to spend WETH", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const { dutchAuctionContract, wrappedNativeTokenContract } = contracts;
+
+    // Approve Dutch Auction spending WETH
+    const tx: ContractTransactionResponse =
+      await wrappedNativeTokenContract.approve(
+        await dutchAuctionContract.getAddress(),
+        AUCTION_WETH_AMOUNT,
+      );
+    await tx.wait();
+  });
+
+  it("should purchase LP-SFT", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const { dutchAuctionContract } = contracts;
+
+    console.log(
+      `    Purchasing LP-SFT with ${ethers
+        .formatEther(AUCTION_WETH_AMOUNT)
+        .toLocaleString()} WETH ($${ethers
+        .formatEther(AUCTION_WETH_AMOUNT * BigInt(ETH_PRICE))
+        .toLocaleString()}`,
+    );
+
+    // Purchase LP-SFT
+    const tx: ContractTransactionResponse = await dutchAuctionContract.purchase(
+      0n, // slot
+      0n, // gameTokenAmount
+      AUCTION_WETH_AMOUNT, // assetTokenAmount
+      await beneficiary.getAddress(), // receiver
+    );
+    await tx.wait();
+  });
+
+  it("should check new price of LP-SFT", async function (): Promise<void> {
+    const { dutchAuctionContract } = contracts;
+
+    // Get the price of the first LP-SFT
+    const price: bigint = await dutchAuctionContract.getPrice(
+      0, // slot
+    );
+    console.log(
+      `    New LP-SFT tip: ${ethers
+        .formatUnits(price, 18)
+        .toLocaleString()} bips (${ethers
+        .formatUnits(price, 20)
+        .toLocaleString()}%)`,
+    );
+
+    chai.expect(price).to.equal(ethers.parseUnits("1", 18));
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Check token balances
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should log Uniswap pool reserves", async function (): Promise<void> {
+    const { pow1PoolContract, pow1TokenContract, wrappedNativeTokenContract } =
+      contracts;
+
+    // Log Uniswap pool reserves
+    const pow1Balance: bigint = await pow1TokenContract.balanceOf(
+      await pow1PoolContract.getAddress(),
+    );
+    const wethBalance: bigint = await wrappedNativeTokenContract.balanceOf(
+      await pow1PoolContract.getAddress(),
+    );
+
+    console.log(
+      `    Pool POW1 reserves: ${ethers
+        .formatUnits(pow1Balance, POW1_DECIMALS)
+        .toLocaleString()} POW1 ($${ethers.formatUnits(
+        (BigInt(100 * INITIAL_POW1_PRICE) * pow1Balance) / 100n,
+      )})`,
+    );
+    console.log(
+      `    Pool WETH reserves: ${ethers
+        .formatEther(wethBalance)
+        .toLocaleString()} WETH ($${ethers
+        .formatEther(BigInt(ETH_PRICE) * wethBalance)
+        .toLocaleString()})`,
+    );
+  });
+
+  it("should check auction LP-SFT LPPOW1 balance", async function (): Promise<void> {
+    const { defiManagerContract } = contracts;
+
+    // Check LP-SFT LPPOW1 balance
+    const lpPow1Balance: bigint = await defiManagerContract.lpPow1Balance(
+      AUCTION_LPNFT_TOKEN_ID,
+    );
+
+    // Calculate DeFi properties
+    const lpPow1Price: number = INITIAL_POW5_PRICE;
+    const lpPow1Value: string = ethers.formatUnits(
+      lpPow1Balance / BigInt(1 / lpPow1Price),
+      LPPOW1_DECIMALS,
+    );
+
+    // Log LP-SFT LPPOW1 balance
+    console.log(
+      `    Auction LP-SFT LPPOW1 balance: ${ethers.formatUnits(
+        lpPow1Balance,
+        LPPOW1_DECIMALS,
+      )} LPPOW1 ($${lpPow1Value.toLocaleString()})`,
+    );
+
+    chai.expect(lpPow1Balance).to.equal(AUCTION_LPPOW1_AMOUNT);
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Check LPPOW1 total supply
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should check LPPOW1 total supply", async function (): Promise<void> {
+    const { lpPow1TokenContract } = contracts;
+
+    // Check total supply
+    const totalSupply: bigint = await lpPow1TokenContract.totalSupply();
+    chai
+      .expect(totalSupply)
+      .to.equal(INITIAL_LPPOW1_AMOUNT + AUCTION_LPPOW1_AMOUNT);
+  });
+});

@@ -9,9 +9,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-/**
- * @description Address book interface
- */
+// TODO
 interface AddressBook {
   defiManager?: string;
   dutchAuction?: string;
