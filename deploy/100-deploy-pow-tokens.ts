@@ -146,6 +146,9 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       args: [
         addressBook.pow1Token!, // pow1Token
         addressBook.pow5Token!, // pow5Token
+        addressBook.lpPow1Token!, // lpPow1Token
+        addressBook.lpPow5Token!, // lpPow5Token
+        addressBook.noPow5Token!, // noPow5Token
         addressBook.uniswapV3NftManager!, // uniswapV3NftManager
       ],
     });

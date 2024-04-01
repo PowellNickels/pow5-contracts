@@ -20,13 +20,13 @@ class Base {
   constructor(...args: any[]) {}
 }
 
-const ERC1155Contract = ERC1155Mixin(Base);
+const AccessControlContract = AccessControlMixin(Base);
+const ERC1155Contract = ERC1155Mixin(AccessControlContract);
 const ERC1155MetadataURIContract = ERC1155MetadataURIMixin(ERC1155Contract);
 const ERC1155EnumerableContract = ERC1155EnumerableMixin(
   ERC1155MetadataURIContract,
 );
-const AccessControlContract = AccessControlMixin(ERC1155EnumerableContract);
-const LPSFTIssuableContract = LPSFTIssuableMixin(AccessControlContract);
+const LPSFTIssuableContract = LPSFTIssuableMixin(ERC1155EnumerableContract);
 const LPNFTHolderContract = LPNFTHolderMixin(LPSFTIssuableContract);
 
 class LPSFTContract extends LPNFTHolderContract {

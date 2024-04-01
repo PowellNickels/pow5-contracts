@@ -39,6 +39,21 @@ contract LPNFT is Context, AccessControl, ILPNFT {
   IERC20 public immutable pow5Token;
 
   /**
+   * @dev The LPPOW1 token contract
+   */
+  IERC20 public immutable lpPow1Token;
+
+  /**
+   * @dev The LPPOW5 token contract
+   */
+  IERC20 public immutable lpPow5Token;
+
+  /**
+   * @dev The NOPOW5 token contract
+   */
+  IERC20 public immutable noPow5Token;
+
+  /**
    * @dev The Uniswap V3 NFT manager
    */
   INonfungiblePositionManager public immutable uniswapV3NftManager;
@@ -66,21 +81,33 @@ contract LPNFT is Context, AccessControl, ILPNFT {
    *
    * @param pow1Token_ The POW1 token
    * @param pow5Token_ The POW5 token
+   * @param lpPow1Token_ The LPPOW1 token
+   * @param lpPow5Token_ The LPPOW5 token
+   * @param noPow5Token_ The NOPOW5 token
    * @param uniswapV3NftManager_ The Uniswap V3 NFT manager
    */
   constructor(
     address pow1Token_,
     address pow5Token_,
+    address lpPow1Token_,
+    address lpPow5Token_,
+    address noPow5Token_,
     address uniswapV3NftManager_
   ) {
     // Validate parameters
     require(pow1Token_ != address(0), "Invalid POW1");
     require(pow5Token_ != address(0), "Invalid POW5");
+    require(lpPow1Token_ != address(0), "Invalid LPPOW1");
+    require(lpPow5Token_ != address(0), "Invalid LPPOW5");
+    require(noPow5Token_ != address(0), "Invalid NOPOW5");
     require(uniswapV3NftManager_ != address(0), "Invalid NFT mgr");
 
     // Initialize routes
     pow1Token = IERC20(pow1Token_);
     pow5Token = IERC20(pow5Token_);
+    lpPow1Token = IERC20(lpPow1Token_);
+    lpPow5Token = IERC20(lpPow5Token_);
+    noPow5Token = IERC20(noPow5Token_);
     uniswapV3NftManager = INonfungiblePositionManager(uniswapV3NftManager_);
 
     // Initialize state
@@ -155,10 +182,9 @@ contract LPNFT is Context, AccessControl, ILPNFT {
 
     // Read state
     uint256 lpNftTokenId = _tokenId;
-    Pool pool = _pool;
 
     // Validate state
-    if (lpNftTokenId == 0 || pool == Pool.INVALID) {
+    if (lpNftTokenId == 0) {
       revert LPNFTAlreadyDeinitialized();
     }
 
@@ -170,15 +196,15 @@ contract LPNFT is Context, AccessControl, ILPNFT {
     }
 
     // Recover POW1
-    uint256 pow1Balance = pow1Token.balanceOf(address(this));
-    if (pow1Balance > 0) {
-      pow1Token.safeTransfer(beneficiary, pow1Balance);
+    uint256 recoveredPow1Balance = pow1Token.balanceOf(address(this));
+    if (recoveredPow1Balance > 0) {
+      pow1Token.safeTransfer(beneficiary, recoveredPow1Balance);
     }
 
     // Recover POW5
-    uint256 pow5Balance = pow5Token.balanceOf(address(this));
-    if (pow5Balance > 0) {
-      pow5Token.safeTransfer(beneficiary, pow5Balance);
+    uint256 recoveredPow5Balance = pow5Token.balanceOf(address(this));
+    if (recoveredPow5Balance > 0) {
+      pow5Token.safeTransfer(beneficiary, recoveredPow5Balance);
     }
 
     // Emit event
@@ -189,11 +215,7 @@ contract LPNFT is Context, AccessControl, ILPNFT {
    * @dev See {ILPNFT-tokenId}
    */
   function tokenId() public view override returns (uint256) {
-    // Validate state
-    if (_tokenId == 0) {
-      revert LPNFTInvalidTokenID();
-    }
-
+    // Read state
     return _tokenId;
   }
 
@@ -208,5 +230,53 @@ contract LPNFT is Context, AccessControl, ILPNFT {
 
     // Read external state
     return uniswapV3NftManager.tokenURI(_tokenId);
+  }
+
+  /**
+   * @dev See {ILPNFT-pool}
+   */
+  function pool() public view override returns (Pool) {
+    // Read state
+    return _pool;
+  }
+
+  /**
+   * @dev See {ILPNFT-pow1Balance}
+   */
+  function pow1Balance() public view override returns (uint256) {
+    // Read external state
+    return pow1Token.balanceOf(address(this));
+  }
+
+  /**
+   * @dev See {ILPNFT-pow5Balance}
+   */
+  function pow5Balance() public view override returns (uint256) {
+    // Read external state
+    return pow5Token.balanceOf(address(this));
+  }
+
+  /**
+   * @dev See {ILPNFT-lpPow1Balance}
+   */
+  function lpPow1Balance() public view override returns (uint256) {
+    // Read external state
+    return lpPow1Token.balanceOf(address(this));
+  }
+
+  /**
+   * @dev See {ILPNFT-lpPow5Balance}
+   */
+  function lpPow5Balance() public view override returns (uint256) {
+    // Read external state
+    return lpPow5Token.balanceOf(address(this));
+  }
+
+  /**
+   * @dev See {ILPNFT-noPow5Balance}
+   */
+  function noPow5Balance() public view override returns (uint256) {
+    // Read external state
+    return noPow5Token.balanceOf(address(this));
   }
 }

@@ -11,8 +11,10 @@
 
 pragma solidity 0.8.25;
 
+import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {Arrays} from "@openzeppelin/contracts/utils/Arrays.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
@@ -32,8 +34,24 @@ import {LPSFTIssuable} from "./extensions/LPSFTIssuable.sol";
  *
  * @dev See https://eips.ethereum.org/EIPS/eip-1155
  */
-contract LPSFT is ERC1155Enumerable, LPSFTIssuable, LPNFTHolder, ILPSFT {
+contract LPSFT is
+  AccessControl,
+  ERC1155Enumerable,
+  LPSFTIssuable,
+  LPNFTHolder,
+  ILPSFT
+{
   using Arrays for uint256[];
+  using SafeERC20 for IERC20;
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Roles
+  //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @dev Role allowing transfer of tokens
+   */
+  bytes32 public constant LPSFT_OPERATOR_ROLE = "LPSFT_OPERATOR_ROLE";
 
   //////////////////////////////////////////////////////////////////////////////
   // Routes
@@ -95,7 +113,7 @@ contract LPSFT is ERC1155Enumerable, LPSFTIssuable, LPNFTHolder, ILPSFT {
       "Invalid Uniswap V3 NFT manager"
     );
 
-    // Initialize {AccessControl} via {LPSFTIssuable}
+    // Initialize {AccessControl}
     _grantRole(DEFAULT_ADMIN_ROLE, owner_);
 
     // Initialize routes
@@ -120,10 +138,17 @@ contract LPSFT is ERC1155Enumerable, LPSFTIssuable, LPNFTHolder, ILPSFT {
     public
     view
     virtual
-    override(ERC1155Enumerable, LPSFTIssuable, LPNFTHolder, IERC165)
+    override(
+      AccessControl,
+      ERC1155Enumerable,
+      LPSFTIssuable,
+      LPNFTHolder,
+      IERC165
+    )
     returns (bool)
   {
     return
+      AccessControl.supportsInterface(interfaceId) ||
       ERC1155Enumerable.supportsInterface(interfaceId) ||
       LPSFTIssuable.supportsInterface(interfaceId) ||
       LPNFTHolder.supportsInterface(interfaceId) ||
@@ -262,6 +287,20 @@ contract LPSFT is ERC1155Enumerable, LPSFTIssuable, LPNFTHolder, ILPSFT {
         ) {
           lpPow5Token.mint(tokenAddress, liquidityAmount);
         }
+      }
+    }
+
+    // If any tokens were returned to the contract after burning the LP-SFT,
+    // transfer them to the sender
+    if (to == address(0)) {
+      uint256 pow1Balance = pow1Token.balanceOf(address(this));
+      uint256 pow5Balance = pow5Token.balanceOf(address(this));
+
+      if (pow1Balance > 0) {
+        pow1Token.safeTransfer(from, pow1Balance);
+      }
+      if (pow5Balance > 0) {
+        pow5Token.safeTransfer(from, pow5Balance);
       }
     }
   }

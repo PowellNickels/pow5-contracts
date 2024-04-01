@@ -92,4 +92,50 @@ interface ILPNFT is IERC165 {
    * @return The LP-NFT's URI
    */
   function uri() external view returns (string memory);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // DeFi interface
+  /////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @dev Get the pool of the LP-NFT, either LPPOW1 or LPPOW5
+   *
+   * @return The pool of the LP-NFT, or UNKNOWN if the LP-NFT is invalid
+   */
+  function pool() external view returns (Pool);
+
+  /**
+   * @dev Get the POW1 balance of the LP-NFT
+   *
+   * @return The POW1 balance
+   */
+  function pow1Balance() external view returns (uint256);
+
+  /**
+   * @dev Get the POW5 balance of the LP-NFT
+   *
+   * @return The POW5 balance
+   */
+  function pow5Balance() external view returns (uint256);
+
+  /**
+   * @dev Get the LPPOW1 balance of the LP-NFT
+   *
+   * @return The LPPOW1 balance
+   */
+  function lpPow1Balance() external view returns (uint256);
+
+  /**
+   * @dev Get the LPPOW5 balance of the LP-NFT
+   *
+   * @return The LPPOW5 balance
+   */
+  function lpPow5Balance() external view returns (uint256);
+
+  /**
+   * @dev Get the mount of POW5 debt held by the LP-NFT
+   *
+   * @return The NOPOW5 balance
+   */
+  function noPow5Balance() external view returns (uint256);
 }

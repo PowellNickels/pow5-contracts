@@ -147,7 +147,7 @@ abstract contract LPNFTHolder is
         delete _tokenToTokenId[token];
 
         // Deinitialize clone
-        token.deinitialize(address(this));
+        token.deinitialize(from);
       }
     }
 
