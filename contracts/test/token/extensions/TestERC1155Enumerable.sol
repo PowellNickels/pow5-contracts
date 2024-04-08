@@ -13,7 +13,7 @@ pragma solidity 0.8.25;
 
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
-import {ERC1155Enumerable} from "../../../src/token/extensions/ERC1155Enumerable.sol";
+import {ERC1155Enumerable} from "../../../src/token/ERC1155/extensions/ERC1155Enumerable.sol";
 
 /**
  * @title ERC-1155: Multi Token Standard, mintable extension for test purposes
@@ -59,7 +59,7 @@ contract TestERC1155Enumerable is ERC1155Enumerable {
     uint256[] memory nftTokenIds
   ) external {
     // Translate parameters
-    uint256[] memory tokenAmounts = _getAmountArray(nftTokenIds.length);
+    uint256[] memory tokenAmounts = getAmountArray(nftTokenIds.length);
 
     // Call ancestor
     _mintBatch(account, nftTokenIds, tokenAmounts, "");
@@ -91,7 +91,7 @@ contract TestERC1155Enumerable is ERC1155Enumerable {
     uint256[] memory nftTokenIds
   ) external {
     // Translate parameters
-    uint256[] memory tokenAmounts = _getAmountArray(nftTokenIds.length);
+    uint256[] memory tokenAmounts = getAmountArray(nftTokenIds.length);
 
     // Call ancestor
     _burnBatch(account, nftTokenIds, tokenAmounts);

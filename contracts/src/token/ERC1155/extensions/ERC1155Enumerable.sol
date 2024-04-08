@@ -20,7 +20,7 @@ import {Arrays} from "@openzeppelin/contracts/utils/Arrays.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
-import {IERC1155Enumerable} from "../../interfaces/token/extensions/IERC1155Enumerable.sol";
+import {IERC1155Enumerable} from "../../../interfaces/token/ERC1155/extensions/IERC1155Enumerable.sol";
 
 /**
  * @title ERC-1155: Multi Token Standard, enumerable extension implementation
@@ -41,15 +41,15 @@ abstract contract ERC1155Enumerable is ERC1155, IERC1155Enumerable {
   /**
    * @dev Mapping from token ID to owner
    */
-  mapping(uint256 => address) private _tokenOwner;
+  mapping(uint256 tokenId => address owner) private _tokenOwner;
 
   /**
    * @dev Mapping from owner to owned token IDs
    */
-  mapping(address => EnumerableSet.UintSet) private _ownedTokens;
+  mapping(address owner => EnumerableSet.UintSet tokenIds) private _ownedTokens;
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {IERC165} via {ERC1155}
+  // Implementation of {IERC165} via {ERC1155} and {IERC1155Enumerable}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -75,7 +75,7 @@ abstract contract ERC1155Enumerable is ERC1155, IERC1155Enumerable {
     address to,
     uint256[] memory ids,
     uint256[] memory values
-  ) internal override {
+  ) internal virtual override {
     // Validate parameters
     if (ids.length != values.length) {
       revert IERC1155Errors.ERC1155InvalidArrayLength(
@@ -90,9 +90,12 @@ abstract contract ERC1155Enumerable is ERC1155, IERC1155Enumerable {
     for (uint256 i = 0; i < tokenCount; i++) {
       // Translate parameters
       uint256 nftTokenId = ids.unsafeMemoryAccess(i);
+      uint256 value = values.unsafeMemoryAccess(i);
 
       // Validate parameters
-      require(values.unsafeMemoryAccess(i) == 1, "Invalid amount");
+      if (value != 1) {
+        revert ERC1155EnumerableInvalidAmount(nftTokenId, value);
+      }
 
       // Handle minting
       if (from == address(0)) {
@@ -172,16 +175,16 @@ abstract contract ERC1155Enumerable is ERC1155, IERC1155Enumerable {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // Utility functions
+  // Public utility functions
   //////////////////////////////////////////////////////////////////////////////
 
   /**
    * @dev Get an amounts array suitable for NFTs (where the total supply of
    * each token is 1)
    */
-  function _getAmountArray(
+  function getAmountArray(
     uint256 tokenCount
-  ) internal pure returns (uint256[] memory) {
+  ) public pure returns (uint256[] memory) {
     uint256[] memory array = new uint256[](tokenCount);
 
     for (uint256 i = 0; i < tokenCount; i++) {

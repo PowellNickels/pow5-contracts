@@ -27,6 +27,22 @@ import {IERC1155} from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
  * unique with a total supply of 1).
  */
 interface IERC1155Enumerable is IERC1155 {
+  //////////////////////////////////////////////////////////////////////////////
+  // Errors
+  //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @dev Error raised if the amount of an NFT is not 1
+   *
+   * @param tokenId The ID of the NFT token with an invalid amount
+   * @param amount The amount of the NFT token
+   */
+  error ERC1155EnumerableInvalidAmount(uint256 tokenId, uint256 amount);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Public interface
+  //////////////////////////////////////////////////////////////////////////////
+
   /**
    * @dev Returns the total amount of tokens stored by the contract
    */
