@@ -14,6 +14,7 @@ pragma solidity 0.8.25;
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
 import {ERC1155Enumerable} from "../../../src/token/ERC1155/extensions/ERC1155Enumerable.sol";
+import {ERC1155Utils} from "../../../src/token/ERC1155/utils/ERC1155Utils.sol";
 
 /**
  * @title ERC-1155: Multi Token Standard, mintable extension for test purposes
@@ -23,7 +24,7 @@ import {ERC1155Enumerable} from "../../../src/token/ERC1155/extensions/ERC1155En
  *
  * FOR TESTING ONLY.
  */
-contract TestERC1155Enumerable is ERC1155Enumerable {
+contract TestERC1155Enumerable is ERC1155Utils, ERC1155Enumerable {
   //////////////////////////////////////////////////////////////////////////////
   // Initialization
   //////////////////////////////////////////////////////////////////////////////

@@ -21,18 +21,18 @@ import {
 } from "ethers";
 import * as hardhat from "hardhat";
 
-import { TICK_SPACINGS, UNI_V3_FEE_AMOUNT } from "../src/constants";
-import { ZERO_ADDRESS } from "../src/constants";
-import { ContractLibrary } from "../src/interfaces";
+import { TICK_SPACINGS, UNI_V3_FEE_AMOUNT } from "../../src/constants";
+import { ZERO_ADDRESS } from "../../src/constants";
+import { ContractLibrary } from "../../src/interfaces";
 import {
   ETH_PRICE,
   USDC_ETH_LP_ETH_AMOUNT_BASE,
   USDC_ETH_LP_USDC_AMOUNT_BASE,
   USDC_PRICE,
-} from "../src/testing/defiMetrics";
-import { setupFixture } from "../src/testing/setupFixture";
-import { extractJSONFromURI } from "../src/utils/lpNftUtils";
-import { getMaxTick, getMinTick } from "../src/utils/tickMath";
+} from "../../src/testing/defiMetrics";
+import { setupFixture } from "../../src/testing/setupFixture";
+import { extractJSONFromURI } from "../../src/utils/lpNftUtils";
+import { getMaxTick, getMinTick } from "../../src/utils/tickMath";
 
 // Setup Hardhat
 const setupTest = hardhat.deployments.createFixture(setupFixture);

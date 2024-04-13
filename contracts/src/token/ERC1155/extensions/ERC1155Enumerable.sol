@@ -22,10 +22,12 @@ import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet
 
 import {IERC1155Enumerable} from "../../../interfaces/token/ERC1155/extensions/IERC1155Enumerable.sol";
 
+import {ERC1155NonReentrant} from "./ERC1155NonReentrant.sol";
+
 /**
  * @title ERC-1155: Multi Token Standard, enumerable extension implementation
  */
-abstract contract ERC1155Enumerable is ERC1155, IERC1155Enumerable {
+abstract contract ERC1155Enumerable is ERC1155NonReentrant, IERC1155Enumerable {
   using Arrays for uint256[];
   using EnumerableSet for EnumerableSet.UintSet;
 
@@ -49,7 +51,7 @@ abstract contract ERC1155Enumerable is ERC1155, IERC1155Enumerable {
   mapping(address owner => EnumerableSet.UintSet tokenIds) private _ownedTokens;
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {IERC165} via {ERC1155} and {IERC1155Enumerable}
+  // Implementation of {IERC165} via {ERC1155NonReentrant} and {IERC1155Enumerable}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -64,7 +66,7 @@ abstract contract ERC1155Enumerable is ERC1155, IERC1155Enumerable {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {ERC1155}
+  // Implementation of {ERC1155} via {ERC1155NonReentrant}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -75,7 +77,12 @@ abstract contract ERC1155Enumerable is ERC1155, IERC1155Enumerable {
     address to,
     uint256[] memory ids,
     uint256[] memory values
-  ) internal virtual override {
+  )
+    internal
+    virtual
+    override
+    nonReentrant(type(ERC1155Enumerable).interfaceId)
+  {
     // Validate parameters
     if (ids.length != values.length) {
       revert IERC1155Errors.ERC1155InvalidArrayLength(
@@ -172,25 +179,5 @@ abstract contract ERC1155Enumerable is ERC1155, IERC1155Enumerable {
     tokenIds = ownedTokens.values();
 
     return tokenIds;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Public utility functions
-  //////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * @dev Get an amounts array suitable for NFTs (where the total supply of
-   * each token is 1)
-   */
-  function getAmountArray(
-    uint256 tokenCount
-  ) public pure returns (uint256[] memory) {
-    uint256[] memory array = new uint256[](tokenCount);
-
-    for (uint256 i = 0; i < tokenCount; i++) {
-      array[i] = 1;
-    }
-
-    return array;
   }
 }

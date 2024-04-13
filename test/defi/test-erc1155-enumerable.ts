@@ -18,9 +18,9 @@ import {
 } from "ethers";
 import * as hardhat from "hardhat";
 
-import { ZERO_ADDRESS } from "../src/constants";
-import { ContractLibrary } from "../src/interfaces";
-import { setupFixture } from "../src/testing/setupFixture";
+import { ZERO_ADDRESS } from "../../src/constants";
+import { ContractLibrary } from "../../src/interfaces";
+import { setupFixture } from "../../src/testing/setupFixture";
 
 // Setup Hardhat
 const setupTest = hardhat.deployments.createFixture(setupFixture);
