@@ -21,7 +21,7 @@ import {
 } from "ethers";
 import * as hardhat from "hardhat";
 
-import { TICK_SPACINGS, UNI_V3_FEE_AMOUNT } from "../../src/constants";
+import { UNI_V3_FEE_AMOUNT } from "../../src/constants";
 import { ZERO_ADDRESS } from "../../src/constants";
 import { ContractLibrary } from "../../src/interfaces";
 import {
@@ -243,8 +243,8 @@ describe("Uniswap V3", () => {
         ? usdcTokenContract.getAddress()
         : wrappedNativeTokenContract.getAddress()), // token1
       WETH_USDC_POOL_FEE, // fee
-      getMinTick(TICK_SPACINGS[WETH_USDC_POOL_FEE]), // tickLower
-      getMaxTick(TICK_SPACINGS[WETH_USDC_POOL_FEE]), // tickUpper
+      getMinTick(WETH_USDC_POOL_FEE), // tickLower
+      getMaxTick(WETH_USDC_POOL_FEE), // tickUpper
       wethIsToken0 ? USDC_ETH_LP_ETH_AMOUNT_BASE : USDC_ETH_LP_USDC_AMOUNT_BASE, // amount0Desired
       wethIsToken0 ? USDC_ETH_LP_USDC_AMOUNT_BASE : USDC_ETH_LP_ETH_AMOUNT_BASE, // amount1Desired
       0n, // amount0Min
@@ -322,12 +322,8 @@ describe("Uniswap V3", () => {
         .to.equal(await wrappedNativeTokenContract.getAddress()); // token1
     }
     chai.expect(positions[4]).to.equal(BigInt(WETH_USDC_POOL_FEE)); // fee
-    chai
-      .expect(positions[5])
-      .to.equal(BigInt(getMinTick(TICK_SPACINGS[WETH_USDC_POOL_FEE]))); // tickLower
-    chai
-      .expect(positions[6])
-      .to.equal(BigInt(getMaxTick(TICK_SPACINGS[WETH_USDC_POOL_FEE]))); // tickUpper
+    chai.expect(positions[5]).to.equal(BigInt(getMinTick(WETH_USDC_POOL_FEE))); // tickLower
+    chai.expect(positions[6]).to.equal(BigInt(getMaxTick(WETH_USDC_POOL_FEE))); // tickUpper
     chai.expect(positions[7]).to.equal(WETH_USDC_POOL_LP_AMOUNT); // liquidity
     chai.expect(positions[8]).to.equal(0n); // feeGrowthInside0LastX128
     chai.expect(positions[9]).to.equal(0n); // feeGrowthInside1LastX128

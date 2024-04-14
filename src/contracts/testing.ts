@@ -13,17 +13,21 @@
 import testErc1155EnumerableAbi from "../abi/contracts/test/token/extensions/TestERC1155Enumerable.sol/TestERC1155Enumerable.json";
 import usdcTokenAbi from "../abi/contracts/test/token/USDC.sol/USDC.json";
 import testLiquidityMathAbi from "../abi/contracts/test/utils/math/TestLiquidityMath.sol/TestLiquidityMath.json";
+import testTickMathAbi from "../abi/contracts/test/utils/math/TestTickMath.sol/TestTickMath.json";
 
 // Contract names (sort by constant)
 const TEST_ERC1155_ENUMERABLE_CONTRACT = "TestERC1155Enumerable";
 const TEST_LIQUIDITY_MATH_CONTRACT = "TestLiquidityMath";
+const TEST_TICK_MATH_CONTRACT = "TestTickMath";
 const USDC_CONTRACT = "USDC";
 
 export {
   testErc1155EnumerableAbi,
   testLiquidityMathAbi,
+  testTickMathAbi,
   usdcTokenAbi,
   TEST_ERC1155_ENUMERABLE_CONTRACT,
   TEST_LIQUIDITY_MATH_CONTRACT,
+  TEST_TICK_MATH_CONTRACT,
   USDC_CONTRACT,
 };

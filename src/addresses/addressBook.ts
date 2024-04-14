@@ -27,6 +27,7 @@ import {
 import {
   TEST_ERC1155_ENUMERABLE_CONTRACT,
   TEST_LIQUIDITY_MATH_CONTRACT,
+  TEST_TICK_MATH_CONTRACT,
   USDC_CONTRACT,
 } from "../contracts/testing";
 import { AddressBook } from "../interfaces";
@@ -56,6 +57,11 @@ async function getAddressBook(networkName: string): Promise<AddressBook> {
     testLiquidityMath: await getContractAddress(
       "testLiquidityMath",
       TEST_LIQUIDITY_MATH_CONTRACT,
+      networkName,
+    ),
+    testTickMath: await getContractAddress(
+      "testTickMath",
+      TEST_TICK_MATH_CONTRACT,
       networkName,
     ),
     uniswapV3Factory: await getContractAddress(

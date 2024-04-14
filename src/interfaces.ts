@@ -23,6 +23,7 @@ interface AddressBook {
   uniswapV3NftDescriptor?: string;
   uniswapV3NftManager?: string;
   uniswapV3Staker?: string;
+  testTickMath?: string;
   usdcToken?: string;
   wrappedNativeToken?: string;
   wrappedNativeUsdcPool?: string;
@@ -33,6 +34,7 @@ interface AddressBook {
 interface ContractLibrary {
   testErc1155EnumerableContract: ethers.Contract;
   testLiquidityMathContract: ethers.Contract;
+  testTickMathContract: ethers.Contract;
   uniswapV3FactoryContract: ethers.Contract;
   uniswapV3NftDescriptorContract: ethers.Contract;
   uniswapV3NftManagerContract: ethers.Contract;

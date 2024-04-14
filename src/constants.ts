@@ -2,7 +2,13 @@
  * Copyright (C) 2024 Powell Nickels
  * https://github.com/PowellNickels/pow5-contracts
  *
- * SPDX-License-Identifier: GPL-3.0-or-later AND Apache-2.0
+ * This file is derived from the Ultrachess project under the Apache 2.0 license.
+ * Copyright (C) 2022-2023 Ultrachess team
+ *
+ * This file is derived from the Uniswap V3 project after the BSL lapsed into
+ * the GPL v2 license on 2023/04/01.
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later AND Apache-2.0 AND GPL-2.0-or-later
  * See the file LICENSE.txt for more information.
  */
 
@@ -11,11 +17,66 @@
  */
 
 ////////////////////////////////////////////////////////////////////////////////
+// Token constants
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @dev The decimal count for POW1
+ */
+const POW1_DECIMALS: number = 18;
+
+/**
+ * @dev The decimal count for POW5
+ */
+const POW5_DECIMALS: number = 12;
+
+/**
+ * @dev The decimal count for LPPOW1
+ */
+const LPPOW1_DECIMALS: number = 15;
+
+/**
+ * @dev The decimal count for LPPOW5
+ */
+const LPPOW5_DECIMALS: number = 12;
+
+////////////////////////////////////////////////////////////////////////////////
 // Uniswap constants
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @dev The fee amount for Uniswap V3 pools
+ * @description Represents the minimum tick value for Uniswap pools
+ *
+ * Computed from log base 1.0001 of 2**-128.
+ */
+const MIN_TICK: number = -887272;
+
+/**
+ * @description Represents the maximum tick value for Uniswap pools
+ *
+ * Computed from log base 1.0001 of 2**128.
+ */
+const MAX_TICK: number = 887272;
+
+/**
+ * @description Represents the minimum square root ratio of token prices in
+ * Uniswap pools
+ *
+ * Equivalent to getSqrtRatioAtTick(MIN_TICK).
+ */
+const MIN_SQRT_RATIO: bigint = 4295128739n;
+
+/**
+ * @description Represents the maximum square root ratio of token prices in
+ * Uniswap pools
+ *
+ * Equivalent to getSqrtRatioAtTick(MAX_TICK).
+ */
+const MAX_SQRT_RATIO: bigint =
+  1461446703485210103287273052203988822378723970342n;
+
+/**
+ * @dev The fee amount for Uniswap V3 pools, in hundredths of a bip
  */
 const enum UNI_V3_FEE_AMOUNT {
   LOW = 500, // 0.05%
@@ -45,4 +106,16 @@ const ZERO_ADDRESS: string = "0x0000000000000000000000000000000000000000";
 // Exports
 ////////////////////////////////////////////////////////////////////////////////
 
-export { TICK_SPACINGS, UNI_V3_FEE_AMOUNT, ZERO_ADDRESS };
+export {
+  LPPOW1_DECIMALS,
+  LPPOW5_DECIMALS,
+  MAX_SQRT_RATIO,
+  MAX_TICK,
+  MIN_SQRT_RATIO,
+  MIN_TICK,
+  POW1_DECIMALS,
+  POW5_DECIMALS,
+  TICK_SPACINGS,
+  UNI_V3_FEE_AMOUNT,
+  ZERO_ADDRESS,
+};

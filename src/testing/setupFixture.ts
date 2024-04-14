@@ -29,6 +29,7 @@ import {
 import {
   testErc1155EnumerableAbi,
   testLiquidityMathAbi,
+  testTickMathAbi,
   usdcTokenAbi,
 } from "../contracts/testing";
 import { AddressBook, ContractLibrary } from "../interfaces";
@@ -63,6 +64,11 @@ async function setupFixture(
   const testLiquidityMathContract = new ethers.Contract(
     addressBook.testLiquidityMath!,
     testLiquidityMathAbi,
+    beneficiary,
+  );
+  const testTickMathContract = new ethers.Contract(
+    addressBook.testTickMath!,
+    testTickMathAbi,
     beneficiary,
   );
   const uniswapV3FactoryContract = new ethers.Contract(
@@ -109,6 +115,7 @@ async function setupFixture(
   return {
     testErc1155EnumerableContract,
     testLiquidityMathContract,
+    testTickMathContract,
     uniswapV3FactoryContract,
     uniswapV3NftDescriptorContract,
     uniswapV3NftManagerContract,
