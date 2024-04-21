@@ -396,6 +396,9 @@ describe("Uniswap V3", () => {
 
     // Content should be valid JSON and structure
     const nftContent = extractJSONFromURI(nftTokenUri);
+    if (!nftContent) {
+      throw new Error("Failed to extract JSON from URI");
+    }
     chai.expect(nftContent).to.haveOwnProperty("name").is.a("string");
     chai.expect(nftContent).to.haveOwnProperty("description").is.a("string");
     chai.expect(nftContent).to.haveOwnProperty("image").is.a("string");
