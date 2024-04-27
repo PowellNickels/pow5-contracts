@@ -19,6 +19,7 @@ import {MultipleReentrancyGuard} from "../../../utils/MultipleReentrancyGuard.so
  * @title ERC-1155: Multi Token Standard, non-reentrant extension
  *
  * This abstract contract extends the OpenZeppelin ERC-1155 implementation by
- * incorporating the MultipleReentrancyGuard to enhance security.
+ * incorporating the MultipleReentrancyGuard to enhance security for derived
+ * contracts.
  */
 abstract contract ERC1155NonReentrant is MultipleReentrancyGuard, ERC1155 {}

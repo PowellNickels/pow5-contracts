@@ -19,17 +19,18 @@ import uniswapV3NftDescriptorAbi from "../abi/contracts/depends/uniswap-v3-perip
 import uniswapV3StakerAbi from "../abi/contracts/depends/uniswap-v3-staker/UniswapV3Staker.sol/UniswapV3Staker.json";
 
 // Contract names (sort by constant)
-const NFT_DESCRIPTOR_CONTRACT = "NFTDescriptor";
-const UNISWAP_V3_FACTORY_CONTRACT = "UniswapV3Factory";
-const UNISWAP_V3_NFT_DESCRIPTOR_CONTRACT = "NonfungibleTokenPositionDescriptor";
-const UNISWAP_V3_NFT_MANAGER_CONTRACT = "NonfungiblePositionManager";
-const UNISWAP_V3_POOL_CONTRACT = "UniswapV3Pool";
-const UNISWAP_V3_STAKER_CONTRACT = "UniswapV3Staker";
-const WRAPPED_NATIVE_TOKEN_CONTRACT = "WETH";
+const NFT_DESCRIPTOR_CONTRACT: string = "NFTDescriptor";
+const UNISWAP_V3_FACTORY_CONTRACT: string = "UniswapV3Factory";
+const UNISWAP_V3_NFT_DESCRIPTOR_CONTRACT: string =
+  "NonfungibleTokenPositionDescriptor";
+const UNISWAP_V3_NFT_MANAGER_CONTRACT: string = "NonfungiblePositionManager";
+const UNISWAP_V3_POOL_CONTRACT: string = "UniswapV3Pool";
+const UNISWAP_V3_STAKER_CONTRACT: string = "UniswapV3Staker";
+const WRAPPED_NATIVE_TOKEN_CONTRACT: string = "WETH";
 
-// Deployed contract aliases
-const WRAPPED_NATIVE_USDC_POOL_CONTRACT = "WrappedNativeUsdcPool";
-const WRAPPED_NATIVE_USDC_POOL_FACTORY_CONTRACT =
+// Deployed contract aliases (sort by constant)
+const WRAPPED_NATIVE_USDC_POOL_CONTRACT: string = "WrappedNativeUsdcPool";
+const WRAPPED_NATIVE_USDC_POOL_FACTORY_CONTRACT: string =
   "WrappedNativeUsdcPoolFactory";
 
 export {

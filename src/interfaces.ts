@@ -19,11 +19,11 @@ import { ethers } from "ethers";
 interface AddressBook {
   testErc1155Enumerable?: string;
   testLiquidityMath?: string;
+  testTickMath?: string;
   uniswapV3Factory?: string;
   uniswapV3NftDescriptor?: string;
   uniswapV3NftManager?: string;
   uniswapV3Staker?: string;
-  testTickMath?: string;
   usdcToken?: string;
   wrappedNativeToken?: string;
   wrappedNativeUsdcPool?: string;

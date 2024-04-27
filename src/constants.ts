@@ -21,22 +21,22 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @dev The decimal count for POW1
+ * @description The decimal count for POW1
  */
 const POW1_DECIMALS: number = 18;
 
 /**
- * @dev The decimal count for POW5
+ * @description The decimal count for POW5
  */
 const POW5_DECIMALS: number = 12;
 
 /**
- * @dev The decimal count for LPPOW1
+ * @description The decimal count for LPPOW1
  */
 const LPPOW1_DECIMALS: number = 15;
 
 /**
- * @dev The decimal count for LPPOW5
+ * @description The decimal count for LPPOW5
  */
 const LPPOW5_DECIMALS: number = 12;
 
@@ -76,7 +76,7 @@ const MAX_SQRT_RATIO: bigint =
   1461446703485210103287273052203988822378723970342n;
 
 /**
- * @dev The fee amount for Uniswap V3 pools, in hundredths of a bip
+ * @description The fee amount for Uniswap V3 pools, in hundredths of a bip
  */
 const enum UNI_V3_FEE_AMOUNT {
   LOW = 500, // 0.05%
@@ -85,7 +85,7 @@ const enum UNI_V3_FEE_AMOUNT {
 }
 
 /**
- * @dev The tick spacings for Uniswap V3 pools
+ * @description The tick spacings for Uniswap V3 pools
  */
 const TICK_SPACINGS: { [amount in UNI_V3_FEE_AMOUNT]: number } = {
   [UNI_V3_FEE_AMOUNT.LOW]: 10,
@@ -98,7 +98,7 @@ const TICK_SPACINGS: { [amount in UNI_V3_FEE_AMOUNT]: number } = {
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @dev The zero or absent address
+ * @description The zero or absent address
  */
 const ZERO_ADDRESS: string = "0x0000000000000000000000000000000000000000";
 

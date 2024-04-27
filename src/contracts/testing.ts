@@ -16,10 +16,10 @@ import testLiquidityMathAbi from "../abi/contracts/test/utils/math/TestLiquidity
 import testTickMathAbi from "../abi/contracts/test/utils/math/TestTickMath.sol/TestTickMath.json";
 
 // Contract names (sort by constant)
-const TEST_ERC1155_ENUMERABLE_CONTRACT = "TestERC1155Enumerable";
-const TEST_LIQUIDITY_MATH_CONTRACT = "TestLiquidityMath";
-const TEST_TICK_MATH_CONTRACT = "TestTickMath";
-const USDC_CONTRACT = "USDC";
+const TEST_ERC1155_ENUMERABLE_CONTRACT: string = "TestERC1155Enumerable";
+const TEST_LIQUIDITY_MATH_CONTRACT: string = "TestLiquidityMath";
+const TEST_TICK_MATH_CONTRACT: string = "TestTickMath";
+const USDC_CONTRACT: string = "USDC";
 
 export {
   testErc1155EnumerableAbi,

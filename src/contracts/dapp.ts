@@ -13,6 +13,6 @@
 import uniV3PoolFactoryAbi from "../abi/contracts/src/utils/helpers/UniV3PoolFactory.sol/UniV3PoolFactory.json";
 
 // Contract names (sort by constant)
-const UNI_V3_POOL_FACTORY_CONTRACT = "UniV3PoolFactory";
+const UNI_V3_POOL_FACTORY_CONTRACT: string = "UniV3PoolFactory";
 
 export { uniV3PoolFactoryAbi, UNI_V3_POOL_FACTORY_CONTRACT };

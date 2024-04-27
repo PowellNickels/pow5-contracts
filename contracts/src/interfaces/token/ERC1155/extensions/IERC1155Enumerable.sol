@@ -15,6 +15,7 @@
 pragma solidity 0.8.25;
 
 import {IERC1155} from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
  * @title ERC-1155: Multi Token Standard, optional enumeration extension
@@ -26,7 +27,7 @@ import {IERC1155} from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
  * Implementers must enforce the constraint that all SFTs are NFTs (they are
  * unique with a total supply of 1).
  */
-interface IERC1155Enumerable is IERC1155 {
+interface IERC1155Enumerable is IERC165, IERC1155 {
   //////////////////////////////////////////////////////////////////////////////
   // Errors
   //////////////////////////////////////////////////////////////////////////////
