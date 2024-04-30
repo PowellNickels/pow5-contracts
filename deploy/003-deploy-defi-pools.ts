@@ -30,10 +30,8 @@ import {
 } from "../src/contracts/depends";
 import { AddressBook } from "../src/interfaces";
 import {
-  ETH_PRICE,
   USDC_ETH_LP_ETH_AMOUNT_BASE,
   USDC_ETH_LP_USDC_AMOUNT_BASE,
-  USDC_PRICE,
 } from "../src/testing/defiMetrics";
 import { encodePriceSqrt } from "../src/utils/fixedMath";
 
@@ -106,11 +104,11 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   const token1: string = await wrappedNativeUsdcPoolContract.token1();
 
   if (addressBook.wrappedNativeToken === token0) {
-    console.log(`WETH is token0 ($${ETH_PRICE})`);
-    console.log(`USDC is token1 ($${USDC_PRICE})`);
+    console.log(`WETH is token0 (${addressBook.wrappedNativeToken})`);
+    console.log(`USDC is token1 (${addressBook.usdcToken})`);
   } else if (addressBook.wrappedNativeToken === token1) {
-    console.log(`WETH is token1 ($${ETH_PRICE})`);
-    console.log(`USDC is token0 ($${USDC_PRICE})`);
+    console.log(`WETH is token1 (${addressBook.wrappedNativeToken})`);
+    console.log(`USDC is token0 (${addressBook.usdcToken})`);
   } else {
     // This should never happen, raise an exception
     throw new Error("ERROR: Neither token0 nor token1 is WETH!");
