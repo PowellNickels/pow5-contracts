@@ -12,14 +12,14 @@
 import chai from "chai";
 import * as hardhat from "hardhat";
 
+import { ContractLibrary } from "../../src/interfaces/contractLibrary";
+import { setupFixture } from "../../src/testing/setupFixture";
 import {
   MAX_SQRT_RATIO,
   MAX_TICK,
   MIN_SQRT_RATIO,
   MIN_TICK,
-} from "../../src/constants";
-import { ContractLibrary } from "../../src/interfaces";
-import { setupFixture } from "../../src/testing/setupFixture";
+} from "../../src/utils/constants";
 import { encodePriceSqrt } from "../../src/utils/fixedMath";
 
 // Setup Hardhat

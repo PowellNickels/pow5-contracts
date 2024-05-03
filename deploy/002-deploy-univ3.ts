@@ -14,7 +14,6 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction, DeployOptions } from "hardhat-deploy/types";
 import { getUnnamedSigners } from "hardhat-deploy-ethers/dist/src/helpers";
 
-import { getAddressBook, writeAddress } from "../src/addresses/addressBook";
 import {
   NFT_DESCRIPTOR_CONTRACT,
   UNISWAP_V3_FACTORY_CONTRACT,
@@ -23,8 +22,9 @@ import {
   UNISWAP_V3_STAKER_CONTRACT,
   uniswapV3NftDescriptorAbi,
   wrappedNativeTokenAbi,
-} from "../src/contracts/depends";
-import { AddressBook } from "../src/interfaces";
+} from "../src/contracts/hardhat/depends";
+import { AddressBook } from "../src/interfaces/addressBook";
+import { getAddressBook, writeAddress } from "../src/utils/getAddressBook";
 
 //
 // Deploy the Uniswap V3 environment

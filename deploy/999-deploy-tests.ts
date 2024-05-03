@@ -16,7 +16,7 @@ import {
   TEST_ERC1155_ENUMERABLE_CONTRACT,
   TEST_LIQUIDITY_MATH_CONTRACT,
   TEST_TICK_MATH_CONTRACT,
-} from "../src/contracts/testing";
+} from "../src/contracts/hardhat/testing";
 
 //
 // Deploy test contracts

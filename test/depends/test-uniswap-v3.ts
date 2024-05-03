@@ -21,9 +21,7 @@ import {
 } from "ethers";
 import * as hardhat from "hardhat";
 
-import { UNI_V3_FEE_AMOUNT } from "../../src/constants";
-import { ZERO_ADDRESS } from "../../src/constants";
-import { ContractLibrary } from "../../src/interfaces";
+import { ContractLibrary } from "../../src/interfaces/contractLibrary";
 import {
   ETH_PRICE,
   USDC_ETH_LP_ETH_AMOUNT_BASE,
@@ -31,6 +29,11 @@ import {
   USDC_PRICE,
 } from "../../src/testing/defiMetrics";
 import { setupFixture } from "../../src/testing/setupFixture";
+import {
+  UNI_V3_FEE_AMOUNT,
+  USDC_DECIMALS,
+  ZERO_ADDRESS,
+} from "../../src/utils/constants";
 import { extractJSONFromURI } from "../../src/utils/lpNftUtils";
 import { getMaxTick, getMinTick } from "../../src/utils/tickMath";
 
@@ -429,7 +432,9 @@ describe("Uniswap V3", () => {
 
     // Calculate reserve amounts and values
     const wethAmount: number = parseInt(ethers.formatEther(wethReserves));
-    const usdcAmount: number = parseInt(ethers.formatUnits(usdcReserves, 6));
+    const usdcAmount: number = parseInt(
+      ethers.formatUnits(usdcReserves, USDC_DECIMALS),
+    );
     const wethValue: number = wethAmount * ETH_PRICE;
     const usdcValue: number = usdcAmount * USDC_PRICE;
 

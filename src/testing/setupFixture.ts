@@ -16,8 +16,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeploymentsExtension } from "hardhat-deploy/types";
 import { getUnnamedSigners } from "hardhat-deploy-ethers/dist/src/helpers";
 
-import { getAddressBook } from "../addresses/addressBook";
-import { uniV3PoolFactoryAbi } from "../contracts/dapp";
+import { uniV3PoolFactoryAbi } from "../contracts/hardhat/dapp";
 import {
   uniswapV3FactoryAbi,
   uniswapV3NftDescriptorAbi,
@@ -25,14 +24,16 @@ import {
   uniswapV3PoolAbi,
   uniswapV3StakerAbi,
   wrappedNativeTokenAbi,
-} from "../contracts/depends";
+} from "../contracts/hardhat/depends";
 import {
   testErc1155EnumerableAbi,
   testLiquidityMathAbi,
   testTickMathAbi,
   usdcTokenAbi,
-} from "../contracts/testing";
-import { AddressBook, ContractLibrary } from "../interfaces";
+} from "../contracts/hardhat/testing";
+import { AddressBook } from "../interfaces/addressBook";
+import { ContractLibrary } from "../interfaces/contractLibrary";
+import { getAddressBook } from "../utils/getAddressBook";
 
 //
 // Fixture setup

@@ -8,7 +8,7 @@
 
 import { ethers } from "ethers";
 
-import { USDC_DECIMALS } from "../constants";
+import { USDC_DECIMALS } from "../utils/constants";
 
 /*
  * Observed DeFi metrics used for testing semi-realistic scenarios

@@ -15,6 +15,8 @@
 import fs from "fs";
 import * as hardhat from "hardhat";
 
+import baseAddresses from "../addresses/base.json";
+import mainnetAddresses from "../addresses/mainnet.json";
 import {
   UNISWAP_V3_FACTORY_CONTRACT,
   UNISWAP_V3_NFT_DESCRIPTOR_CONTRACT,
@@ -23,16 +25,14 @@ import {
   WRAPPED_NATIVE_TOKEN_CONTRACT,
   WRAPPED_NATIVE_USDC_POOL_CONTRACT,
   WRAPPED_NATIVE_USDC_POOL_FACTORY_CONTRACT,
-} from "../contracts/depends";
+} from "../contracts/hardhat/depends";
 import {
   TEST_ERC1155_ENUMERABLE_CONTRACT,
   TEST_LIQUIDITY_MATH_CONTRACT,
   TEST_TICK_MATH_CONTRACT,
   USDC_CONTRACT,
-} from "../contracts/testing";
-import { AddressBook } from "../interfaces";
-import baseAddresses from "./base.json";
-import mainnetAddresses from "./mainnet.json";
+} from "../contracts/hardhat/testing";
+import { AddressBook } from "../interfaces/addressBook";
 
 //
 // Address book instance

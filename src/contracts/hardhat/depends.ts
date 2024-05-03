@@ -10,13 +10,13 @@
  */
 
 // Contract ABIs and artifacts (sort by path)
-import erc20Abi from "../abi/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
-import wrappedNativeTokenAbi from "../abi/contracts/depends/canonical-weth/WETH9.sol/WETH9.json";
-import uniswapV3FactoryAbi from "../abi/contracts/depends/uniswap-v3-core/UniswapV3Factory.sol/UniswapV3Factory.json";
-import uniswapV3PoolAbi from "../abi/contracts/depends/uniswap-v3-core/UniswapV3Pool.sol/UniswapV3Pool.json";
-import uniswapV3NftManagerAbi from "../abi/contracts/depends/uniswap-v3-periphery/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
-import uniswapV3NftDescriptorAbi from "../abi/contracts/depends/uniswap-v3-periphery/NonfungibleTokenPositionDescriptor.sol/NonfungibleTokenPositionDescriptor.json";
-import uniswapV3StakerAbi from "../abi/contracts/depends/uniswap-v3-staker/UniswapV3Staker.sol/UniswapV3Staker.json";
+import erc20Abi from "../../abi/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
+import wrappedNativeTokenAbi from "../../abi/contracts/depends/canonical-weth/WETH9.sol/WETH9.json";
+import uniswapV3FactoryAbi from "../../abi/contracts/depends/uniswap-v3-core/UniswapV3Factory.sol/UniswapV3Factory.json";
+import uniswapV3PoolAbi from "../../abi/contracts/depends/uniswap-v3-core/UniswapV3Pool.sol/UniswapV3Pool.json";
+import uniswapV3NftManagerAbi from "../../abi/contracts/depends/uniswap-v3-periphery/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
+import uniswapV3NftDescriptorAbi from "../../abi/contracts/depends/uniswap-v3-periphery/NonfungibleTokenPositionDescriptor.sol/NonfungibleTokenPositionDescriptor.json";
+import uniswapV3StakerAbi from "../../abi/contracts/depends/uniswap-v3-staker/UniswapV3Staker.sol/UniswapV3Staker.json";
 
 // Contract names (sort by constant)
 const NFT_DESCRIPTOR_CONTRACT: string = "NFTDescriptor";

@@ -11,26 +11,9 @@
 
 import { ethers } from "ethers";
 
-/*
- * Interfaces
+/**
+ * @description Contract library interface
  */
-
-// Address book interface
-interface AddressBook {
-  testErc1155Enumerable?: string;
-  testLiquidityMath?: string;
-  testTickMath?: string;
-  uniswapV3Factory?: string;
-  uniswapV3NftDescriptor?: string;
-  uniswapV3NftManager?: string;
-  uniswapV3Staker?: string;
-  usdcToken?: string;
-  wrappedNativeToken?: string;
-  wrappedNativeUsdcPool?: string;
-  wrappedNativeUsdcPoolFactory?: string;
-}
-
-// Contract instances
 interface ContractLibrary {
   testErc1155EnumerableContract: ethers.Contract;
   testLiquidityMathContract: ethers.Contract;
@@ -45,4 +28,4 @@ interface ContractLibrary {
   wrappedNativeUsdcPoolFactoryContract: ethers.Contract;
 }
 
-export { AddressBook, ContractLibrary };
+export { ContractLibrary };

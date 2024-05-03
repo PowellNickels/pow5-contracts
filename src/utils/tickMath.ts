@@ -17,7 +17,7 @@ import {
   MIN_TICK,
   TICK_SPACINGS,
   UNI_V3_FEE_AMOUNT,
-} from "../constants";
+} from "./constants";
 
 /**
  * @description Calculates the minimum tick that can be set for a given fee

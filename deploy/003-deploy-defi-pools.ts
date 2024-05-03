@@ -19,21 +19,21 @@ import {
 } from "hardhat-deploy/types";
 import { getUnnamedSigners } from "hardhat-deploy-ethers/dist/src/helpers";
 
-import { getAddressBook, writeAddress } from "../src/addresses/addressBook";
-import { UNI_V3_FEE_AMOUNT } from "../src/constants";
-import { UNI_V3_POOL_FACTORY_CONTRACT } from "../src/contracts/dapp";
-import { uniV3PoolFactoryAbi } from "../src/contracts/dapp";
+import { UNI_V3_POOL_FACTORY_CONTRACT } from "../src/contracts/hardhat/dapp";
+import { uniV3PoolFactoryAbi } from "../src/contracts/hardhat/dapp";
 import {
   uniswapV3PoolAbi,
   WRAPPED_NATIVE_USDC_POOL_CONTRACT,
   WRAPPED_NATIVE_USDC_POOL_FACTORY_CONTRACT,
-} from "../src/contracts/depends";
-import { AddressBook } from "../src/interfaces";
+} from "../src/contracts/hardhat/depends";
+import { AddressBook } from "../src/interfaces/addressBook";
 import {
   USDC_ETH_LP_ETH_AMOUNT_BASE,
   USDC_ETH_LP_USDC_AMOUNT_BASE,
 } from "../src/testing/defiMetrics";
+import { UNI_V3_FEE_AMOUNT } from "../src/utils/constants";
 import { encodePriceSqrt } from "../src/utils/fixedMath";
+import { getAddressBook, writeAddress } from "../src/utils/getAddressBook";
 
 //
 // Deploy test token contracts
