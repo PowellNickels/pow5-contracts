@@ -9,18 +9,16 @@
  * See the file LICENSE.txt for more information.
  */
 
+import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
 import chai from "chai";
-import {
-  ContractTransactionReceipt,
-  ContractTransactionResponse,
-  EventLog,
-  Log,
-} from "ethers";
+import { ContractTransactionReceipt, EventLog, Log } from "ethers";
 import * as hardhat from "hardhat";
 
-import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
+import { TestERC1155EnumerableContract } from "../../src/contracts/test/token/erc1155/extensions/testErc1155EnumerableContract";
+import { AddressBook } from "../../src/interfaces/addressBook";
 import { setupFixture } from "../../src/testing/setupFixture";
 import { ZERO_ADDRESS } from "../../src/utils/constants";
+import { getAddressBook } from "../../src/utils/getAddressBook";
 
 // Setup Hardhat
 const setupTest = hardhat.deployments.createFixture(setupFixture);
@@ -39,24 +37,37 @@ const nftTokenIdNonexistent: bigint = 999n;
 //
 
 describe("ERC1155Enumerable", () => {
-  let deployerAddress: string;
-  let beneficiaryAddress: string;
-  let contracts: ContractLibraryEthers;
+  //////////////////////////////////////////////////////////////////////////////
+  // Fixture state
+  //////////////////////////////////////////////////////////////////////////////
+
+  let deployer: SignerWithAddress;
+  let beneficiary: SignerWithAddress;
+  let testERC1155EnumerableContract: TestERC1155EnumerableContract;
 
   //////////////////////////////////////////////////////////////////////////////
   // Mocha setup
   //////////////////////////////////////////////////////////////////////////////
 
-  before(async function () {
+  before(async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    // Get the wallet addresses
-    const accounts: string[] = await hardhat.getUnnamedAccounts();
-    deployerAddress = accounts[0];
-    beneficiaryAddress = accounts[1];
+    // Use ethers to get the account
+    const signers: SignerWithAddress[] = await hardhat.ethers.getSigners();
+    deployer = signers[0];
+    beneficiary = signers[1];
 
     // A single fixture is used for the test suite
-    contracts = await setupTest();
+    await setupTest();
+
+    // Get address book
+    const addressBook: AddressBook = await getAddressBook(hardhat.network.name);
+
+    // Create the contract
+    testERC1155EnumerableContract = new TestERC1155EnumerableContract(
+      beneficiary,
+      addressBook.testErc1155Enumerable!,
+    );
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -64,26 +75,20 @@ describe("ERC1155Enumerable", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   it("should check total supply with no tokens", async function () {
-    const { testErc1155EnumerableContract } = contracts;
-
     const totalSupply: bigint =
-      await testErc1155EnumerableContract.totalSupply();
+      await testERC1155EnumerableContract.totalSupply();
     chai.expect(totalSupply).to.equal(0n);
   });
 
   it("should mint first NFT", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
     // Mint NFT
-    const tx: ContractTransactionResponse =
-      await testErc1155EnumerableContract.mintNFT(
-        beneficiaryAddress,
+    const receipt: ContractTransactionReceipt =
+      await testERC1155EnumerableContract.mintNFT(
+        await beneficiary.getAddress(),
         nftTokenId1,
       );
-
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
 
     // Check events
@@ -92,52 +97,42 @@ describe("ERC1155Enumerable", () => {
 
     const log: EventLog = logs[0] as EventLog;
     chai.expect(log.fragment.name).to.equal("TransferSingle");
-    chai.expect(log.args[0]).to.equal(beneficiaryAddress);
+    chai.expect(log.args[0]).to.equal(await beneficiary.getAddress());
     chai.expect(log.args[1]).to.equal(ZERO_ADDRESS);
-    chai.expect(log.args[2]).to.equal(beneficiaryAddress);
+    chai.expect(log.args[2]).to.equal(await beneficiary.getAddress());
     chai.expect(log.args[3]).to.equal(nftTokenId1);
     chai.expect(log.args[4]).to.equal(1n);
   });
 
   it("should check NFT balance", async function () {
-    const { testErc1155EnumerableContract } = contracts;
-
-    const nftBalance: bigint = await testErc1155EnumerableContract.balanceOf(
-      beneficiaryAddress,
+    const nftBalance: bigint = await testERC1155EnumerableContract.balanceOf(
+      await beneficiary.getAddress(),
       nftTokenId1,
     );
     chai.expect(nftBalance).to.equal(1n);
   });
 
   it("should check total supply with one token", async function () {
-    const { testErc1155EnumerableContract } = contracts;
-
     const totalSupply: bigint =
-      await testErc1155EnumerableContract.totalSupply();
+      await testERC1155EnumerableContract.totalSupply();
     chai.expect(totalSupply).to.equal(1n);
   });
 
   it("should mint second NFT", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
     // Mint NFT
-    const tx: ContractTransactionResponse =
-      await testErc1155EnumerableContract.mintNFT(
-        beneficiaryAddress,
-        nftTokenId2,
-      );
-    await tx.wait();
+    await testERC1155EnumerableContract.mintNFT(
+      await beneficiary.getAddress(),
+      nftTokenId2,
+    );
   });
 
   it("should check NFT balance", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
-    const nftBalance: bigint = await testErc1155EnumerableContract.balanceOf(
-      beneficiaryAddress,
+    const nftBalance: bigint = await testERC1155EnumerableContract.balanceOf(
+      await beneficiary.getAddress(),
       nftTokenId2,
     );
     chai.expect(nftBalance).to.equal(1n);
@@ -146,10 +141,8 @@ describe("ERC1155Enumerable", () => {
   it("should check total supply with two tokens", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
     const totalSupply: bigint =
-      await testErc1155EnumerableContract.totalSupply();
+      await testERC1155EnumerableContract.totalSupply();
     chai.expect(totalSupply).to.equal(2n);
   });
 
@@ -160,16 +153,11 @@ describe("ERC1155Enumerable", () => {
   it("should burn first NFT", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
-    // Burn NFT
-    const tx: ContractTransactionResponse =
-      await testErc1155EnumerableContract.burnNFT(
-        beneficiaryAddress,
+    const receipt: ContractTransactionReceipt =
+      await testERC1155EnumerableContract.burnNFT(
+        await beneficiary.getAddress(),
         nftTokenId1,
       );
-
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
 
     // Check events
@@ -178,8 +166,8 @@ describe("ERC1155Enumerable", () => {
 
     const log: EventLog = logs[0] as EventLog;
     chai.expect(log.fragment.name).to.equal("TransferSingle");
-    chai.expect(log.args[0]).to.equal(beneficiaryAddress);
-    chai.expect(log.args[1]).to.equal(beneficiaryAddress);
+    chai.expect(log.args[0]).to.equal(await beneficiary.getAddress());
+    chai.expect(log.args[1]).to.equal(await beneficiary.getAddress());
     chai.expect(log.args[2]).to.equal(ZERO_ADDRESS);
     chai.expect(log.args[3]).to.equal(nftTokenId1);
     chai.expect(log.args[4]).to.equal(1n);
@@ -188,10 +176,8 @@ describe("ERC1155Enumerable", () => {
   it("should check NFT balance", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
-    const nftBalance: bigint = await testErc1155EnumerableContract.balanceOf(
-      beneficiaryAddress,
+    const nftBalance: bigint = await testERC1155EnumerableContract.balanceOf(
+      await beneficiary.getAddress(),
       nftTokenId1,
     );
     chai.expect(nftBalance).to.equal(0n);
@@ -200,34 +186,26 @@ describe("ERC1155Enumerable", () => {
   it("should check total supply with one token", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
     const totalSupply: bigint =
-      await testErc1155EnumerableContract.totalSupply();
+      await testERC1155EnumerableContract.totalSupply();
     chai.expect(totalSupply).to.equal(1n);
   });
 
   it("should burn second NFT", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
     // Burn NFT
-    const tx: ContractTransactionResponse =
-      await testErc1155EnumerableContract.burnNFT(
-        beneficiaryAddress,
-        nftTokenId2,
-      );
-    await tx.wait();
+    await testERC1155EnumerableContract.burnNFT(
+      await beneficiary.getAddress(),
+      nftTokenId2,
+    );
   });
 
   it("should check NFT balance", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
-    const nftBalance: bigint = await testErc1155EnumerableContract.balanceOf(
-      beneficiaryAddress,
+    const nftBalance: bigint = await testERC1155EnumerableContract.balanceOf(
+      await beneficiary.getAddress(),
       nftTokenId2,
     );
     chai.expect(nftBalance).to.equal(0n);
@@ -236,10 +214,8 @@ describe("ERC1155Enumerable", () => {
   it("should check total supply with no tokens", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
     const totalSupply: bigint =
-      await testErc1155EnumerableContract.totalSupply();
+      await testERC1155EnumerableContract.totalSupply();
     chai.expect(totalSupply).to.equal(0n);
   });
 
@@ -250,16 +226,12 @@ describe("ERC1155Enumerable", () => {
   it("should batch mint two NFTs", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
     // Use tokens with ID 3 and 1 to verify correct sorting later
-    const tx: ContractTransactionResponse =
-      await testErc1155EnumerableContract.batchMintNFT(beneficiaryAddress, [
-        nftTokenId3,
-        nftTokenId1,
-      ]);
-
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
+    const receipt: ContractTransactionReceipt =
+      await testERC1155EnumerableContract.batchMintNFT(
+        await beneficiary.getAddress(),
+        [nftTokenId3, nftTokenId1],
+      );
     chai.expect(receipt).to.not.be.null;
 
     // Check events
@@ -268,9 +240,9 @@ describe("ERC1155Enumerable", () => {
 
     const log: EventLog = logs[0] as EventLog;
     chai.expect(log.fragment.name).to.equal("TransferBatch");
-    chai.expect(log.args[0]).to.equal(beneficiaryAddress);
+    chai.expect(log.args[0]).to.equal(await beneficiary.getAddress());
     chai.expect(log.args[1]).to.equal(ZERO_ADDRESS);
-    chai.expect(log.args[2]).to.equal(beneficiaryAddress);
+    chai.expect(log.args[2]).to.equal(await beneficiary.getAddress());
     chai.expect(log.args[3].length).to.equal(2);
     chai.expect(log.args[3][0]).to.equal(nftTokenId3);
     chai.expect(log.args[3][1]).to.equal(nftTokenId1);
@@ -282,16 +254,14 @@ describe("ERC1155Enumerable", () => {
   it("should check NFT balance", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
-    const nftBalance1: bigint = await testErc1155EnumerableContract.balanceOf(
-      beneficiaryAddress,
+    const nftBalance1: bigint = await testERC1155EnumerableContract.balanceOf(
+      await beneficiary.getAddress(),
       nftTokenId3,
     );
     chai.expect(nftBalance1).to.equal(1n);
 
-    const nftBalance2: bigint = await testErc1155EnumerableContract.balanceOf(
-      beneficiaryAddress,
+    const nftBalance2: bigint = await testERC1155EnumerableContract.balanceOf(
+      await beneficiary.getAddress(),
       nftTokenId1,
     );
     chai.expect(nftBalance2).to.equal(1n);
@@ -300,10 +270,8 @@ describe("ERC1155Enumerable", () => {
   it("should check total supply with two tokens", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
     const totalSupply: bigint =
-      await testErc1155EnumerableContract.totalSupply();
+      await testERC1155EnumerableContract.totalSupply();
     chai.expect(totalSupply).to.equal(2n);
   });
 
@@ -314,16 +282,12 @@ describe("ERC1155Enumerable", () => {
   it("should batch burn two NFTs", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
     // Burn NFTs
-    const tx: ContractTransactionResponse =
-      await testErc1155EnumerableContract.batchBurnNFT(beneficiaryAddress, [
-        nftTokenId3,
-        nftTokenId1,
-      ]);
-
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
+    const receipt: ContractTransactionReceipt =
+      await testERC1155EnumerableContract.batchBurnNFT(
+        await beneficiary.getAddress(),
+        [nftTokenId3, nftTokenId1],
+      );
     chai.expect(receipt).to.not.be.null;
 
     // Check events
@@ -332,8 +296,8 @@ describe("ERC1155Enumerable", () => {
 
     const log: EventLog = logs[0] as EventLog;
     chai.expect(log.fragment.name).to.equal("TransferBatch");
-    chai.expect(log.args[0]).to.equal(beneficiaryAddress);
-    chai.expect(log.args[1]).to.equal(beneficiaryAddress);
+    chai.expect(log.args[0]).to.equal(await beneficiary.getAddress());
+    chai.expect(log.args[1]).to.equal(await beneficiary.getAddress());
     chai.expect(log.args[2]).to.equal(ZERO_ADDRESS);
     chai.expect(log.args[3].length).to.equal(2);
     chai.expect(log.args[3][0]).to.equal(nftTokenId3);
@@ -346,16 +310,14 @@ describe("ERC1155Enumerable", () => {
   it("should check NFT balance", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
-    const nftBalance3: bigint = await testErc1155EnumerableContract.balanceOf(
-      beneficiaryAddress,
+    const nftBalance3: bigint = await testERC1155EnumerableContract.balanceOf(
+      await beneficiary.getAddress(),
       nftTokenId3,
     );
     chai.expect(nftBalance3).to.equal(0n);
 
-    const nftBalance1: bigint = await testErc1155EnumerableContract.balanceOf(
-      beneficiaryAddress,
+    const nftBalance1: bigint = await testERC1155EnumerableContract.balanceOf(
+      await beneficiary.getAddress(),
       nftTokenId1,
     );
     chai.expect(nftBalance1).to.equal(0n);
@@ -364,10 +326,8 @@ describe("ERC1155Enumerable", () => {
   it("should check total supply with no tokens", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
     const totalSupply: bigint =
-      await testErc1155EnumerableContract.totalSupply();
+      await testERC1155EnumerableContract.totalSupply();
     chai.expect(totalSupply).to.equal(0n);
   });
 
@@ -378,33 +338,25 @@ describe("ERC1155Enumerable", () => {
   it("should mint two NFTs", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
     // Mint NFTs
-    const tx: ContractTransactionResponse =
-      await testErc1155EnumerableContract.batchMintNFT(beneficiaryAddress, [
-        nftTokenId3,
-        nftTokenId1,
-      ]);
-    await tx.wait();
+    await testERC1155EnumerableContract.batchMintNFT(
+      await beneficiary.getAddress(),
+      [nftTokenId3, nftTokenId1],
+    );
   });
 
   it("should transfer both NFTs", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
     // Transfer NFTs
-    const tx: ContractTransactionResponse =
-      await testErc1155EnumerableContract.safeBatchTransferFrom(
-        beneficiaryAddress,
-        deployerAddress,
+    const receipt: ContractTransactionReceipt =
+      await testERC1155EnumerableContract.safeBatchTransferFrom(
+        await beneficiary.getAddress(),
+        await deployer.getAddress(),
         [nftTokenId3, nftTokenId1],
-        [1, 1],
-        "0x",
+        [1n, 1n],
+        new Uint8Array(),
       );
-
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
 
     // Check events
@@ -413,9 +365,9 @@ describe("ERC1155Enumerable", () => {
 
     const log: EventLog = logs[0] as EventLog;
     chai.expect(log.fragment.name).to.equal("TransferBatch");
-    chai.expect(log.args[0]).to.equal(beneficiaryAddress);
-    chai.expect(log.args[1]).to.equal(beneficiaryAddress);
-    chai.expect(log.args[2]).to.equal(deployerAddress);
+    chai.expect(log.args[0]).to.equal(await beneficiary.getAddress());
+    chai.expect(log.args[1]).to.equal(await beneficiary.getAddress());
+    chai.expect(log.args[2]).to.equal(await deployer.getAddress());
     chai.expect(log.args[3].length).to.equal(2);
     chai.expect(log.args[3][0]).to.equal(nftTokenId3);
     chai.expect(log.args[3][1]).to.equal(nftTokenId1);
@@ -425,42 +377,36 @@ describe("ERC1155Enumerable", () => {
   });
 
   it("should check beneficiary NFT balance", async function () {
-    const { testErc1155EnumerableContract } = contracts;
-
-    const nftBalance1: bigint = await testErc1155EnumerableContract.balanceOf(
-      beneficiaryAddress,
+    const nftBalance1: bigint = await testERC1155EnumerableContract.balanceOf(
+      await beneficiary.getAddress(),
       nftTokenId3,
     );
     chai.expect(nftBalance1).to.equal(0n);
 
-    const nftBalance2: bigint = await testErc1155EnumerableContract.balanceOf(
-      beneficiaryAddress,
+    const nftBalance2: bigint = await testERC1155EnumerableContract.balanceOf(
+      await beneficiary.getAddress(),
       nftTokenId1,
     );
     chai.expect(nftBalance2).to.equal(0n);
   });
 
   it("should check deployer NFT balance", async function () {
-    const { testErc1155EnumerableContract } = contracts;
-
-    const nftBalance1: bigint = await testErc1155EnumerableContract.balanceOf(
-      deployerAddress,
+    const nftBalance1: bigint = await testERC1155EnumerableContract.balanceOf(
+      await deployer.getAddress(),
       nftTokenId3,
     );
     chai.expect(nftBalance1).to.equal(1n);
 
-    const nftBalance2: bigint = await testErc1155EnumerableContract.balanceOf(
-      deployerAddress,
+    const nftBalance2: bigint = await testERC1155EnumerableContract.balanceOf(
+      await deployer.getAddress(),
       nftTokenId1,
     );
     chai.expect(nftBalance2).to.equal(1n);
   });
 
   it("should check total supply after transfer", async function () {
-    const { testErc1155EnumerableContract } = contracts;
-
     const totalSupply: bigint =
-      await testErc1155EnumerableContract.totalSupply();
+      await testERC1155EnumerableContract.totalSupply();
     chai.expect(totalSupply).to.equal(2n);
   });
 
@@ -471,29 +417,21 @@ describe("ERC1155Enumerable", () => {
   it("should mint third NFT", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
     // Mint NFT
-    const tx: ContractTransactionResponse =
-      await testErc1155EnumerableContract.mintNFT(
-        beneficiaryAddress,
-        nftTokenId2,
-      );
-    await tx.wait();
+    await testERC1155EnumerableContract.mintNFT(
+      await beneficiary.getAddress(),
+      nftTokenId2,
+    );
   });
 
   it("should return the correct owner for an existing NFT", async function () {
-    const { testErc1155EnumerableContract } = contracts;
-
     const owner: string =
-      await testErc1155EnumerableContract.ownerOf(nftTokenId2);
-    chai.expect(owner).to.equal(beneficiaryAddress);
+      await testERC1155EnumerableContract.ownerOf(nftTokenId2);
+    chai.expect(owner).to.equal(await beneficiary.getAddress());
   });
 
   it("should check nonexistent token ID", async function () {
-    const { testErc1155EnumerableContract } = contracts;
-
-    const owner: string = await testErc1155EnumerableContract.ownerOf(
+    const owner: string = await testERC1155EnumerableContract.ownerOf(
       nftTokenIdNonexistent,
     );
     chai.expect(owner).to.equal(ZERO_ADDRESS);
@@ -502,26 +440,20 @@ describe("ERC1155Enumerable", () => {
   it("should transfer third NFT", async function () {
     this.timeout(60 * 1000);
 
-    const { testErc1155EnumerableContract } = contracts;
-
     // Transfer NFT
-    const tx: ContractTransactionResponse =
-      await testErc1155EnumerableContract.safeTransferFrom(
-        beneficiaryAddress,
-        deployerAddress,
-        nftTokenId2,
-        1,
-        "0x",
-      );
-    await tx.wait();
+    await testERC1155EnumerableContract.safeTransferFrom(
+      await beneficiary.getAddress(),
+      await deployer.getAddress(),
+      nftTokenId2,
+      1n,
+      new Uint8Array(),
+    );
   });
 
   it("should return the correct owner after transfer", async function () {
-    const { testErc1155EnumerableContract } = contracts;
-
     const owner: string =
-      await testErc1155EnumerableContract.ownerOf(nftTokenId3);
-    chai.expect(owner).to.equal(deployerAddress);
+      await testERC1155EnumerableContract.ownerOf(nftTokenId3);
+    chai.expect(owner).to.equal(await deployer.getAddress());
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -529,14 +461,16 @@ describe("ERC1155Enumerable", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   it("should return all token IDs", async function () {
-    const { testErc1155EnumerableContract } = contracts;
-
     const beneficiaryTokenIds: bigint[] =
-      await testErc1155EnumerableContract.getTokenIds(beneficiaryAddress);
+      await testERC1155EnumerableContract.getTokenIds(
+        await beneficiary.getAddress(),
+      );
     chai.expect(beneficiaryTokenIds.length).to.equal(0);
 
     const deployerTokenIds: bigint[] =
-      await testErc1155EnumerableContract.getTokenIds(deployerAddress);
+      await testERC1155EnumerableContract.getTokenIds(
+        await deployer.getAddress(),
+      );
     chai.expect(deployerTokenIds.length).to.equal(3);
     chai.expect(deployerTokenIds[0]).to.equal(nftTokenId3);
     chai.expect(deployerTokenIds[1]).to.equal(nftTokenId1);
