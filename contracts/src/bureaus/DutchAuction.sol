@@ -25,7 +25,7 @@ import {IDutchAuction} from "../interfaces/bureaus/IDutchAuction.sol";
 import {ILPSFT} from "../interfaces/token/ERC1155/ILPSFT.sol";
 import {IUniV3Pooler} from "../interfaces/token/routes/IUniV3Pooler.sol";
 import {IUniV3Swapper} from "../interfaces/token/routes/IUniV3Swapper.sol";
-import {VRGDA} from "../utils/auction/VRGDA.sol";
+import {AuctionMath} from "../utils/math/AuctionMath.sol";
 import {LiquidityMath} from "../utils/math/LiquidityMath.sol";
 
 /**
@@ -93,7 +93,7 @@ contract DutchAuction is
   /**
    * @dev Mapping from auction slot to auction
    */
-  mapping(uint256 slot => VRGDA auction) private _slotToAuction;
+  mapping(uint256 slot => AuctionMath auction) private _slotToAuction;
 
   /**
    * @dev Mapping from auction slot to LP-NFT ID
@@ -261,7 +261,7 @@ contract DutchAuction is
     require(_slotToLpNft[slot] == 0, "NFT exists");
 
     // Create the auction
-    VRGDA auction = new VRGDA(targetPrice, priceDecayConstant);
+    AuctionMath auction = new AuctionMath(targetPrice, priceDecayConstant);
 
     // Get token balances, as Uniswap V3 can't mint a token with zero liquidity
     uint256 gameTokenBalance = gameToken.balanceOf(address(this));
@@ -359,7 +359,7 @@ contract DutchAuction is
    */
   function getPrice(uint256 slot) external view returns (uint256) {
     // Read state
-    VRGDA auction = _slotToAuction[slot];
+    AuctionMath auction = _slotToAuction[slot];
 
     // Calculate the auction price
     int256 timeSinceStart = 0; // TODO
@@ -381,7 +381,7 @@ contract DutchAuction is
     require(receiver != address(0), "Invalid receiver");
 
     // Read state
-    VRGDA auction = _slotToAuction[slot];
+    AuctionMath auction = _slotToAuction[slot];
     nftTokenId = _slotToLpNft[slot];
 
     int256 timeSinceStart = 1; // TODO

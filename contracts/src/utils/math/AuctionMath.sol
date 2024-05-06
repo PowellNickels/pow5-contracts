@@ -17,9 +17,9 @@ pragma solidity 0.8.25;
 import {wadLn, wadMul, wadExp, unsafeWadMul, toWadUnsafe} from "solmate/src/utils/SignedWadMath.sol";
 
 /**
- * @title Variable Rate Gradual Dutch Auction
+ * @title Variable Rate Gradual Dutch Auction math library
  */
-contract VRGDA {
+contract AuctionMath {
   //////////////////////////////////////////////////////////////////////////////
   // State
   //////////////////////////////////////////////////////////////////////////////
