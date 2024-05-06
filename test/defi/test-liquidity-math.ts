@@ -13,7 +13,7 @@ import chai from "chai";
 import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
-import { ContractLibrary } from "../../src/interfaces/contractLibrary";
+import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
 import { setupFixture } from "../../src/testing/setupFixture";
 
 // Setup Hardhat
@@ -42,7 +42,7 @@ const A_SWAP_AMOUNT_NO_FEE: bigint = A_SWAP_AMOUNT - A_SWAP_FEE;
 //
 
 describe("LiquidityMath", () => {
-  let contracts: ContractLibrary;
+  let contracts: ContractLibraryEthers;
 
   //////////////////////////////////////////////////////////////////////////////
   // Mocha setup

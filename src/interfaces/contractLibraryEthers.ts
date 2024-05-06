@@ -12,9 +12,9 @@
 import { ethers } from "ethers";
 
 /**
- * @description Contract library interface
+ * @description Contract library interface using ethers.js version 6
  */
-interface ContractLibrary {
+interface ContractLibraryEthers {
   testErc1155EnumerableContract: ethers.Contract;
   testLiquidityMathContract: ethers.Contract;
   testTickMathContract: ethers.Contract;
@@ -28,4 +28,4 @@ interface ContractLibrary {
   wrappedNativeUsdcPoolFactoryContract: ethers.Contract;
 }
 
-export { ContractLibrary };
+export { ContractLibraryEthers };

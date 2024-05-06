@@ -18,7 +18,7 @@ import {
 } from "ethers";
 import * as hardhat from "hardhat";
 
-import { ContractLibrary } from "../../src/interfaces/contractLibrary";
+import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
 import { setupFixture } from "../../src/testing/setupFixture";
 import { ZERO_ADDRESS } from "../../src/utils/constants";
 
@@ -41,7 +41,7 @@ const nftTokenIdNonexistent: bigint = 999n;
 describe("ERC1155Enumerable", () => {
   let deployerAddress: string;
   let beneficiaryAddress: string;
-  let contracts: ContractLibrary;
+  let contracts: ContractLibraryEthers;
 
   //////////////////////////////////////////////////////////////////////////////
   // Mocha setup

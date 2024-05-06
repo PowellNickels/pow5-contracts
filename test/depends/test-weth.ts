@@ -19,7 +19,7 @@ import {
 } from "ethers";
 import * as hardhat from "hardhat";
 
-import { ContractLibrary } from "../../src/interfaces/contractLibrary";
+import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
 import { setupFixture } from "../../src/testing/setupFixture";
 
 // Setup Hardhat
@@ -37,7 +37,7 @@ const DEPOSIT_AMOUNT: bigint = ethers.parseEther("1");
 
 describe("W-ETH", () => {
   let beneficiaryAddress: string;
-  let contracts: ContractLibrary;
+  let contracts: ContractLibraryEthers;
 
   //////////////////////////////////////////////////////////////////////////////
   // Mocha setup

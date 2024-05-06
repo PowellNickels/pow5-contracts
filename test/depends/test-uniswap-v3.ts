@@ -21,7 +21,7 @@ import {
 } from "ethers";
 import * as hardhat from "hardhat";
 
-import { ContractLibrary } from "../../src/interfaces/contractLibrary";
+import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
 import {
   ETH_PRICE,
   USDC_ETH_LP_ETH_AMOUNT_BASE,
@@ -78,7 +78,7 @@ describe("Uniswap V3", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   let beneficiaryAddress: string;
-  let contracts: ContractLibrary;
+  let contracts: ContractLibraryEthers;
   let wethIsToken0: boolean;
 
   //////////////////////////////////////////////////////////////////////////////

@@ -12,7 +12,7 @@
 import chai from "chai";
 import * as hardhat from "hardhat";
 
-import { ContractLibrary } from "../../src/interfaces/contractLibrary";
+import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
 import { setupFixture } from "../../src/testing/setupFixture";
 import {
   MAX_SQRT_RATIO,
@@ -30,7 +30,7 @@ const setupTest = hardhat.deployments.createFixture(setupFixture);
 //
 
 describe("TickMath", () => {
-  let contracts: ContractLibrary;
+  let contracts: ContractLibraryEthers;
 
   //////////////////////////////////////////////////////////////////////////////
   // Mocha setup

@@ -32,7 +32,7 @@ import {
   usdcTokenAbi,
 } from "../contracts/hardhat/testing";
 import { AddressBook } from "../interfaces/addressBook";
-import { ContractLibrary } from "../interfaces/contractLibrary";
+import { ContractLibraryEthers } from "../interfaces/contractLibraryEthers";
 import { getAddressBook } from "../utils/getAddressBook";
 
 //
@@ -41,7 +41,7 @@ import { getAddressBook } from "../utils/getAddressBook";
 
 async function setupFixture(
   hardhat_re: HardhatRuntimeEnvironment,
-): Promise<ContractLibrary> {
+): Promise<ContractLibraryEthers> {
   // Ensure we start from a fresh deployment
   const deployments: DeploymentsExtension = hardhat_re.deployments;
   await deployments.fixture();
