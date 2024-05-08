@@ -9,6 +9,7 @@
  * See the file LICENSE.txt for more information.
  */
 
+import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
 import chai from "chai";
 import {
   ContractTransactionReceipt,
@@ -19,8 +20,11 @@ import {
 } from "ethers";
 import * as hardhat from "hardhat";
 
-import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
+import { AddressBook } from "../../src/interfaces/addressBook";
+import { ContractLibrary } from "../../src/interfaces/contractLibrary";
 import { setupFixture } from "../../src/testing/setupFixture";
+import { getAddressBook } from "../../src/utils/getAddressBook";
+import { getContractLibrary } from "../../src/utils/getContractLibrary";
 
 // Setup Hardhat
 const setupTest = hardhat.deployments.createFixture(setupFixture);
@@ -36,8 +40,7 @@ const DEPOSIT_AMOUNT: bigint = ethers.parseEther("1");
 //
 
 describe("W-ETH", () => {
-  let beneficiaryAddress: string;
-  let contracts: ContractLibraryEthers;
+  let contracts: ContractLibrary;
 
   //////////////////////////////////////////////////////////////////////////////
   // Mocha setup
@@ -46,12 +49,18 @@ describe("W-ETH", () => {
   before(async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    // Get the wallet addresses
-    const accounts: string[] = await hardhat.getUnnamedAccounts();
-    beneficiaryAddress = accounts[1];
+    // Use ethers to get the accounts
+    const signers: SignerWithAddress[] = await hardhat.ethers.getSigners();
+    const beneficiary: SignerWithAddress = signers[1];
 
     // A single fixture is used for the test suite
-    contracts = await setupTest();
+    await setupTest();
+
+    // Get address book
+    const addressBook: AddressBook = await getAddressBook(hardhat.network.name);
+
+    // Get contract library
+    contracts = getContractLibrary(beneficiary, addressBook);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -61,11 +70,12 @@ describe("W-ETH", () => {
   it("should deposit ETH", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { wrappedNativeTokenContract } = contracts;
+    const { wrappedNativeContract } = contracts;
 
     // Perform deposit
-    const tx: ContractTransactionResponse =
-      await wrappedNativeTokenContract.deposit({ value: DEPOSIT_AMOUNT });
+    const tx: ContractTransactionResponse = await wrappedNativeContract.deposit(
+      { value: DEPOSIT_AMOUNT },
+    );
 
     const receipt: ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
@@ -75,9 +85,7 @@ describe("W-ETH", () => {
     chai.expect(logs.length).to.be.greaterThan(0);
 
     const log: EventLog = logs[0] as EventLog;
-    chai
-      .expect(log.address)
-      .to.equal(await wrappedNativeTokenContract.getAddress());
+    chai.expect(log.address).to.equal(await wrappedNativeContract.getAddress());
     chai.expect(log.fragment.name).to.equal("Deposit");
     chai.expect(log.args.length).to.equal(2);
     chai.expect(log.args[0]).to.equal(beneficiaryAddress);
@@ -85,11 +93,11 @@ describe("W-ETH", () => {
   });
 
   it("should check balance", async function (): Promise<void> {
-    const { wrappedNativeTokenContract } = contracts;
+    const { wrappedNativeContract } = contracts;
 
     // Check balance
     const balance: bigint =
-      await wrappedNativeTokenContract.balanceOf(beneficiaryAddress);
+      await wrappedNativeContract.balanceOf(beneficiaryAddress);
     chai.expect(balance).to.equal(DEPOSIT_AMOUNT);
   });
 
@@ -100,11 +108,11 @@ describe("W-ETH", () => {
   it("should withdraw ETH", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { wrappedNativeTokenContract } = contracts;
+    const { wrappedNativeContract } = contracts;
 
     // Perform withdraw
     const tx: ContractTransactionResponse =
-      await wrappedNativeTokenContract.withdraw(DEPOSIT_AMOUNT);
+      await wrappedNativeContract.withdraw(DEPOSIT_AMOUNT);
 
     const receipt: ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
@@ -114,9 +122,7 @@ describe("W-ETH", () => {
     chai.expect(logs.length).to.be.greaterThan(0);
 
     const log: EventLog = logs[0] as EventLog;
-    chai
-      .expect(log.address)
-      .to.equal(await wrappedNativeTokenContract.getAddress());
+    chai.expect(log.address).to.equal(await wrappedNativeContract.getAddress());
     chai.expect(log.fragment.name).to.equal("Withdrawal");
     chai.expect(log.args.length).to.equal(2);
     chai.expect(log.args[0]).to.equal(beneficiaryAddress);
@@ -124,11 +130,11 @@ describe("W-ETH", () => {
   });
 
   it("should check zero balance", async function (): Promise<void> {
-    const { wrappedNativeTokenContract } = contracts;
+    const { wrappedNativeContract } = contracts;
 
     // Check balance
     const balance: bigint =
-      await wrappedNativeTokenContract.balanceOf(beneficiaryAddress);
+      await wrappedNativeContract.balanceOf(beneficiaryAddress);
     chai.expect(balance).to.equal(0n);
   });
 });
