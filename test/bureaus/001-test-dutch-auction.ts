@@ -14,6 +14,8 @@ import { Contract, ContractTransactionResponse, ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { DutchAuctionContract } from "../../src/contracts/bureaus/dutchAuctionContract";
+import { AddressBook } from "../../src/interfaces/addressBook";
+import { ContractLibrary } from "../../src/interfaces/contractLibrary";
 import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
 import { ETH_PRICE } from "../../src/testing/defiMetrics";
 import { setupFixture } from "../../src/testing/setupFixture";
@@ -27,6 +29,8 @@ import {
   POW1_DECIMALS,
 } from "../../src/utils/constants";
 import { encodePriceSqrt } from "../../src/utils/fixedMath";
+import { getAddressBook } from "../../src/utils/getAddressBook";
+import { getContractLibrary } from "../../src/utils/getContractLibrary";
 import { extractJSONFromURI } from "../../src/utils/lpNftUtils";
 
 // Setup Hardhat
@@ -92,10 +96,12 @@ describe("Bureau 1: Dutch Auction", () => {
 
   let deployer: SignerWithAddress;
   let beneficiary: SignerWithAddress;
-  let contracts: ContractLibraryEthers;
-  let pow1IsToken0: boolean;
+  let ethersContracts: ContractLibraryEthers;
+  let addressBook: AddressBook;
+  let deployerContracts: ContractLibrary;
+  let beneficiaryContracts: ContractLibrary;
 
-  let dutchAuctionContract: DutchAuctionContract;
+  let pow1IsToken0: boolean;
 
   //////////////////////////////////////////////////////////////////////////////
   // Mocha setup
@@ -110,12 +116,13 @@ describe("Bureau 1: Dutch Auction", () => {
     beneficiary = signers[1];
 
     // A single fixture is used for the test suite
-    contracts = await setupTest();
+    ethersContracts = await setupTest();
 
-    // Set up the Dutch Auction contract for deployer
-    dutchAuctionContract = new DutchAuctionContract(deployer, {
-      dutchAuction: await contracts.dutchAuctionContract.getAddress(),
-    });
+    // Get address book
+    addressBook = await getAddressBook(hardhat.network.name);
+
+    deployerContracts = getContractLibrary(deployer, addressBook);
+    beneficiaryContracts = getContractLibrary(beneficiary, addressBook);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -125,7 +132,7 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should obtain W-ETH to initialize DutchAuction", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { wrappedNativeTokenContract } = contracts;
+    const { wrappedNativeTokenContract } = ethersContracts;
 
     // Deposit ETH into W-ETH
     const tx: ContractTransactionResponse = await (
@@ -143,13 +150,10 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should grant LPPOW1 issuer role to LPSFT", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { lpPow1TokenContract, lpSftContract } = contracts;
+    const { lpPow1Contract } = deployerContracts;
 
     // Grant ERC-20 issuer role to LP-SFT
-    const tx: ContractTransactionResponse = await (
-      lpPow1TokenContract.connect(deployer) as Contract
-    ).grantRole(ERC20_ISSUER_ROLE, await lpSftContract.getAddress());
-    await tx.wait();
+    await lpPow1Contract.grantRole(ERC20_ISSUER_ROLE, addressBook.lpSft!);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -159,16 +163,13 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should grant LP-SFT minter role to LPPOW1 stake farm", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { lpSftContract, pow1LpNftStakeFarmContract } = contracts;
+    const { lpSftContract } = deployerContracts;
 
     // Grant LP-SFT minter role to LPPOW1 stake farm
-    const tx: ContractTransactionResponse = await (
-      lpSftContract.connect(deployer) as Contract
-    ).grantRole(
+    await lpSftContract.grantRole(
       LPSFT_ISSUER_ROLE,
-      await pow1LpNftStakeFarmContract.getAddress(),
+      addressBook.pow1LpNftStakeFarm!,
     );
-    await tx.wait();
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -176,7 +177,7 @@ describe("Bureau 1: Dutch Auction", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   it("should get pool token order for LPPOW5", async function (): Promise<void> {
-    const { pow1PoolerContract } = contracts;
+    const { pow1PoolerContract } = ethersContracts;
 
     // Get pool token order
     pow1IsToken0 = await pow1PoolerContract.gameIsToken0();
@@ -194,7 +195,7 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should initialize the LPPOW1 pool", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1PoolContract } = contracts;
+    const { pow1PoolContract } = ethersContracts;
 
     // The initial sqrt price [sqrt(amountToken1/amountToken0)] as a Q64.96 value
     const INITIAL_PRICE: bigint = encodePriceSqrt(
@@ -215,24 +216,21 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should approve Dutch Auction to spend POW1", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1TokenContract, dutchAuctionContract } = contracts;
+    const { pow1Contract, dutchAuctionContract } = deployerContracts;
 
     // Approve Dutch Auction spending POW1 for deployer
-    const tx: ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as Contract
-    ).approve(await dutchAuctionContract.getAddress(), INITIAL_POW1_SUPPLY);
-    await tx.wait();
+    await pow1Contract.approve(addressBook.dutchAuction!, INITIAL_POW1_SUPPLY);
   });
 
   it("should approve Dutch Auction to spend WETH", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { wrappedNativeTokenContract, dutchAuctionContract } = contracts;
+    const { wrappedNativeTokenContract } = ethersContracts;
 
     // Approve Dutch Auction spending WETH
     const tx: ContractTransactionResponse = await (
       wrappedNativeTokenContract.connect(deployer) as Contract
-    ).approve(await dutchAuctionContract.getAddress(), INITIAL_WETH_AMOUNT);
+    ).approve(addressBook.dutchAuction!, INITIAL_WETH_AMOUNT);
     await tx.wait();
   });
 
@@ -242,6 +240,8 @@ describe("Bureau 1: Dutch Auction", () => {
 
   it("should initialize DutchAuction", async function (): Promise<void> {
     this.timeout(60 * 1000);
+
+    const { dutchAuctionContract } = deployerContracts;
 
     // Calculate DeFi metrics
     const pow1Value: string = ethers.formatUnits(
@@ -278,7 +278,7 @@ describe("Bureau 1: Dutch Auction", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   it("should check LP-SFT POW1 balance", async function (): Promise<void> {
-    const { defiManagerContract } = contracts;
+    const { defiManagerContract } = ethersContracts;
 
     // Check LP-SFT POW1 balance
     const pow1Balance: bigint = await defiManagerContract.pow1Balance(
@@ -302,7 +302,7 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   it("should check beneficiary WETH balance", async function (): Promise<void> {
-    const { wrappedNativeTokenContract } = contracts;
+    const { wrappedNativeTokenContract } = ethersContracts;
 
     // Check WETH balance
     const wethBalance: bigint = await wrappedNativeTokenContract.balanceOf(
@@ -322,11 +322,11 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   it("should log Uniswap pool reserves", async function (): Promise<void> {
-    const { pow1PoolContract, pow1TokenContract, wrappedNativeTokenContract } =
-      contracts;
+    const { pow1Contract } = deployerContracts;
+    const { pow1PoolContract, wrappedNativeTokenContract } = ethersContracts;
 
     // Get Uniswap pool reserves
-    const pow1Balance: bigint = await pow1TokenContract.balanceOf(
+    const pow1Balance: bigint = await pow1Contract.balanceOf(
       await pow1PoolContract.getAddress(),
     );
     const wethBalance: bigint = await wrappedNativeTokenContract.balanceOf(
@@ -354,7 +354,7 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   it("should check initial LP-SFT LPPOW1 balance", async function (): Promise<void> {
-    const { defiManagerContract } = contracts;
+    const { defiManagerContract } = ethersContracts;
 
     // Check LP-SFT LPPOW1 balance
     const lpPow1Balance: bigint = await defiManagerContract.lpPow1Balance(
@@ -383,10 +383,10 @@ describe("Bureau 1: Dutch Auction", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   it("should check LPPOW1 total supply", async function (): Promise<void> {
-    const { lpPow1TokenContract } = contracts;
+    const { lpPow1Contract } = deployerContracts;
 
     // Check total supply
-    const totalSupply: bigint = await lpPow1TokenContract.totalSupply();
+    const totalSupply: bigint = await lpPow1Contract.totalSupply();
     chai.expect(totalSupply).to.equal(INITIAL_LPPOW1_AMOUNT);
   });
 
@@ -395,7 +395,7 @@ describe("Bureau 1: Dutch Auction", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   it("should verify LP-SFT ownership", async function (): Promise<void> {
-    const { lpSftContract } = contracts;
+    const { lpSftContract } = deployerContracts;
 
     // Get owner
     const owner: string = await lpSftContract.ownerOf(LPPOW1_LPNFT_TOKEN_ID);
@@ -405,7 +405,7 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should check POW1 LP-SFT properties", async function (): Promise<void> {
     this.timeout(10 * 1000);
 
-    const { lpSftContract } = contracts;
+    const { lpSftContract } = deployerContracts;
 
     // Check total supply
     const totalSupply: bigint = await lpSftContract.totalSupply();
@@ -445,15 +445,12 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should obtain WETH dust", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { wrappedNativeTokenContract } = contracts;
+    const { wrappedNativeContract } = deployerContracts;
 
     // Deposit ETH into W-ETH
-    const tx: ContractTransactionResponse = await (
-      wrappedNativeTokenContract.connect(deployer) as Contract
-    ).deposit({
+    await wrappedNativeContract.deposit({
       value: WETH_DUST_AMOUNT * 2n,
     });
-    await tx.wait();
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -463,7 +460,7 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should approve POW1Swapper to spend WETH", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1SwapperContract, wrappedNativeTokenContract } = contracts;
+    const { pow1SwapperContract, wrappedNativeTokenContract } = ethersContracts;
 
     // Approve POW1Swapper spending WETH
     const tx: ContractTransactionResponse = await (
@@ -475,7 +472,7 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should swap WETH dust for POW1 dust", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1SwapperContract } = contracts;
+    const { pow1SwapperContract } = ethersContracts;
 
     // Swap WETH for POW1
     const tx: ContractTransactionResponse = await (
@@ -485,10 +482,10 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   it("should check POW1 balance", async function (): Promise<void> {
-    const { pow1TokenContract } = contracts;
+    const { pow1Contract } = deployerContracts;
 
     // Check POW1 balance
-    const pow1Balance: bigint = await pow1TokenContract.balanceOf(
+    const pow1Balance: bigint = await pow1Contract.balanceOf(
       await deployer.getAddress(),
     );
 
@@ -507,11 +504,11 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   it("should log Uniswap pool reserves", async function (): Promise<void> {
-    const { pow1PoolContract, pow1TokenContract, wrappedNativeTokenContract } =
-      contracts;
+    const { pow1Contract } = deployerContracts;
+    const { pow1PoolContract, wrappedNativeTokenContract } = ethersContracts;
 
     // Get Uniswap pool reserves
-    const pow1Balance: bigint = await pow1TokenContract.balanceOf(
+    const pow1Balance: bigint = await pow1Contract.balanceOf(
       await pow1PoolContract.getAddress(),
     );
     const wethBalance: bigint = await wrappedNativeTokenContract.balanceOf(
@@ -549,40 +546,36 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should transfer POW1 dust to DutchAuction", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1TokenContract, dutchAuctionContract } = contracts;
+    const { pow1Contract } = deployerContracts;
 
     // Transfer POW1 dust to Dutch Auction
-    const tx: ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as Contract
-    ).transfer(await dutchAuctionContract.getAddress(), POW1_DUST_AMOUNT);
-    await tx.wait();
+    await pow1Contract.transfer(addressBook.dutchAuction!, POW1_DUST_AMOUNT);
   });
 
   it("should transfer WETH dust to DutchAuction", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { wrappedNativeTokenContract, dutchAuctionContract } = contracts;
+    const { wrappedNativeTokenContract } = ethersContracts;
 
     // Transfer WETH to Dutch Auction
-    const tx: ContractTransactionResponse = await (
-      wrappedNativeTokenContract.connect(deployer) as Contract
-    ).transfer(await dutchAuctionContract.getAddress(), WETH_DUST_AMOUNT);
+    const tx: ContractTransactionResponse =
+      await wrappedNativeTokenContract.transfer(
+        addressBook.dutchAuction!,
+        WETH_DUST_AMOUNT,
+      );
     await tx.wait();
   });
 
   it("should log DutchAuction balances", async function (): Promise<void> {
-    const {
-      dutchAuctionContract,
-      pow1TokenContract,
-      wrappedNativeTokenContract,
-    } = contracts;
+    const { pow1Contract } = deployerContracts;
+    const { wrappedNativeTokenContract } = ethersContracts;
 
     // Log Dutch Auction balances
-    const pow1Balance: bigint = await pow1TokenContract.balanceOf(
-      await dutchAuctionContract.getAddress(),
+    const pow1Balance: bigint = await pow1Contract.balanceOf(
+      addressBook.dutchAuction!,
     );
     const wethBalance: bigint = await wrappedNativeTokenContract.balanceOf(
-      await dutchAuctionContract.getAddress(),
+      addressBook.dutchAuction!,
     );
 
     console.log(
@@ -608,6 +601,8 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should set new auction", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
+    const { dutchAuctionContract } = deployerContracts;
+
     // Set new auction
     await dutchAuctionContract.setAuction(
       0, // slot
@@ -618,18 +613,15 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   it("should log DutchAuction balances", async function (): Promise<void> {
-    const {
-      dutchAuctionContract,
-      pow1TokenContract,
-      wrappedNativeTokenContract,
-    } = contracts;
+    const { pow1Contract } = deployerContracts;
+    const { wrappedNativeTokenContract } = ethersContracts;
 
     // Log Dutch Auction balances
-    const pow1Balance: bigint = await pow1TokenContract.balanceOf(
-      await dutchAuctionContract.getAddress(),
+    const pow1Balance: bigint = await pow1Contract.balanceOf(
+      addressBook.dutchAuction!,
     );
     const wethBalance: bigint = await wrappedNativeTokenContract.balanceOf(
-      await dutchAuctionContract.getAddress(),
+      addressBook.dutchAuction!,
     );
 
     console.log(
@@ -649,17 +641,18 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   it("should log Uniswap pool reserves", async function (): Promise<void> {
-    const { pow1PoolContract, pow1TokenContract, wrappedNativeTokenContract } =
-      contracts;
+    const { pow1Contract } = deployerContracts;
+    const { pow1PoolContract, wrappedNativeTokenContract } = ethersContracts;
 
-    // Log Uniswap pool reserves
-    const pow1Balance: bigint = await pow1TokenContract.balanceOf(
+    // Get Uniswap pool reserves
+    const pow1Balance: bigint = await pow1Contract.balanceOf(
       await pow1PoolContract.getAddress(),
     );
     const wethBalance: bigint = await wrappedNativeTokenContract.balanceOf(
       await pow1PoolContract.getAddress(),
     );
 
+    // Log Uniswap pool reserves
     console.log(
       `    Pool POW1 reserves: ${ethers
         .formatUnits(pow1Balance, POW1_DECIMALS)
@@ -677,7 +670,7 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   it("should check first POW1 LP-SFT price", async function (): Promise<void> {
-    const { dutchAuctionContract } = contracts;
+    const { dutchAuctionContract } = deployerContracts;
 
     // Get the price of the first LP-SFT
     const price: bigint = await dutchAuctionContract.getPrice(
@@ -697,7 +690,7 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should check auction LPPOW1 LP-NFT properties", async function (): Promise<void> {
     this.timeout(10 * 1000);
 
-    const { dutchAuctionContract, uniswapV3NftManagerContract } = contracts;
+    const { uniswapV3NftManagerContract } = ethersContracts;
 
     // Check total supply
     const totalSupply: bigint = await uniswapV3NftManagerContract.totalSupply();
@@ -707,7 +700,7 @@ describe("Bureau 1: Dutch Auction", () => {
     const owner: string = await uniswapV3NftManagerContract.ownerOf(
       AUCTION_LPNFT_TOKEN_ID,
     );
-    chai.expect(owner).to.equal(await dutchAuctionContract.getAddress());
+    chai.expect(owner).to.equal(addressBook.dutchAuction!);
 
     // Check token URI
     const nftTokenUri: string = await uniswapV3NftManagerContract.tokenURI(
@@ -738,7 +731,7 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should obtain WETH to purchase LP-SFT", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { wrappedNativeTokenContract } = contracts;
+    const { wrappedNativeTokenContract } = ethersContracts;
 
     // Deposit ETH into W-ETH
     const tx: ContractTransactionResponse =
@@ -755,12 +748,12 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should approve DutchAuction to spend WETH", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { dutchAuctionContract, wrappedNativeTokenContract } = contracts;
+    const { wrappedNativeTokenContract } = ethersContracts;
 
     // Approve Dutch Auction spending WETH
     const tx: ContractTransactionResponse =
       await wrappedNativeTokenContract.approve(
-        await dutchAuctionContract.getAddress(),
+        addressBook.dutchAuction!,
         AUCTION_WETH_AMOUNT,
       );
     await tx.wait();
@@ -769,7 +762,7 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should purchase LP-SFT", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { dutchAuctionContract } = contracts;
+    const { dutchAuctionContract } = beneficiaryContracts;
 
     console.log(
       `    Purchasing LP-SFT with ${ethers
@@ -780,17 +773,16 @@ describe("Bureau 1: Dutch Auction", () => {
     );
 
     // Purchase LP-SFT
-    const tx: ContractTransactionResponse = await dutchAuctionContract.purchase(
+    await dutchAuctionContract.purchase(
       0n, // slot
       0n, // gameTokenAmount
       AUCTION_WETH_AMOUNT, // assetTokenAmount
       await beneficiary.getAddress(), // receiver
     );
-    await tx.wait();
   });
 
   it("should check new price of LP-SFT", async function (): Promise<void> {
-    const { dutchAuctionContract } = contracts;
+    const { dutchAuctionContract } = beneficiaryContracts;
 
     // Get the price of the first LP-SFT
     const price: bigint = await dutchAuctionContract.getPrice(
@@ -812,17 +804,18 @@ describe("Bureau 1: Dutch Auction", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   it("should log Uniswap pool reserves", async function (): Promise<void> {
-    const { pow1PoolContract, pow1TokenContract, wrappedNativeTokenContract } =
-      contracts;
+    const { pow1Contract } = deployerContracts;
+    const { pow1PoolContract, wrappedNativeTokenContract } = ethersContracts;
 
-    // Log Uniswap pool reserves
-    const pow1Balance: bigint = await pow1TokenContract.balanceOf(
+    // Get Uniswap pool reserves
+    const pow1Balance: bigint = await pow1Contract.balanceOf(
       await pow1PoolContract.getAddress(),
     );
     const wethBalance: bigint = await wrappedNativeTokenContract.balanceOf(
       await pow1PoolContract.getAddress(),
     );
 
+    // Log Uniswap pool reserves
     console.log(
       `    Pool POW1 reserves: ${ethers
         .formatUnits(pow1Balance, POW1_DECIMALS)
@@ -840,7 +833,7 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   it("should check auction LP-SFT LPPOW1 balance", async function (): Promise<void> {
-    const { defiManagerContract } = contracts;
+    const { defiManagerContract } = ethersContracts;
 
     // Check LP-SFT LPPOW1 balance
     const lpPow1Balance: bigint = await defiManagerContract.lpPow1Balance(
@@ -870,10 +863,10 @@ describe("Bureau 1: Dutch Auction", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   it("should check LPPOW1 total supply", async function (): Promise<void> {
-    const { lpPow1TokenContract } = contracts;
+    const { lpPow1Contract } = deployerContracts;
 
     // Check total supply
-    const totalSupply: bigint = await lpPow1TokenContract.totalSupply();
+    const totalSupply: bigint = await lpPow1Contract.totalSupply();
     chai
       .expect(totalSupply)
       .to.equal(INITIAL_LPPOW1_AMOUNT + AUCTION_LPPOW1_AMOUNT);
