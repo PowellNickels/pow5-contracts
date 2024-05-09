@@ -10,8 +10,8 @@
  */
 
 // Contract ABIs and artifacts (sort by path)
-import testErc1155EnumerableAbi from "../../abi/contracts/test/token/extensions/TestERC1155Enumerable.sol/TestERC1155Enumerable.json";
-import usdcTokenAbi from "../../abi/contracts/test/token/USDC.sol/USDC.json";
+import usdcTokenAbi from "../../abi/contracts/test/token/erc20/USDC.sol/USDC.json";
+import testErc1155EnumerableAbi from "../../abi/contracts/test/token/erc1155/extensions/TestERC1155Enumerable.sol/TestERC1155Enumerable.json";
 import testLiquidityMathAbi from "../../abi/contracts/test/utils/math/TestLiquidityMath.sol/TestLiquidityMath.json";
 import testTickMathAbi from "../../abi/contracts/test/utils/math/TestTickMath.sol/TestTickMath.json";
 

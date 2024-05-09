@@ -12,7 +12,7 @@
 // slither-disable-next-line solc-version
 pragma solidity >=0.8.0;
 
-import "../../depends/canonical-weth/WETH9.sol";
+import "../../../depends/canonical-weth/WETH9.sol";
 
 /**
  * @title W-ETH
