@@ -29,7 +29,7 @@ jobs:
           - os: ubuntu-22.04
             node-version: 20
           - os: ubuntu-22.04
-            node-version: 21
+            node-version: 22
 
     # Steps represent a sequence of tasks that will be executed as part of the
     # job
