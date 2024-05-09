@@ -11,10 +11,17 @@
 
 pragma solidity 0.8.25;
 
+import {IERC1155Errors} from "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
+import {Arrays} from "@openzeppelin/contracts/utils/Arrays.sol";
+
+import {IERC1155Enumerable} from "../../../interfaces/token/ERC1155/extensions/IERC1155Enumerable.sol";
+
 /**
  * @title ERC-1155 Utility Functions
  */
 contract ERC1155Utils {
+  using Arrays for uint256[];
+
   //////////////////////////////////////////////////////////////////////////////
   // Public utility functions
   //////////////////////////////////////////////////////////////////////////////
@@ -33,5 +40,36 @@ contract ERC1155Utils {
     }
 
     return array;
+  }
+
+  /**
+   * @dev Check that an amount array is suitable for NFTs (where the total
+   * supply of each token is 1)
+   */
+  function checkAmountArray(
+    uint256[] memory tokenIds,
+    uint256[] memory amounts
+  ) public pure {
+    // Validate parameters
+    if (tokenIds.length != amounts.length) {
+      revert IERC1155Errors.ERC1155InvalidArrayLength(
+        tokenIds.length,
+        amounts.length
+      );
+    }
+
+    // Loop through tokens
+    for (uint256 i = 0; i < amounts.length; i++) {
+      // Translate parameters
+      uint256 amount = amounts.unsafeMemoryAccess(i);
+
+      // Validate parameters
+      if (amount != 1) {
+        revert IERC1155Enumerable.ERC1155EnumerableInvalidAmount(
+          tokenIds.unsafeMemoryAccess(i),
+          amount
+        );
+      }
+    }
   }
 }

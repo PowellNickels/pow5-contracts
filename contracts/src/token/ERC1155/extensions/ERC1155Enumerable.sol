@@ -14,7 +14,6 @@
 
 pragma solidity 0.8.25;
 
-import {IERC1155Errors} from "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {Arrays} from "@openzeppelin/contracts/utils/Arrays.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
@@ -22,12 +21,18 @@ import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet
 
 import {IERC1155Enumerable} from "../../../interfaces/token/ERC1155/extensions/IERC1155Enumerable.sol";
 
+import {ERC1155Utils} from "../utils/ERC1155Utils.sol";
+
 import {ERC1155NonReentrant} from "./ERC1155NonReentrant.sol";
 
 /**
  * @title ERC-1155: Multi Token Standard, enumerable extension implementation
  */
-abstract contract ERC1155Enumerable is ERC1155NonReentrant, IERC1155Enumerable {
+abstract contract ERC1155Enumerable is
+  ERC1155NonReentrant,
+  ERC1155Utils,
+  IERC1155Enumerable
+{
   using Arrays for uint256[];
   using EnumerableSet for EnumerableSet.UintSet;
 
@@ -84,12 +89,7 @@ abstract contract ERC1155Enumerable is ERC1155NonReentrant, IERC1155Enumerable {
     nonReentrant(type(ERC1155Enumerable).interfaceId)
   {
     // Validate parameters
-    if (ids.length != values.length) {
-      revert IERC1155Errors.ERC1155InvalidArrayLength(
-        ids.length,
-        values.length
-      );
-    }
+    checkAmountArray(ids, values);
 
     // Translate parameters
     uint256 tokenCount = ids.length;
@@ -97,12 +97,6 @@ abstract contract ERC1155Enumerable is ERC1155NonReentrant, IERC1155Enumerable {
     for (uint256 i = 0; i < tokenCount; i++) {
       // Translate parameters
       uint256 nftTokenId = ids.unsafeMemoryAccess(i);
-      uint256 value = values.unsafeMemoryAccess(i);
-
-      // Validate parameters
-      if (value != 1) {
-        revert ERC1155EnumerableInvalidAmount(nftTokenId, value);
-      }
 
       // Handle minting
       if (from == address(0)) {
