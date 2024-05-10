@@ -60,7 +60,9 @@ contract TestERC1155Enumerable is ERC1155Utils, ERC1155Enumerable {
     uint256[] memory nftTokenIds
   ) external {
     // Translate parameters
-    uint256[] memory tokenAmounts = getAmountArray(nftTokenIds.length);
+    uint256[] memory tokenAmounts = ERC1155Utils.getAmountArray(
+      nftTokenIds.length
+    );
 
     // Call ancestor
     _mintBatch(account, nftTokenIds, tokenAmounts, "");
@@ -92,7 +94,9 @@ contract TestERC1155Enumerable is ERC1155Utils, ERC1155Enumerable {
     uint256[] memory nftTokenIds
   ) external {
     // Translate parameters
-    uint256[] memory tokenAmounts = getAmountArray(nftTokenIds.length);
+    uint256[] memory tokenAmounts = ERC1155Utils.getAmountArray(
+      nftTokenIds.length
+    );
 
     // Call ancestor
     _burnBatch(account, nftTokenIds, tokenAmounts);

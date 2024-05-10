@@ -89,7 +89,7 @@ abstract contract ERC1155Enumerable is
     nonReentrant(type(ERC1155Enumerable).interfaceId)
   {
     // Validate parameters
-    checkAmountArray(ids, values);
+    ERC1155Utils.checkAmountArray(ids, values);
 
     // Translate parameters
     uint256 tokenCount = ids.length;

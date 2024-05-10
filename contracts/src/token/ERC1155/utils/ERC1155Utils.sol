@@ -29,6 +29,10 @@ contract ERC1155Utils {
   /**
    * @dev Get an amount array suitable for NFTs (where the total supply of
    * each token is 1)
+   *
+   * @param tokenCount Number of tokens
+   *
+   * @return array Array of length `tokenCount` with all values set to 1
    */
   function getAmountArray(
     uint256 tokenCount
@@ -45,6 +49,9 @@ contract ERC1155Utils {
   /**
    * @dev Check that an amount array is suitable for NFTs (where the total
    * supply of each token is 1)
+   *
+   * @param tokenIds Array of token IDs
+   * @param amounts Array of token amounts
    */
   function checkAmountArray(
     uint256[] memory tokenIds,
