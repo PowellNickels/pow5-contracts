@@ -13,8 +13,36 @@
  * @description Address book interface
  */
 interface AddressBook {
+  defiManager?: string;
+  dutchAuction?: string;
+  liquidityForge?: string;
+  lpNft?: string;
+  lpPow1Token?: string;
+  lpPow5Token?: string;
+  lpSft?: string;
+  noLpSft?: string;
+  noPow5Token?: string;
+  pow1LpNftStakeFarm?: string;
+  pow1LpSftLendFarm?: string;
+  pow1Pool?: string;
+  pow1Pooler?: string;
+  pow1PoolFactory?: string;
+  pow1Staker?: string;
+  pow1Swapper?: string;
+  pow1Token?: string;
+  pow5InterestFarm?: string;
+  pow5LpNftStakeFarm?: string;
+  pow5Pool?: string;
+  pow5Pooler?: string;
+  pow5PoolFactory?: string;
+  pow5Staker?: string;
+  pow5Swapper?: string;
+  pow5Token?: string;
+  reverseRepo?: string;
   testErc1155Enumerable?: string;
   testLiquidityMath?: string;
+  testPow5InterestFarm?: string;
+  testRewardMath?: string;
   testTickMath?: string;
   uniswapV3Factory?: string;
   uniswapV3NftDescriptor?: string;
@@ -24,6 +52,7 @@ interface AddressBook {
   wrappedNativeToken?: string;
   wrappedNativeUsdcPool?: string;
   wrappedNativeUsdcPoolFactory?: string;
+  yieldHarvest?: string;
 }
 
 export { AddressBook };
