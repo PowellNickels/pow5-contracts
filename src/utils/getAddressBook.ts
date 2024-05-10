@@ -18,6 +18,25 @@ import * as hardhat from "hardhat";
 import baseAddresses from "../addresses/base.json";
 import mainnetAddresses from "../addresses/mainnet.json";
 import {
+  LPPOW1_TOKEN_CONTRACT,
+  LPPOW5_TOKEN_CONTRACT,
+  LPSFT_CONTRACT,
+  NOLPSFT_CONTRACT,
+  NOPOW5_TOKEN_CONTRACT,
+  POW1_POOL_CONTRACT,
+  POW1_POOL_FACTORY_CONTRACT,
+  POW1_POOLER_CONTRACT,
+  POW1_STAKER_CONTRACT,
+  POW1_SWAPPER_CONTRACT,
+  POW1_TOKEN_CONTRACT,
+  POW5_POOL_CONTRACT,
+  POW5_POOL_FACTORY_CONTRACT,
+  POW5_POOLER_CONTRACT,
+  POW5_STAKER_CONTRACT,
+  POW5_SWAPPER_CONTRACT,
+  POW5_TOKEN_CONTRACT,
+} from "../contracts/hardhat/dapp";
+import {
   UNISWAP_V3_FACTORY_CONTRACT,
   UNISWAP_V3_NFT_DESCRIPTOR_CONTRACT,
   UNISWAP_V3_NFT_MANAGER_CONTRACT,
@@ -49,6 +68,83 @@ const addressBook: { [networkName: string]: AddressBook } = {
 
 async function getAddressBook(networkName: string): Promise<AddressBook> {
   return {
+    lpPow1Token: await getContractAddress(
+      "lpPow1Token",
+      LPPOW1_TOKEN_CONTRACT,
+      networkName,
+    ),
+    lpPow5Token: await getContractAddress(
+      "lpPow5Token",
+      LPPOW5_TOKEN_CONTRACT,
+      networkName,
+    ),
+    lpSft: await getContractAddress("lpSft", LPSFT_CONTRACT, networkName),
+    noLpSft: await getContractAddress("noLpSft", NOLPSFT_CONTRACT, networkName),
+    noPow5Token: await getContractAddress(
+      "noPow5Token",
+      NOPOW5_TOKEN_CONTRACT,
+      networkName,
+    ),
+    pow1Pool: await getContractAddress(
+      "pow1Pool",
+      POW1_POOL_CONTRACT,
+      networkName,
+    ),
+    pow1Pooler: await getContractAddress(
+      "pow1Pooler",
+      POW1_POOLER_CONTRACT,
+      networkName,
+    ),
+    pow1PoolFactory: await getContractAddress(
+      "pow1PoolFactory",
+      POW1_POOL_FACTORY_CONTRACT,
+      networkName,
+    ),
+    pow1Staker: await getContractAddress(
+      "pow1Staker",
+      POW1_STAKER_CONTRACT,
+      networkName,
+    ),
+    pow1Swapper: await getContractAddress(
+      "pow1Swapper",
+      POW1_SWAPPER_CONTRACT,
+      networkName,
+    ),
+    pow1Token: await getContractAddress(
+      "pow1Token",
+      POW1_TOKEN_CONTRACT,
+      networkName,
+    ),
+    pow5Pool: await getContractAddress(
+      "pow5Pool",
+      POW5_POOL_CONTRACT,
+      networkName,
+    ),
+    pow5Pooler: await getContractAddress(
+      "pow5Pooler",
+      POW5_POOLER_CONTRACT,
+      networkName,
+    ),
+    pow5PoolFactory: await getContractAddress(
+      "pow5PoolFactory",
+      POW5_POOL_FACTORY_CONTRACT,
+      networkName,
+    ),
+    pow5Staker: await getContractAddress(
+      "pow5Staker",
+      POW5_STAKER_CONTRACT,
+      networkName,
+    ),
+    pow5Swapper: await getContractAddress(
+      "pow5Swapper",
+      POW5_SWAPPER_CONTRACT,
+      networkName,
+    ),
+    pow5Token: await getContractAddress(
+      "pow5Token",
+      POW5_TOKEN_CONTRACT,
+      networkName,
+    ),
     testErc1155Enumerable: await getContractAddress(
       "testErc1155Enumerable",
       TEST_ERC1155_ENUMERABLE_CONTRACT,

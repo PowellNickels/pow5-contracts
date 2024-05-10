@@ -13,6 +13,25 @@
  * @description Address book interface
  */
 interface AddressBook {
+  lpNft?: string;
+  lpPow1Token?: string;
+  lpPow5Token?: string;
+  lpSft?: string;
+  noLpSft?: string;
+  noPow5Token?: string;
+  pow1Pool?: string;
+  pow1Pooler?: string;
+  pow1PoolFactory?: string;
+  pow1Staker?: string;
+  pow1Swapper?: string;
+  pow1Token?: string;
+  pow5InterestFarm?: string;
+  pow5Pool?: string;
+  pow5Pooler?: string;
+  pow5PoolFactory?: string;
+  pow5Staker?: string;
+  pow5Swapper?: string;
+  pow5Token?: string;
   testErc1155Enumerable?: string;
   testLiquidityMath?: string;
   testTickMath?: string;
