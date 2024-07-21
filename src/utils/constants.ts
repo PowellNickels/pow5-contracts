@@ -94,7 +94,7 @@ const INITIAL_LPPOW5_USDC_VALUE: number = 100; // $100
 /**
  * @description The initial LPPOW1 amount, sqrt(POW1 * WETH)
  */
-const INITIAL_LPPOW1_AMOUNT: bigint = 18_227_065_414_412_229_238n; // 18,227 LPPOW1
+const INITIAL_LPPOW1_AMOUNT: bigint = 16_907_916_618_206_111_794n; // 16,908 LPPOW1
 
 /**
  * @description The initial POW5 amount, LPPOW1 * 99 / 100

@@ -71,13 +71,13 @@ const POW5_LPNFT_TOKEN_ID: bigint = 2n;
 
 // The initial tick of the pool, i.e. log base 1.0001 of the starting price of
 // the pool. TODO: Calculate these
-const LPPOW1_INITIAL_TICK_LOW = -126155; // If POW1 is token0
+const LPPOW1_INITIAL_TICK_LOW = -127658; // If POW1 is token0
 const LPPOW1_INITIAL_TICK_HIGH = -(LPPOW1_INITIAL_TICK_LOW + 1); // If POW1 is token1
 const LPPOW5_INITIAL_TICK_LOW = -237202; // If POW5 is token0
 const LPPOW5_INITIAL_TICK_HIGH = -(LPPOW5_INITIAL_TICK_LOW + 1); // If POW5 is token1
 
 // Remaining dust balances after depositing into LP pools
-const LPPOW1_POW1_DUST: bigint = 462n;
+const LPPOW1_POW1_DUST: bigint = 387n;
 const LPPOW1_WETH_DUST: bigint = 0n;
 const LPPOW5_POW5_DUST: bigint = 134_419n;
 const LPPOW5_USDC_DUST: bigint = 0n;

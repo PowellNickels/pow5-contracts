@@ -24,18 +24,26 @@ const USDC_PRICE: number = 1.0; // $1
 // Price of ETH, in dollars
 // Observed on 2024-04-01: $3,452
 // Observed on 2024-04-30: $3,010
+// Observed on 2024-07-20: $3,498
 //
-const ETH_PRICE: number = 3010.0; // $3,010
+const ETH_PRICE: number = 3498; // $3,498
 
 //
-// Total supply of UniV3-USDC/ETH pool on Base with TVL of $428.7M
-// Observed on 2024-04-01
+// Total supply of USDC in UniV3-USDC/ETH pool on Base with TVL of
+// Observed on 2024-04-01: 187,000,000 (TVL $428.7M)
+// Observed on 2024-07-20: 8,276,359
 //
 const USDC_ETH_LP_USDC_AMOUNT_BASE: bigint = ethers.parseUnits(
-  "187000000",
+  "8276359",
   USDC_DECIMALS,
-); // 187.0M
-const USDC_ETH_LP_ETH_AMOUNT_BASE: bigint = ethers.parseEther("70100"); // 70.1K
+); // 8,276,359
+
+//
+// Total supply of ETH in UniV3-USDC/ETH pool on Base with TVL of
+// Observed on 2024-04-01: 70,100 (TVL $428.7M)
+// Observed on 2024-07-20: 2,074
+//
+const USDC_ETH_LP_ETH_AMOUNT_BASE: bigint = ethers.parseEther("2074"); // 2,074
 
 export {
   ETH_PRICE,

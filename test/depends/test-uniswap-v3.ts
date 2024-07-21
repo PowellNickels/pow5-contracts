@@ -52,10 +52,10 @@ const WETH_USDC_POOL_FEE: UNI_V3_FEE_AMOUNT = UNI_V3_FEE_AMOUNT.LOW;
 
 // This value depends on the initial sqrtPriceX96 of the pool
 // TODO: Derive constant
-const WETH_USDC_POOL_LP_AMOUNT: bigint = 3620593873938362615n;
+const WETH_USDC_POOL_LP_AMOUNT: bigint = 131_015_909_591_163_774n;
 
 // Remaining dust after depositing into the pool
-const WETH_DUST: bigint = 2879n; // 2,879 wei
+const WETH_DUST: bigint = 12_902n; // 12,902 wei
 const USDC_DUST: bigint = 0n; // 0 USDC
 
 // Initial Uniswap V3 LP-NFT token ID
