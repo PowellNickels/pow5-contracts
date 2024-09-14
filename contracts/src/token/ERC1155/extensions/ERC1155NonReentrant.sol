@@ -13,13 +13,22 @@ pragma solidity 0.8.25;
 
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
-import {MultipleReentrancyGuard} from "../../../utils/MultipleReentrancyGuard.sol";
+import {ERC1155EnumerableNonReentrant} from "../../../utils/guards/ERC1155EnumerableNonReentrant.sol";
+import {LPNFTHolderNonReentrant} from "../../../utils/guards/LPNFTHolderNonReentrant.sol";
+import {LPSFTIssuableNonReentrant} from "../../../utils/guards/LPSFTIssuableNonReentrant.sol";
+import {LPSFTNonReentrant} from "../../../utils/guards/LPSFTNonReentrant.sol";
 
 /**
  * @title ERC-1155: Multi Token Standard, non-reentrant extension
  *
  * This abstract contract extends the OpenZeppelin ERC-1155 implementation by
- * incorporating the MultipleReentrancyGuard to enhance security for derived
- * contracts.
+ * incorporating multiple reentrancy guards to enhance security for contracts
+ * that are derived using diamond inheritance.
  */
-abstract contract ERC1155NonReentrant is MultipleReentrancyGuard, ERC1155 {}
+abstract contract ERC1155NonReentrant is
+  ERC1155EnumerableNonReentrant,
+  LPNFTHolderNonReentrant,
+  LPSFTIssuableNonReentrant,
+  LPSFTNonReentrant,
+  ERC1155
+{}

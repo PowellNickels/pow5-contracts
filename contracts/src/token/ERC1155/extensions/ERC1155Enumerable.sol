@@ -82,12 +82,7 @@ abstract contract ERC1155Enumerable is
     address to,
     uint256[] memory ids,
     uint256[] memory values
-  )
-    internal
-    virtual
-    override
-    nonReentrant(type(ERC1155Enumerable).interfaceId)
-  {
+  ) internal virtual override nonReentrantERC1155Enumerable {
     // Validate parameters
     ERC1155Utils.checkAmountArray(ids, values);
 

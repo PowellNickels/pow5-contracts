@@ -26,6 +26,7 @@ import {ILPSFT} from "../../interfaces/token/ERC1155/ILPSFT.sol";
 import {IERC20Issuable} from "../../interfaces/token/ERC20/extensions/IERC20Issuable.sol";
 
 import {ERC1155Enumerable} from "./extensions/ERC1155Enumerable.sol";
+import {ERC1155NonReentrant} from "./extensions/ERC1155NonReentrant.sol";
 import {LPNFTHolder} from "./extensions/LPNFTHolder.sol";
 import {LPSFTIssuable} from "./extensions/LPSFTIssuable.sol";
 
@@ -36,6 +37,7 @@ import {LPSFTIssuable} from "./extensions/LPSFTIssuable.sol";
  */
 contract LPSFT is
   AccessControl,
+  ERC1155NonReentrant,
   ERC1155Enumerable,
   LPSFTIssuable,
   LPNFTHolder,
@@ -125,8 +127,8 @@ contract LPSFT is
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {IERC165} via {ERC1155Enumerable}, {LPSFTIssuable},
-  // {LPNFTHolder} and {ILPSFT}
+  // Implementation of {IERC165} via {AccessControl}, {ERC1155NonReentrant},
+  // {ERC1155Enumerable}, {LPSFTIssuable}, {LPNFTHolder} and {ILPSFT}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -143,6 +145,7 @@ contract LPSFT is
       ERC1155Enumerable,
       LPSFTIssuable,
       LPNFTHolder,
+      ERC1155,
       IERC165
     )
     returns (bool)
@@ -156,8 +159,8 @@ contract LPSFT is
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {IERC1155MetadataURI} via {ERC1155Enumerable},
-  // {LSFTIssuable} and {LPNFTHolder}
+  // Implementation of {IERC1155MetadataURI} via {ERC1155NonReentrant},
+  // {ERC1155Enumerable}, {LSFTIssuable} and {LPNFTHolder}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -184,7 +187,8 @@ contract LPSFT is
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {ERC1155} via {ERC1155Enumerable} and {LPNFTHolder}
+  // Implementation of {ERC1155} via {ERC1155NonReentrant}, {ERC1155Enumerable},
+  // {LSFTIssuable} and {LPNFTHolder}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -199,7 +203,7 @@ contract LPSFT is
     internal
     virtual
     override(ERC1155, ERC1155Enumerable, LPNFTHolder)
-    nonReentrant(type(ILPSFT).interfaceId)
+    nonReentrantLPSFT
   {
     // Translate parameters
     uint256 tokenCount = ids.length;

@@ -94,12 +94,13 @@ abstract contract LPNFTHolder is
   /**
    * @dev See {ERC1155-_update}
    */
+  // slither-disable-next-line reentrancy-events
   function _update(
     address from,
     address to,
     uint256[] memory ids,
     uint256[] memory values
-  ) internal virtual override nonReentrant(type(LPNFTHolder).interfaceId) {
+  ) internal virtual override nonReentrantLPNFTHolder {
     // Validate parameters
     ERC1155Utils.checkAmountArray(ids, values);
 

@@ -73,7 +73,7 @@ abstract contract LPSFTIssuable is
     address to,
     uint256 sftTokenId,
     bytes memory data
-  ) external nonReentrant(type(LPSFTIssuable).interfaceId) {
+  ) external nonReentrantLPSFTIssuable {
     // Validate access
     _checkRole(LPSFT_ISSUER_ROLE);
 
@@ -93,7 +93,7 @@ abstract contract LPSFTIssuable is
     address to,
     uint256[] memory sftTokenIds,
     bytes memory data
-  ) external nonReentrant(type(LPSFTIssuable).interfaceId) {
+  ) external nonReentrantLPSFTIssuable {
     // Validate access
     _checkRole(LPSFT_ISSUER_ROLE);
 
@@ -120,7 +120,7 @@ abstract contract LPSFTIssuable is
   function burn(
     address from,
     uint256 sftTokenId
-  ) external nonReentrant(type(LPSFTIssuable).interfaceId) {
+  ) external nonReentrantLPSFTIssuable {
     // Validate access
     _checkRole(LPSFT_ISSUER_ROLE);
 
@@ -139,7 +139,7 @@ abstract contract LPSFTIssuable is
   function burnBatch(
     address from,
     uint256[] memory sftTokenIds
-  ) external nonReentrant(type(LPSFTIssuable).interfaceId) {
+  ) external nonReentrantLPSFTIssuable {
     // Validate access
     _checkRole(LPSFT_ISSUER_ROLE);
 
