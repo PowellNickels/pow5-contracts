@@ -41,11 +41,11 @@ contract LiquidityMath {
    *
    *   rcvB = reserveB - reserveB'
    *
-   *          = reserveB - k / (reserveA + (1 - fee) * swapA)
+   *        = reserveB - k / (reserveA + (1 - fee) * swapA)
    *
-   *          = reserveB - reserveA * reserveB / (reserveA + (1 - fee) * swapA)
+   *        = reserveB - reserveA * reserveB / (reserveA + (1 - fee) * swapA)
    *
-   *          = (1 - fee) * reserveB * swapA / (reserveA + (1 - fee) * swapA)
+   *        = (1 - fee) * reserveB * swapA / (reserveA + (1 - fee) * swapA)
    *
    * The optimal swapA should satisfy the equality constraint on the
    * user's asset ratio and the reserve's asset ratio:
