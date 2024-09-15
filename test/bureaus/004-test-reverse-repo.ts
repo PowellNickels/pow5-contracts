@@ -17,6 +17,7 @@ import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEther
 import { ETH_PRICE, USDC_PRICE } from "../../src/testing/defiMetrics";
 import { setupFixture } from "../../src/testing/setupFixture";
 import {
+  INITIAL_LPPOW1_AMOUNT,
   INITIAL_LPPOW1_WETH_VALUE,
   INITIAL_LPPOW5_AMOUNT,
   INITIAL_LPPOW5_USDC_VALUE,
@@ -1191,5 +1192,28 @@ describe("Bureau 4: Reverse Repo", () => {
       1n,
       new Uint8Array(),
     );
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Check LP-SFT balances after withdrawing LP-SFT
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should check LP-SFT balances after repaying POW5", async function (): Promise<void> {
+    const { defiManagerContract } = beneficiaryContracts;
+
+    const pow1Amount: bigint = await defiManagerContract.pow1Balance(
+      LPPOW1_LPNFT_TOKEN_ID,
+    );
+    chai.expect(pow1Amount).to.not.equal(0n);
+
+    const lpPow1Amount: bigint = await defiManagerContract.lpPow1Balance(
+      LPPOW1_LPNFT_TOKEN_ID,
+    );
+    chai.expect(lpPow1Amount).to.equal(INITIAL_LPPOW1_AMOUNT);
+
+    const noPow5Amount: bigint = await defiManagerContract.noPow5Balance(
+      LPPOW1_LPNFT_TOKEN_ID,
+    );
+    chai.expect(noPow5Amount).to.equal(0n);
   });
 });
