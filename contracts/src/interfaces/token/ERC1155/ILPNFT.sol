@@ -48,11 +48,6 @@ interface ILPNFT is IERC165 {
   error LPNFTReinitializationNotAllowed(uint256 tokenId, Pool pool);
 
   /**
-   * @dev Error raised if a deinitialized LP-NFT is again deinitalized
-   */
-  error LPNFTAlreadyDeinitialized();
-
-  /**
    * @dev Error raised if the LP-NFT is for neither LPPOW1 nor LPPOW5 pools
    *
    * @param tokenId The token ID of the LP-NFT
@@ -73,8 +68,7 @@ interface ILPNFT is IERC165 {
   /**
    * @dev Deinitialize the LP-NFT
    *
-   * Frees any transient memory and returns any leftover ETH or ERC-20 tokens to
-   * the beneficiary.
+   * Returns any leftover ETH or ERC-20 tokens to the beneficiary.
    *
    * @param beneficiary The beneficiary of leftover ETH or ERC-20 tokens, if any
    */

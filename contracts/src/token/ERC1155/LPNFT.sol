@@ -161,6 +161,7 @@ contract LPNFT is Context, AccessControl, ILPNFT {
       lpNftTokenId
     );
 
+    // Update state
     if (token0 == address(pow1Token) || token1 == address(pow1Token)) {
       _pool = Pool.LPPOW1;
     } else if (token0 == address(pow5Token) || token1 == address(pow5Token)) {
@@ -180,12 +181,12 @@ contract LPNFT is Context, AccessControl, ILPNFT {
     // Validate parameters
     require(beneficiary != address(0), "Invalid beneficiary");
 
-    // Read state
-    uint256 lpNftTokenId = _tokenId;
-
     // Validate state
-    if (lpNftTokenId == 0) {
-      revert LPNFTAlreadyDeinitialized();
+    if (_tokenId == 0) {
+      revert LPNFTInvalidTokenID();
+    }
+    if (_pool == Pool.INVALID) {
+      revert LPNFTInvalidPool(_tokenId);
     }
 
     // Recover ETH
@@ -206,9 +207,6 @@ contract LPNFT is Context, AccessControl, ILPNFT {
     if (recoveredPow5Balance > 0) {
       pow5Token.safeTransfer(beneficiary, recoveredPow5Balance);
     }
-
-    // Emit event
-    //emit LPNFTDeinitialized(lpNftTokenId, pool);
   }
 
   /**
