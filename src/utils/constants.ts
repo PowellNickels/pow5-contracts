@@ -153,6 +153,7 @@ const enum UNI_V3_FEE_AMOUNT {
 /**
  * @description The tick spacings for Uniswap V3 pools
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TICK_SPACINGS: { [amount in UNI_V3_FEE_AMOUNT]: number } = {
   [UNI_V3_FEE_AMOUNT.LOW]: 10,
   [UNI_V3_FEE_AMOUNT.MEDIUM]: 60,
