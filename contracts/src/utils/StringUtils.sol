@@ -6,7 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-pragma solidity 0.8.25;
+pragma solidity 0.8.27;
 
 /**
  * @dev Library providing string manipulation utilities

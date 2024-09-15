@@ -6,7 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-pragma solidity 0.8.25;
+pragma solidity 0.8.27;
 
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {IERC721Errors} from "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";

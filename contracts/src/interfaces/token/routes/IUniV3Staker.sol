@@ -9,7 +9,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-pragma solidity 0.8.25;
+pragma solidity 0.8.27;
 
 /**
  * @dev Token router to stake a Uniswap V3 LP NFT in exchange for liquidity

@@ -9,7 +9,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-pragma solidity 0.8.25;
+pragma solidity 0.8.27;
 
 /**
  * @dev Token router to swap between the game token and a yielding asset token

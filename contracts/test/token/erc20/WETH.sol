@@ -9,8 +9,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-// slither-disable-next-line solc-version
-pragma solidity >=0.8.0;
+pragma solidity 0.8.27;
 
 import "../../../depends/canonical-weth/WETH9.sol";
 

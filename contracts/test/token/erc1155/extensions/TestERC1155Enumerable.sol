@@ -9,7 +9,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-pragma solidity 0.8.25;
+pragma solidity 0.8.27;
 
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
