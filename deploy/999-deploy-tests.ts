@@ -16,6 +16,7 @@ import {
   TEST_ERC1155_ENUMERABLE_CONTRACT,
   TEST_LIQUIDITY_MATH_CONTRACT,
   TEST_REWARD_MATH_CONTRACT,
+  TEST_STRING_UTILS_CONTRACT,
   TEST_TICK_MATH_CONTRACT,
 } from "../src/contracts/hardhat/testing";
 
@@ -60,6 +61,13 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
 
   console.log(`Deploying ${TEST_REWARD_MATH_CONTRACT}`);
   await deployments.deploy(TEST_REWARD_MATH_CONTRACT, opts);
+
+  //
+  // Deploy TestStringUtils
+  //
+
+  console.log(`Deploying ${TEST_STRING_UTILS_CONTRACT}`);
+  await deployments.deploy(TEST_STRING_UTILS_CONTRACT, opts);
 };
 
 export default func;

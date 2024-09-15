@@ -43,6 +43,7 @@ interface AddressBook {
   testLiquidityMath?: string;
   testPow5InterestFarm?: string;
   testRewardMath?: string;
+  testStringUtils?: string;
   testTickMath?: string;
   uniswapV3Factory?: string;
   uniswapV3NftDescriptor?: string;

@@ -58,6 +58,7 @@ import {
   TEST_ERC1155_ENUMERABLE_CONTRACT,
   TEST_LIQUIDITY_MATH_CONTRACT,
   TEST_REWARD_MATH_CONTRACT,
+  TEST_STRING_UTILS_CONTRACT,
   TEST_TICK_MATH_CONTRACT,
   USDC_CONTRACT,
 } from "../contracts/hardhat/testing";
@@ -208,6 +209,11 @@ async function getAddressBook(networkName: string): Promise<AddressBook> {
     testRewardMath: await getContractAddress(
       "testRewardMath",
       TEST_REWARD_MATH_CONTRACT,
+      networkName,
+    ),
+    testStringUtils: await getContractAddress(
+      "testStringUtils",
+      TEST_STRING_UTILS_CONTRACT,
       networkName,
     ),
     testTickMath: await getContractAddress(
