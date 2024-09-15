@@ -144,7 +144,7 @@ contract LPNFT is Context, AccessControl, ILPNFT {
 
     // Validate state
     if (_tokenId != 0 || _pool != Pool.INVALID) {
-      revert LPNFTReinitializationNotAllowed();
+      revert LPNFTReinitializationNotAllowed(_tokenId, _pool);
     }
 
     // Initialize {AccessControl}
@@ -166,7 +166,7 @@ contract LPNFT is Context, AccessControl, ILPNFT {
     } else if (token0 == address(pow5Token) || token1 == address(pow5Token)) {
       _pool = Pool.LPPOW5;
     } else {
-      revert LPNFTInvalidPool();
+      revert LPNFTInvalidPool(lpNftTokenId);
     }
   }
 

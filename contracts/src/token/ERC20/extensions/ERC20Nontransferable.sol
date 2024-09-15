@@ -22,8 +22,12 @@ abstract contract ERC20Nontransferable is ERC20 {
 
   /**
    * @dev Emitted when a transfer is attempted
+   *
+   * @param from The sender
+   * @param to The recipient
+   * @param value The amount
    */
-  error ERC20TransferAttempted();
+  error ERC20TransferAttempted(address from, address to, uint256 value);
 
   //////////////////////////////////////////////////////////////////////////////
   // Implementation of {ERC20}
@@ -39,7 +43,7 @@ abstract contract ERC20Nontransferable is ERC20 {
   ) internal virtual override {
     // Validate parameters
     if (from != address(0) && to != address(0)) {
-      revert ERC20TransferAttempted();
+      revert ERC20TransferAttempted(from, to, value);
     }
 
     // Call ancestor
