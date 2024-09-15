@@ -11,7 +11,7 @@ import { Signer } from "ethers";
 import { IERC20Metadata } from "../../../../../types/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata";
 import { IERC20Metadata__factory } from "../../../../../types/factories/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata__factory";
 
-// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function ERC20MetadataMixin<T extends new (...args: any[]) => {}>(Base: T) {
   return class extends Base {
     private erc20Metadata: IERC20Metadata;

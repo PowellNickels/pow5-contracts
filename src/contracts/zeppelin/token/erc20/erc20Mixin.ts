@@ -15,7 +15,7 @@ import {
 import { IERC20 } from "../../../../types/@openzeppelin/contracts/token/ERC20/IERC20";
 import { IERC20__factory } from "../../../../types/factories/@openzeppelin/contracts/token/ERC20/IERC20__factory";
 
-// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function ERC20Mixin<T extends new (...args: any[]) => {}>(Base: T) {
   return class extends Base {
     private erc20: IERC20;

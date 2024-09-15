@@ -11,7 +11,7 @@ import { Signer } from "ethers";
 import { ILPNFTHolder } from "../../../../types/contracts/src/interfaces/token/ERC1155/extensions/ILPNFTHolder";
 import { ILPNFTHolder__factory } from "../../../../types/factories/contracts/src/interfaces/token/ERC1155/extensions/ILPNFTHolder__factory";
 
-// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function LPNFTHolderMixin<T extends new (...args: any[]) => {}>(Base: T) {
   return class extends Base {
     private lpNftTHolder: ILPNFTHolder;

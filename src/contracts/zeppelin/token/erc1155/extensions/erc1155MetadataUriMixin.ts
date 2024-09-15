@@ -11,7 +11,7 @@ import { Signer } from "ethers";
 import { IERC1155MetadataURI } from "../../../../../types/@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI";
 import { IERC1155MetadataURI__factory } from "../../../../../types/factories/@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI__factory";
 
-// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function ERC1155MetadataURIMixin<T extends new (...args: any[]) => {}>(
   Base: T,
 ) {

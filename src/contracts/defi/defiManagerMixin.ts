@@ -15,7 +15,7 @@ import {
 import { IDeFiManager } from "../../types/contracts/src/interfaces/defi/IDeFiManager";
 import { IDeFiManager__factory } from "../../types/factories/contracts/src/interfaces/defi/IDeFiManager__factory";
 
-// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function DeFiManagerMixin<T extends new (...args: any[]) => {}>(Base: T) {
   return class extends Base {
     private defiManager: IDeFiManager;

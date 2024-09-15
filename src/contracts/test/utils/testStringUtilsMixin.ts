@@ -11,7 +11,7 @@ import { Signer } from "ethers";
 import { TestStringUtils } from "../../../types/contracts/test/utils/TestStringUtils";
 import { TestStringUtils__factory } from "../../../types/factories/contracts/test/utils/TestStringUtils__factory";
 
-// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function TestStringUtilsMixin<T extends new (...args: any[]) => {}>(Base: T) {
   return class extends Base {
     private testStringUtils: TestStringUtils;

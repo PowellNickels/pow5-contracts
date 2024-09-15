@@ -15,7 +15,7 @@ import {
 import { IERC20Issuable } from "../../../../types/contracts/src/interfaces/token/ERC20/extensions/IERC20Issuable";
 import { IERC20Issuable__factory } from "../../../../types/factories/contracts/src/interfaces/token/ERC20/extensions/IERC20Issuable__factory";
 
-// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function ERC20IssuableMixin<T extends new (...args: any[]) => {}>(Base: T) {
   return class extends Base {
     private erc20Issuable: IERC20Issuable;

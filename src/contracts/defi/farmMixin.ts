@@ -11,7 +11,7 @@ import { Signer } from "ethers";
 import { IFarm } from "../../types/contracts/src/interfaces/defi/IFarm";
 import { IFarm__factory } from "../../types/factories/contracts/src/interfaces/defi/IFarm__factory";
 
-// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function FarmMixin<T extends new (...args: any[]) => {}>(Base: T) {
   return class extends Base {
     private farm: IFarm;

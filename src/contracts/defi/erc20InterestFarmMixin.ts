@@ -15,7 +15,7 @@ import {
 import { IERC20InterestFarm } from "../../types/contracts/src/interfaces/defi/IERC20InterestFarm";
 import { IERC20InterestFarm__factory } from "../../types/factories/contracts/src/interfaces/defi/IERC20InterestFarm__factory";
 
-// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function ERC20InterestFarmMixin<T extends new (...args: any[]) => {}>(Base: T) {
   return class extends Base {
     private interestFarm: IERC20InterestFarm;

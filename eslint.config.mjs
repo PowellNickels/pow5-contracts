@@ -25,6 +25,7 @@ const config = [
     rules: {
       "simple-import-sort/imports": "error",
       ...typescriptPlugin.configs.recommended.rules,
+      "@typescript-eslint/no-unused-expressions": "off",
     },
   },
   {

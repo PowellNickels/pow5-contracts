@@ -284,6 +284,7 @@ function loadDeployment(
     if (deployment.address) {
       return deployment.address;
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {}
 
   // Not found
@@ -323,6 +324,7 @@ const getContractAddress = async (
         contractDeployment.address;
       return contractDeployment.address;
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {}
 
   // Not found

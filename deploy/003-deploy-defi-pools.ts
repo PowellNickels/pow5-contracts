@@ -142,6 +142,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Failure is not fatal, pool may already have been initialized
   try {
     await (await initializeTx).wait();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
     console.log(`${WRAPPED_NATIVE_USDC_POOL_CONTRACT} is already initialized`);
   }

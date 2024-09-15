@@ -15,7 +15,7 @@ import {
 import { IAccessControl } from "../../../types/@openzeppelin/contracts/access/IAccessControl";
 import { IAccessControl__factory } from "../../../types/factories/@openzeppelin/contracts/access/IAccessControl__factory";
 
-// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function AccessControlMixin<T extends new (...args: any[]) => {}>(Base: T) {
   return class extends Base {
     private accessControl: IAccessControl;

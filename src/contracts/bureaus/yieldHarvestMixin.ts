@@ -11,7 +11,7 @@ import { Signer } from "ethers";
 import { IYieldHarvest } from "../../types/contracts/src/interfaces/bureaus/IYieldHarvest";
 import { IYieldHarvest__factory } from "../../types/factories/contracts/src/interfaces/bureaus/IYieldHarvest__factory";
 
-// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function YieldHarvestMixin<T extends new (...args: any[]) => {}>(Base: T) {
   return class extends Base {
     private yieldHarvest: IYieldHarvest;
