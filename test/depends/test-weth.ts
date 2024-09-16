@@ -14,10 +14,10 @@ import chai from "chai";
 import { ContractTransactionReceipt, ethers, EventLog, Log } from "ethers";
 import * as hardhat from "hardhat";
 
+import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { ContractLibrary } from "../../src/interfaces/contractLibrary";
 import { setupFixture } from "../../src/testing/setupFixture";
-import { getAddressBook } from "../../src/utils/getAddressBook";
 import { getContractLibrary } from "../../src/utils/getContractLibrary";
 
 // Setup Hardhat

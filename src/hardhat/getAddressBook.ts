@@ -44,7 +44,7 @@ import {
   POW5_TOKEN_CONTRACT,
   REVERSE_REPO_CONTRACT,
   YIELD_HARVEST_CONTRACT,
-} from "../contracts/hardhat/dapp";
+} from "../hardhat/contracts/dapp";
 import {
   UNISWAP_V3_FACTORY_CONTRACT,
   UNISWAP_V3_NFT_DESCRIPTOR_CONTRACT,
@@ -53,7 +53,7 @@ import {
   WRAPPED_NATIVE_TOKEN_CONTRACT,
   WRAPPED_NATIVE_USDC_POOL_CONTRACT,
   WRAPPED_NATIVE_USDC_POOL_FACTORY_CONTRACT,
-} from "../contracts/hardhat/depends";
+} from "../hardhat/contracts/depends";
 import {
   TEST_ERC1155_ENUMERABLE_CONTRACT,
   TEST_LIQUIDITY_MATH_CONTRACT,
@@ -61,7 +61,7 @@ import {
   TEST_STRING_UTILS_CONTRACT,
   TEST_TICK_MATH_CONTRACT,
   USDC_CONTRACT,
-} from "../contracts/hardhat/testing";
+} from "../hardhat/contracts/testing";
 import { AddressBook } from "../interfaces/addressBook";
 
 //

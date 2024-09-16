@@ -15,10 +15,10 @@ import { ContractTransactionReceipt, EventLog, Log } from "ethers";
 import * as hardhat from "hardhat";
 
 import { TestERC1155EnumerableContract } from "../../src/contracts/test/token/erc1155/extensions/testErc1155EnumerableContract";
+import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { setupFixture } from "../../src/testing/setupFixture";
 import { ZERO_ADDRESS } from "../../src/utils/constants";
-import { getAddressBook } from "../../src/utils/getAddressBook";
 
 // Setup Hardhat
 const setupTest = hardhat.deployments.createFixture(setupFixture);

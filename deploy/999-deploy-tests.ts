@@ -18,7 +18,7 @@ import {
   TEST_REWARD_MATH_CONTRACT,
   TEST_STRING_UTILS_CONTRACT,
   TEST_TICK_MATH_CONTRACT,
-} from "../src/contracts/hardhat/testing";
+} from "../src/hardhat/contracts/testing";
 
 //
 // Deploy test contracts

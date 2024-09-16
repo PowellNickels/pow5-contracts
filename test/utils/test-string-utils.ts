@@ -12,9 +12,9 @@ import { ethers } from "hardhat";
 import * as hardhat from "hardhat";
 
 import { TestStringUtilsContract } from "../../src/contracts/test/utils/testStringUtilsContract";
+import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { setupFixture } from "../../src/testing/setupFixture";
-import { getAddressBook } from "../../src/utils/getAddressBook";
 
 // Setup Hardhat
 const setupTest = hardhat.deployments.createFixture(setupFixture);

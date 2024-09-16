@@ -11,11 +11,11 @@ import chai, { AssertionError } from "chai";
 import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
+import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { ContractLibrary } from "../../src/interfaces/contractLibrary";
 import { setupFixture } from "../../src/testing/setupFixture";
 import { POW1_DECIMALS } from "../../src/utils/constants";
-import { getAddressBook } from "../../src/utils/getAddressBook";
 import { getContractLibrary } from "../../src/utils/getContractLibrary";
 
 // Setup Hardhat

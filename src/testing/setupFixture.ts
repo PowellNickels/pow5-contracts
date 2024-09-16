@@ -37,7 +37,7 @@ import {
   uniV3StakerAbi,
   uniV3SwapperAbi,
   yieldHarvestAbi,
-} from "../contracts/hardhat/dapp";
+} from "../hardhat/contracts/dapp";
 import {
   uniswapV3FactoryAbi,
   uniswapV3NftDescriptorAbi,
@@ -45,17 +45,17 @@ import {
   uniswapV3PoolAbi,
   uniswapV3StakerAbi,
   wrappedNativeTokenAbi,
-} from "../contracts/hardhat/depends";
+} from "../hardhat/contracts/depends";
 import {
   testErc1155EnumerableAbi,
   testLiquidityMathAbi,
   testRewardMathAbi,
   testTickMathAbi,
   usdcTokenAbi,
-} from "../contracts/hardhat/testing";
+} from "../hardhat/contracts/testing";
+import { getAddressBook } from "../hardhat/getAddressBook";
 import { AddressBook } from "../interfaces/addressBook";
 import { ContractLibraryEthers } from "../interfaces/contractLibraryEthers";
-import { getAddressBook } from "../utils/getAddressBook";
 
 //
 // Fixture setup

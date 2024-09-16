@@ -20,10 +20,10 @@ import {
   POW5_INTEREST_FARM_CONTRACT,
   POW5_LPNFT_STAKE_FARM_CONTRACT,
   UNIV3_STAKE_FARM_CONTRACT,
-} from "../src/contracts/hardhat/dapp";
+} from "../src/hardhat/contracts/dapp";
+import { getAddressBook } from "../src/hardhat/getAddressBook";
 import { AddressBook } from "../src/interfaces/addressBook";
 import { POW1_DECIMALS } from "../src/utils/constants";
-import { getAddressBook } from "../src/utils/getAddressBook";
 
 //
 // Deployment parameters

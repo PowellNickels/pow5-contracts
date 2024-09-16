@@ -11,6 +11,7 @@ import chai from "chai";
 import { Contract, ContractTransactionResponse, ethers } from "ethers";
 import * as hardhat from "hardhat";
 
+import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { ContractLibrary } from "../../src/interfaces/contractLibrary";
 import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
@@ -33,7 +34,6 @@ import {
   ZERO_ADDRESS,
 } from "../../src/utils/constants";
 import { encodePriceSqrt } from "../../src/utils/fixedMath";
-import { getAddressBook } from "../../src/utils/getAddressBook";
 import { getContractLibrary } from "../../src/utils/getContractLibrary";
 import { extractJSONFromURI } from "../../src/utils/lpNftUtils";
 

@@ -27,11 +27,11 @@ import {
   UNI_V3_POOLER_CONTRACT,
   UNI_V3_STAKER_CONTRACT,
   UNI_V3_SWAPPER_CONTRACT,
-} from "../src/contracts/hardhat/dapp";
-import { uniswapV3PoolAbi } from "../src/contracts/hardhat/depends";
+} from "../src/hardhat/contracts/dapp";
+import { uniswapV3PoolAbi } from "../src/hardhat/contracts/depends";
+import { getAddressBook, writeAddress } from "../src/hardhat/getAddressBook";
 import { AddressBook } from "../src/interfaces/addressBook";
 import { LPPOW1_POOL_FEE, LPPOW5_POOL_FEE } from "../src/utils/constants";
-import { getAddressBook, writeAddress } from "../src/utils/getAddressBook";
 
 //
 // Deploy the Uniswap V3 pool factory and token routes

@@ -21,9 +21,9 @@ import {
   NOPOW5_TOKEN_CONTRACT,
   POW1_TOKEN_CONTRACT,
   POW5_TOKEN_CONTRACT,
-} from "../src/contracts/hardhat/dapp";
+} from "../src/hardhat/contracts/dapp";
+import { getAddressBook } from "../src/hardhat/getAddressBook";
 import { AddressBook } from "../src/interfaces/addressBook";
-import { getAddressBook } from "../src/utils/getAddressBook";
 
 //
 // Deploy the Uniswap V3 pool factory and token routes

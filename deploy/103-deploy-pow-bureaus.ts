@@ -14,9 +14,9 @@ import {
   LIQUIDITY_FORGE_CONTRACT,
   REVERSE_REPO_CONTRACT,
   YIELD_HARVEST_CONTRACT,
-} from "../src/contracts/hardhat/dapp";
+} from "../src/hardhat/contracts/dapp";
+import { getAddressBook } from "../src/hardhat/getAddressBook";
 import { AddressBook } from "../src/interfaces/addressBook";
-import { getAddressBook } from "../src/utils/getAddressBook";
 
 //
 // Deploy the Uniswap V3 pool factory and token routes

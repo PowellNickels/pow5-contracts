@@ -22,9 +22,9 @@ import {
   UNISWAP_V3_STAKER_CONTRACT,
   uniswapV3NftDescriptorAbi,
   wrappedNativeTokenAbi,
-} from "../src/contracts/hardhat/depends";
+} from "../src/hardhat/contracts/depends";
+import { getAddressBook, writeAddress } from "../src/hardhat/getAddressBook";
 import { AddressBook } from "../src/interfaces/addressBook";
-import { getAddressBook, writeAddress } from "../src/utils/getAddressBook";
 
 //
 // Deploy the Uniswap V3 environment
