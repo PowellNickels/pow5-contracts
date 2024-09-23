@@ -197,7 +197,7 @@ describe("Bureau 2: Yield Harvest", () => {
       pow1TokenContract.connect(deployer) as Contract
     ).mint(
       await pow1LpSftLendFarmContract.getAddress(),
-      ethers.parseUnits("50", POW1_DECIMALS), // TODO: Handle rewards
+      ethers.parseUnits("5000", POW1_DECIMALS), // TODO: Handle rewards
     );
     await mintTx.wait();
   });
