@@ -166,16 +166,14 @@ describe("Bureau 2: Yield Harvest", () => {
   it("should grant LPSFT_FARM_OPERATOR_ROLE to YieldHarvest", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1LpSftLendFarmContract, yieldHarvestContract } = ethersContracts;
+    const { pow1LpSftLendFarmContract } = deployerContracts;
+    const { yieldHarvestContract } = ethersContracts;
 
     // Grant LPSFT_FARM_OPERATOR_ROLE to YieldHarvest
-    const tx: ethers.ContractTransactionResponse = await (
-      pow1LpSftLendFarmContract.connect(deployer) as ethers.Contract
-    ).grantRole(
+    await pow1LpSftLendFarmContract.grantRole(
       LPSFT_FARM_OPERATOR_ROLE,
       await yieldHarvestContract.getAddress(),
     );
-    await tx.wait();
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -185,7 +183,8 @@ describe("Bureau 2: Yield Harvest", () => {
   it("should mint POW1 reward to the POW1 LP-SFT lend farm", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1LpSftLendFarmContract, pow1TokenContract } = ethersContracts;
+    const { pow1LpSftLendFarmContract } = deployerContracts;
+    const { pow1TokenContract } = ethersContracts;
 
     // Grant issuer role to deployer
     const grantTx: ethers.ContractTransactionResponse = await (
@@ -197,7 +196,7 @@ describe("Bureau 2: Yield Harvest", () => {
     const mintTx: ethers.ContractTransactionResponse = await (
       pow1TokenContract.connect(deployer) as ethers.Contract
     ).mint(
-      await pow1LpSftLendFarmContract.getAddress(),
+      pow1LpSftLendFarmContract.address,
       ethers.parseUnits("5000", POW1_DECIMALS), // TODO: Handle rewards
     );
     await mintTx.wait();

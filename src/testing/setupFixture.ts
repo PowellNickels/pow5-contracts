@@ -169,6 +169,11 @@ async function setupFixture(
     uniV3StakeFarmAbi,
     beneficiary,
   );
+  const pow5LpSftLendFarmContract = new ethers.Contract(
+    addressBook.pow5LpSftLendFarm!,
+    lpSftLendFarmAbi,
+    beneficiary,
+  );
   const pow5PoolContract = new ethers.Contract(
     addressBook.pow5Pool!,
     uniswapV3PoolAbi,
@@ -289,6 +294,7 @@ async function setupFixture(
     pow1TokenContract,
     pow5InterestFarmContract,
     pow5LpNftStakeFarmContract,
+    pow5LpSftLendFarmContract,
     pow5PoolContract,
     pow5PoolerContract,
     pow5PoolFactoryContract,

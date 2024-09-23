@@ -36,6 +36,7 @@ import {
   POW1_TOKEN_CONTRACT,
   POW5_INTEREST_FARM_CONTRACT,
   POW5_LPNFT_STAKE_FARM_CONTRACT,
+  POW5_LPSFT_LEND_FARM_CONTRACT,
   POW5_POOL_CONTRACT,
   POW5_POOL_FACTORY_CONTRACT,
   POW5_POOLER_CONTRACT,
@@ -159,6 +160,11 @@ async function getAddressBook(networkName: string): Promise<AddressBook> {
     pow5LpNftStakeFarm: await getContractAddress(
       "pow5LpNftStakeFarm",
       POW5_LPNFT_STAKE_FARM_CONTRACT,
+      networkName,
+    ),
+    pow5LpSftLendFarm: await getContractAddress(
+      "pow5LpSftLendFarm",
+      POW5_LPSFT_LEND_FARM_CONTRACT,
       networkName,
     ),
     pow5Pool: await getContractAddress(

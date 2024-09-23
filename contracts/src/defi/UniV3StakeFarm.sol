@@ -197,6 +197,13 @@ contract UniV3StakeFarm is
   }
 
   /**
+   * @dev See {IUniV3StakeFarm-isInitialized}
+   */
+  function isInitialized() external view override returns (bool) {
+    return _incentiveCreated;
+  }
+
+  /**
    * @dev See {IUniV3StakeFarm-enter}
    */
   function enter(uint256 tokenId) external override nonReentrant {

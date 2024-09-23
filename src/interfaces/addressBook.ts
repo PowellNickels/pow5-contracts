@@ -32,6 +32,7 @@ interface AddressBook {
   pow1Token?: string;
   pow5InterestFarm?: string;
   pow5LpNftStakeFarm?: string;
+  pow5LpSftLendFarm?: string;
   pow5Pool?: string;
   pow5Pooler?: string;
   pow5PoolFactory?: string;

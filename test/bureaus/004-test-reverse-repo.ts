@@ -207,19 +207,19 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should initialize YieldHarvest", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { noLpSftContract, pow1Contract } = deployerContracts;
+    const { noLpSftContract, pow1Contract, pow1LpSftLendFarmContract } =
+      deployerContracts;
     const { lpSftContract } = beneficiaryContracts;
-    const { pow1LpSftLendFarmContract } = ethersContracts;
 
     // Grant roles
     await noLpSftContract.grantRole(
       LPSFT_ISSUER_ROLE,
       addressBook.yieldHarvest!,
     );
-    const tx: ethers.ContractTransactionResponse = await (
-      pow1LpSftLendFarmContract.connect(deployer) as ethers.Contract
-    ).grantRole(LPSFT_FARM_OPERATOR_ROLE, addressBook.yieldHarvest!);
-    await tx.wait();
+    await pow1LpSftLendFarmContract.grantRole(
+      LPSFT_FARM_OPERATOR_ROLE,
+      addressBook.yieldHarvest!,
+    );
     await pow1Contract.grantRole(
       ERC20_ISSUER_ROLE,
       await deployer.getAddress(),

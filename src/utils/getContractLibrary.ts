@@ -16,7 +16,11 @@ import { LiquidityForgeContract } from "../contracts/bureaus/liquidityForgeContr
 import { ReverseRepoContract } from "../contracts/bureaus/reverseRepoContract";
 import { YieldHarvestContract } from "../contracts/bureaus/yieldHarvestContract";
 import { DeFiManagerContract } from "../contracts/defi/defiManagerContract";
+import { POW1LpNftStakeFarmContract } from "../contracts/defi/pow1LpNftStakeFarmContract";
+import { POW1LpSftLendFarmContract } from "../contracts/defi/pow1LpSftLendFarmContract";
 import { POW5InterestFarmContract } from "../contracts/defi/pow5InterestFarmContract";
+import { POW5LpNftStakeFarmContract } from "../contracts/defi/pow5LpNftStakeFarmContract";
+import { POW5LpSftLendFarmContract } from "../contracts/defi/pow5LpSftLendFarmContract";
 import { LPPOW1Contract } from "../contracts/token/erc20/lpPow1Contract";
 import { LPPOW5Contract } from "../contracts/token/erc20/lpPow5Contract";
 import { NOPOW5Contract } from "../contracts/token/erc20/noPow5Contract";
@@ -56,10 +60,26 @@ function getContractLibrary(
     noLpSftContract: new NOLPSFTContract(signer, addressBook.noLpSft!),
     noPow5Contract: new NOPOW5Contract(signer, addressBook.noPow5Token!),
     pow1Contract: new POW1Contract(signer, addressBook.pow1Token!),
+    pow1LpNftStakeFarmContract: new POW1LpNftStakeFarmContract(
+      signer,
+      addressBook.pow1LpNftStakeFarm!,
+    ),
+    pow1LpSftLendFarmContract: new POW1LpSftLendFarmContract(
+      signer,
+      addressBook.pow1LpSftLendFarm!,
+    ),
     pow5Contract: new POW5Contract(signer, addressBook.pow5Token!),
     pow5InterestFarmContract: new POW5InterestFarmContract(
       signer,
       addressBook.pow5InterestFarm!,
+    ),
+    pow5LpNftStakeFarmContract: new POW5LpNftStakeFarmContract(
+      signer,
+      addressBook.pow5LpNftStakeFarm!,
+    ),
+    pow5LpSftLendFarmContract: new POW5LpSftLendFarmContract(
+      signer,
+      addressBook.pow5LpSftLendFarm!,
     ),
     reverseRepoContract: new ReverseRepoContract(
       signer,

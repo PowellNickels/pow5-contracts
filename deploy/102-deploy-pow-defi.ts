@@ -19,6 +19,7 @@ import {
   POW1_LPSFT_LEND_FARM_CONTRACT,
   POW5_INTEREST_FARM_CONTRACT,
   POW5_LPNFT_STAKE_FARM_CONTRACT,
+  POW5_LPSFT_LEND_FARM_CONTRACT,
   UNIV3_STAKE_FARM_CONTRACT,
 } from "../src/hardhat/contracts/dapp";
 import { getAddressBook } from "../src/hardhat/getAddressBook";
@@ -29,14 +30,18 @@ import { POW1_DECIMALS } from "../src/utils/constants";
 // Deployment parameters
 //
 
-const LPPOW1_NFT_STAKE_FARM_REWARD_RATE: bigint = ethers.parseUnits(
+const POW1_LPNFT_STAKE_FARM_REWARD_RATE: bigint = ethers.parseUnits(
   "1",
   POW1_DECIMALS,
 ); // 1 POW1 per lent LPPOW1 per second
-const LPPOW1_SFT_LEND_FARM_REWARD_RATE: bigint = ethers.parseUnits(
+const POW1_LPSFT_LEND_FARM_REWARD_RATE: bigint = ethers.parseUnits(
   "1",
   POW1_DECIMALS,
 ); // 1 POW1 per lent LPPOW1 per second
+const POW5_LPSFT_LEND_FARM_REWARD_RATE: bigint = ethers.parseUnits(
+  "1",
+  POW1_DECIMALS,
+); // 1 POW1 per lent LPPOW5 per second
 
 const POW5_INTEREST_RATE: bigint = ethers.parseUnits("1", POW1_DECIMALS); // 1 POW1 per lent POW5 per second
 
@@ -103,14 +108,14 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
         addressBook.pow1Token!, // pow1Token
         addressBook.pow5Token!, // pow5Token
         addressBook.uniswapV3NftManager!, // uniswapV3NftManager
-        LPPOW1_NFT_STAKE_FARM_REWARD_RATE, // rewardRate
+        POW1_LPNFT_STAKE_FARM_REWARD_RATE, // rewardRate
       ],
     },
   );
   addressBook.pow1LpNftStakeFarm = pow1LpNftStakeFarmTx.address;
 
   //
-  // Deploy LPPOW1SftLendFarm
+  // Deploy POW1SftLendFarm
   //
 
   console.log(`Deploying ${POW1_LPSFT_LEND_FARM_CONTRACT}`);
@@ -124,7 +129,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
         addressBook.lpSft!, // sftToken
         addressBook.pow1Token!, // rewardToken
         addressBook.lpPow1Token!, // lpToken
-        LPPOW1_SFT_LEND_FARM_REWARD_RATE, // rewardRate
+        POW1_LPSFT_LEND_FARM_REWARD_RATE, // rewardRate
       ],
     },
   );
@@ -155,6 +160,27 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
     },
   );
   addressBook.pow5LpNftStakeFarm = pow5LpNftStakeFarmTx.address;
+
+  //
+  // Deploy POW5SftLendFarm
+  //
+
+  console.log(`Deploying ${POW5_LPSFT_LEND_FARM_CONTRACT}`);
+  const pow5LpSftLendFarmTx = await deployments.deploy(
+    POW5_LPSFT_LEND_FARM_CONTRACT,
+    {
+      ...opts,
+      contract: LPSFT_LEND_FARM_CONTRACT,
+      args: [
+        deployer, // owner
+        addressBook.lpSft!, // sftToken
+        addressBook.pow1Token!, // rewardToken
+        addressBook.lpPow1Token!, // lpToken
+        POW5_LPSFT_LEND_FARM_REWARD_RATE, // rewardRate
+      ],
+    },
+  );
+  addressBook.pow5LpSftLendFarm = pow5LpSftLendFarmTx.address;
 
   //
   // Deploy POW5InterestFarm

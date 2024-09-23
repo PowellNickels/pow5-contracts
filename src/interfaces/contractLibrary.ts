@@ -14,7 +14,11 @@ import { LiquidityForgeContract } from "../contracts/bureaus/liquidityForgeContr
 import { ReverseRepoContract } from "../contracts/bureaus/reverseRepoContract";
 import { YieldHarvestContract } from "../contracts/bureaus/yieldHarvestContract";
 import { DeFiManagerContract } from "../contracts/defi/defiManagerContract";
+import { POW1LpNftStakeFarmContract } from "../contracts/defi/pow1LpNftStakeFarmContract";
+import { POW1LpSftLendFarmContract } from "../contracts/defi/pow1LpSftLendFarmContract";
 import { POW5InterestFarmContract } from "../contracts/defi/pow5InterestFarmContract";
+import { POW5LpNftStakeFarmContract } from "../contracts/defi/pow5LpNftStakeFarmContract";
+import { POW5LpSftLendFarmContract } from "../contracts/defi/pow5LpSftLendFarmContract";
 import { LPPOW1Contract } from "../contracts/token/erc20/lpPow1Contract";
 import { LPPOW5Contract } from "../contracts/token/erc20/lpPow5Contract";
 import { NOPOW5Contract } from "../contracts/token/erc20/noPow5Contract";
@@ -38,8 +42,12 @@ interface ContractLibrary {
   noLpSftContract: NOLPSFTContract;
   noPow5Contract: NOPOW5Contract;
   pow1Contract: POW1Contract;
+  pow1LpNftStakeFarmContract: POW1LpNftStakeFarmContract;
+  pow1LpSftLendFarmContract: POW1LpSftLendFarmContract;
   pow5Contract: POW5Contract;
   pow5InterestFarmContract: POW5InterestFarmContract;
+  pow5LpNftStakeFarmContract: POW5LpNftStakeFarmContract;
+  pow5LpSftLendFarmContract: POW5LpSftLendFarmContract;
   reverseRepoContract: ReverseRepoContract;
   usdcContract: ERC20Contract;
   wrappedNativeContract: WrappedNativeContract;

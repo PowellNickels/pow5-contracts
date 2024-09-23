@@ -126,10 +126,10 @@ describe("Bureau integration test", () => {
       noLpSftContract,
       noPow5Contract,
       pow1Contract,
+      pow1LpSftLendFarmContract,
       pow5Contract,
+      pow5InterestFarmContract,
     } = deployerContracts;
-    const { pow1LpSftLendFarmContract, pow5InterestFarmContract } =
-      ethersContracts;
 
     // Grant LPSFT roles
     await lpPow1Contract.grantRole(ERC20_ISSUER_ROLE, addressBook.lpSft!);
@@ -160,14 +160,14 @@ describe("Bureau integration test", () => {
       addressBook.liquidityForge!,
     );
 
-    const txPow1LendFarm: ethers.ContractTransactionResponse = await (
-      pow1LpSftLendFarmContract.connect(deployer) as ethers.Contract
-    ).grantRole(LPSFT_FARM_OPERATOR_ROLE, addressBook.yieldHarvest!);
-    await txPow1LendFarm.wait();
-    const txPow5InterestFarm: ethers.ContractTransactionResponse = await (
-      pow5InterestFarmContract.connect(deployer) as ethers.Contract
-    ).grantRole(ERC20_FARM_OPERATOR_ROLE, addressBook.liquidityForge!);
-    await txPow5InterestFarm.wait();
+    await pow1LpSftLendFarmContract.grantRole(
+      LPSFT_FARM_OPERATOR_ROLE,
+      addressBook.yieldHarvest!,
+    );
+    await pow5InterestFarmContract.grantRole(
+      ERC20_FARM_OPERATOR_ROLE,
+      addressBook.liquidityForge!,
+    );
 
     // For testing
     await pow1Contract.grantRole(
@@ -281,13 +281,10 @@ describe("Bureau integration test", () => {
   it("should initialize farms", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow5LpNftStakeFarmContract } = ethersContracts;
+    const { pow5LpNftStakeFarmContract } = deployerContracts;
 
     // Create LPPOW5 incentive
-    const txCreatePow5Incentive: ethers.ContractTransactionResponse = await (
-      pow5LpNftStakeFarmContract.connect(deployer) as ethers.Contract
-    ).createIncentive(LPPOW5_REWARD_AMOUNT);
-    await txCreatePow5Incentive.wait();
+    await pow5LpNftStakeFarmContract.createIncentive(LPPOW5_REWARD_AMOUNT);
   });
 
   //////////////////////////////////////////////////////////////////////////////

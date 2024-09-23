@@ -57,7 +57,7 @@ const YIELD_HARVEST_CONTRACT: string = "YieldHarvest";
 
 // Deployed contract aliases (sort by constant)
 const POW1_LPNFT_STAKE_FARM_CONTRACT: string = "POW1LpNftStakeFarm";
-const POW1_LPSFT_LEND_FARM_CONTRACT: string = "LPPOW1SftLendFarm";
+const POW1_LPSFT_LEND_FARM_CONTRACT: string = "POW1LpSftLendFarm";
 const POW1_POOL_CONTRACT: string = "POW1Pool";
 const POW1_POOL_FACTORY_CONTRACT: string = "POW1PoolFactory";
 const POW1_POOLER_CONTRACT: string = "POW1Pooler";
@@ -65,6 +65,7 @@ const POW1_STAKER_CONTRACT: string = "POW1Staker";
 const POW1_SWAPPER_CONTRACT: string = "POW1Swapper";
 const POW5_INTEREST_FARM_CONTRACT: string = "POW5InterestFarm";
 const POW5_LPNFT_STAKE_FARM_CONTRACT: string = "POW5LpNftStakeFarm";
+const POW5_LPSFT_LEND_FARM_CONTRACT: string = "POW5LpSftLendFarm";
 const POW5_POOL_CONTRACT: string = "POW5Pool";
 const POW5_POOL_FACTORY_CONTRACT: string = "POW5PoolFactory";
 const POW5_POOLER_CONTRACT: string = "POW5Pooler";
@@ -115,6 +116,7 @@ export {
   POW1_TOKEN_CONTRACT,
   POW5_INTEREST_FARM_CONTRACT,
   POW5_LPNFT_STAKE_FARM_CONTRACT,
+  POW5_LPSFT_LEND_FARM_CONTRACT,
   POW5_POOL_CONTRACT,
   POW5_POOL_FACTORY_CONTRACT,
   POW5_POOLER_CONTRACT,

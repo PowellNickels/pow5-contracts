@@ -27,6 +27,13 @@ interface IUniV3StakeFarm is IERC165 {
    */
   function createIncentive(uint256 rewardAmount) external;
 
+  /**
+   * @dev Checks if the Uniswap V3 staker incentive has been initialized
+   *
+   * @return True if the incentive has been initialized, false otherwise
+   */
+  function isInitialized() external view returns (bool);
+
   //////////////////////////////////////////////////////////////////////////////
   // Public interface
   //////////////////////////////////////////////////////////////////////////////

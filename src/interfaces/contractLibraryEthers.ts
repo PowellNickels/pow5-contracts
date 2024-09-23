@@ -33,6 +33,7 @@ interface ContractLibraryEthers {
   pow1TokenContract: ethers.Contract;
   pow5InterestFarmContract: ethers.Contract;
   pow5LpNftStakeFarmContract: ethers.Contract;
+  pow5LpSftLendFarmContract: ethers.Contract;
   pow5PoolContract: ethers.Contract;
   pow5PoolerContract: ethers.Contract;
   pow5PoolFactoryContract: ethers.Contract;
