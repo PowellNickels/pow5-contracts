@@ -8,14 +8,10 @@
 
 import { Signer } from "ethers";
 
+import { BaseContract } from "../../baseContract";
 import { TestStringUtilsMixin } from "./testStringUtilsMixin";
 
-class Base {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-  constructor(...args: any[]) {}
-}
-
-const TestStringUtilsContractBase = TestStringUtilsMixin(Base);
+const TestStringUtilsContractBase = TestStringUtilsMixin(BaseContract);
 
 class TestStringUtilsContract extends TestStringUtilsContractBase {
   constructor(signer: Signer, contractAddress: string) {

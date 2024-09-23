@@ -8,15 +8,11 @@
 
 import { Signer } from "ethers";
 
+import { BaseContract } from "../baseContract";
 import { AccessControlMixin } from "../zeppelin/access/accessControlMixin";
 import { DeFiManagerMixin } from "./defiManagerMixin";
 
-class Base {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-  constructor(...args: any[]) {}
-}
-
-const AccessControlContract = AccessControlMixin(Base);
+const AccessControlContract = AccessControlMixin(BaseContract);
 const DeFiManagerContractBase = DeFiManagerMixin(AccessControlContract);
 
 class DeFiManagerContract extends DeFiManagerContractBase {

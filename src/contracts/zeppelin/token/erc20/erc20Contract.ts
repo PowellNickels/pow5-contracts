@@ -8,14 +8,10 @@
 
 import { Signer } from "ethers";
 
+import { BaseContract } from "../../../baseContract";
 import { ERC20Mixin } from "./erc20Mixin";
 
-class Base {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-  constructor(...args: any[]) {}
-}
-
-const ERC20ContractBase = ERC20Mixin(Base);
+const ERC20ContractBase = ERC20Mixin(BaseContract);
 
 class ERC20Contract extends ERC20ContractBase {
   constructor(signer: Signer, contractAddress: string) {

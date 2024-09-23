@@ -8,15 +8,11 @@
 
 import { Signer } from "ethers";
 
+import { BaseContract } from "../../baseContract";
 import { ERC20Mixin } from "../../zeppelin/token/erc20/erc20Mixin";
 import { WrappedNativeMixin } from "./wrappedNativeMixin";
 
-class Base {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-  constructor(...args: any[]) {}
-}
-
-const ERC20Contract = ERC20Mixin(Base);
+const ERC20Contract = ERC20Mixin(BaseContract);
 const WrappedNativeContractBase = WrappedNativeMixin(ERC20Contract);
 
 class WrappedNativeContract extends WrappedNativeContractBase {

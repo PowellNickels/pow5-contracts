@@ -8,6 +8,7 @@
 
 import { Signer } from "ethers";
 
+import { BaseContract } from "../../baseContract";
 import { AccessControlMixin } from "../../zeppelin/access/accessControlMixin";
 import { ERC1155Mixin } from "../../zeppelin/token/erc1155/erc1155Mixin";
 import { ERC1155MetadataURIMixin } from "../../zeppelin/token/erc1155/extensions/erc1155MetadataUriMixin";
@@ -15,12 +16,7 @@ import { ERC1155EnumerableMixin } from "./extensions/erc1155EnumerableMixin";
 import { LPNFTHolderMixin } from "./extensions/lpNftHolderMixin";
 import { LPSFTIssuableMixin } from "./extensions/lpSftIssuableMixin";
 
-class Base {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-  constructor(...args: any[]) {}
-}
-
-const AccessControlContract = AccessControlMixin(Base);
+const AccessControlContract = AccessControlMixin(BaseContract);
 const ERC1155Contract = ERC1155Mixin(AccessControlContract);
 const ERC1155MetadataURIContract = ERC1155MetadataURIMixin(ERC1155Contract);
 const ERC1155EnumerableContract = ERC1155EnumerableMixin(

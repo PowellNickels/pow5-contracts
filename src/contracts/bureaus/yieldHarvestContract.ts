@@ -8,14 +8,10 @@
 
 import { Signer } from "ethers";
 
+import { BaseContract } from "../baseContract";
 import { YieldHarvestMixin } from "./yieldHarvestMixin";
 
-class Base {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-  constructor(...args: any[]) {}
-}
-
-const YieldHarvestContractBase = YieldHarvestMixin(Base);
+const YieldHarvestContractBase = YieldHarvestMixin(BaseContract);
 
 class YieldHarvestContract extends YieldHarvestContractBase {
   constructor(signer: Signer, contractAddress: string) {

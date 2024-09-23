@@ -8,14 +8,10 @@
 
 import { Signer } from "ethers";
 
+import { BaseContract } from "../baseContract";
 import { LiquidityForgeMixin } from "./liquidityForgeMixin";
 
-class Base {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-  constructor(...args: any[]) {}
-}
-
-const LiquidityForgeContractBase = LiquidityForgeMixin(Base);
+const LiquidityForgeContractBase = LiquidityForgeMixin(BaseContract);
 
 class LiquidityForgeContract extends LiquidityForgeContractBase {
   constructor(signer: Signer, contractAddress: string) {

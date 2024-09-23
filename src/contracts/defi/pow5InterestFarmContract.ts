@@ -8,16 +8,12 @@
 
 import { Signer } from "ethers";
 
+import { BaseContract } from "../baseContract";
 import { AccessControlMixin } from "../zeppelin/access/accessControlMixin";
 import { ERC20InterestFarmMixin } from "./erc20InterestFarmMixin";
 import { FarmMixin } from "./farmMixin";
 
-class Base {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-  constructor(...args: any[]) {}
-}
-
-const AccessControlContract = AccessControlMixin(Base);
+const AccessControlContract = AccessControlMixin(BaseContract);
 const FarmContract = FarmMixin(AccessControlContract);
 const ERC20InterestFarmContract = ERC20InterestFarmMixin(FarmContract);
 

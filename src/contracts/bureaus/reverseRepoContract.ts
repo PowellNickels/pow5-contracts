@@ -8,14 +8,10 @@
 
 import { Signer } from "ethers";
 
+import { BaseContract } from "../baseContract";
 import { ReverseRepoMixin } from "./reverseRepoMixin";
 
-class Base {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-  constructor(...args: any[]) {}
-}
-
-const ReverseRepoContractBase = ReverseRepoMixin(Base);
+const ReverseRepoContractBase = ReverseRepoMixin(BaseContract);
 
 class ReverseRepoContract extends ReverseRepoContractBase {
   constructor(signer: Signer, contractAddress: string) {
