@@ -12,10 +12,10 @@ import * as hardhat from "hardhat";
 
 import { TestERC20MintableContract } from "../../src/contracts/test/token/erc20/extensions/testErc20MintableContract";
 import { AccessControlContract } from "../../src/contracts/zeppelin/access/accessControlContract";
+import { ERC20Contract } from "../../src/contracts/zeppelin/token/erc20/erc20Contract";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { ContractLibrary } from "../../src/interfaces/contractLibrary";
-import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
 import { ETH_PRICE, USDC_PRICE } from "../../src/testing/defiMetrics";
 import { setupFixture } from "../../src/testing/setupFixture";
 import {
@@ -88,7 +88,6 @@ describe("Bureau integration test", () => {
 
   let deployerContracts: ContractLibrary;
   let beneficiaryContracts: ContractLibrary;
-  let ethersContracts: ContractLibraryEthers;
 
   //////////////////////////////////////////////////////////////////////////////
   // Mocha setup
@@ -103,7 +102,7 @@ describe("Bureau integration test", () => {
     beneficiary = signers[1];
 
     // A single fixture is used for the test suite
-    ethersContracts = await setupTest();
+    await setupTest();
 
     // Get the address book
     addressBook = await getAddressBook(hardhat.network.name);
@@ -255,7 +254,10 @@ describe("Bureau integration test", () => {
       reverseRepoContract,
       wrappedNativeContract,
     } = deployerContracts;
-    const { usdcTokenContract } = ethersContracts;
+    const usdcTokenContract: ERC20Contract = new ERC20Contract(
+      deployer,
+      addressBook.usdcToken!,
+    );
 
     // Approve Dutch Auction
     await pow1Contract.approve(
@@ -278,10 +280,10 @@ describe("Bureau integration test", () => {
       reverseRepoContract.address,
       INITIAL_POW5_DEPOSIT,
     );
-    const txApproveUsdc: ethers.ContractTransactionResponse = await (
-      usdcTokenContract.connect(deployer) as ethers.Contract
-    ).approve(reverseRepoContract.address, INITIAL_USDC_AMOUNT);
-    await txApproveUsdc.wait();
+    await usdcTokenContract.approve(
+      reverseRepoContract.address,
+      INITIAL_USDC_AMOUNT,
+    );
   });
 
   //////////////////////////////////////////////////////////////////////////////
