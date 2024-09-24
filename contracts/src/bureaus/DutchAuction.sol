@@ -91,6 +91,11 @@ contract DutchAuction is
   //////////////////////////////////////////////////////////////////////////////
 
   /**
+   * @dev Initialization flag
+   */
+  bool private _initialized = false;
+
+  /**
    * @dev Mapping from auction slot to auction
    */
   mapping(uint256 slot => VRGDA auction) private _slotToAuction;
@@ -197,6 +202,12 @@ contract DutchAuction is
     require(assetTokenAmount > 0, "Invalid asset amount");
     require(receiver != address(0), "Invalid receiver");
 
+    // Validate state
+    require(!_initialized, "Already initialized");
+
+    // Update state
+    _initialized = true;
+
     // Call external contracts
     gameToken.safeTransferFrom(_msgSender(), address(this), gameTokenAmount);
     assetToken.safeTransferFrom(_msgSender(), address(this), assetTokenAmount);
@@ -239,6 +250,14 @@ contract DutchAuction is
     lpSft.safeTransferFrom(address(this), receiver, nftTokenId, 1, "");
 
     return nftTokenId;
+  }
+
+  /**
+   * @dev See {IDutchAuction-isInitialized}
+   */
+  function isInitialized() external view override returns (bool) {
+    // Read state
+    return _initialized;
   }
 
   /**

@@ -40,6 +40,10 @@ function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
       return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
 
+    async isInitialized(): Promise<boolean> {
+      return await this.dutchAuction.isInitialized();
+    }
+
     async setAuction(
       slot: bigint,
       targetPrice: bigint,

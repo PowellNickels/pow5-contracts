@@ -48,6 +48,13 @@ interface IDutchAuction is IERC165 {
   ) external returns (uint256 nftTokenId);
 
   /**
+   * @dev Check if the Dutch Auction is initialized
+   *
+   * @return True if the Dutch Auction is initialized, false otherwise
+   */
+  function isInitialized() external view returns (bool);
+
+  /**
    * @dev Set the auction for a slot, allowing for multiple auctions
    *
    * @param slot The auction slot
