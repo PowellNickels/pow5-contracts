@@ -30,6 +30,7 @@ import {
 } from "../src/hardhat/contracts/dapp";
 import { uniswapV3PoolAbi } from "../src/hardhat/contracts/depends";
 import { getAddressBook, writeAddress } from "../src/hardhat/getAddressBook";
+import { getNetworkName } from "../src/hardhat/hardhatUtils";
 import { AddressBook } from "../src/interfaces/addressBook";
 import { LPPOW1_POOL_FEE, LPPOW5_POOL_FEE } from "../src/utils/constants";
 
@@ -47,7 +48,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   };
 
   // Get the network name
-  const networkName: string = hardhat_re.network.name;
+  const networkName: string = getNetworkName();
 
   // Get the contract addresses
   const addressBook: AddressBook = await getAddressBook(networkName);

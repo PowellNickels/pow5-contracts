@@ -15,6 +15,7 @@ import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
+import { getNetworkName } from "../../src/hardhat/hardhatUtils";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { ContractLibrary } from "../../src/interfaces/contractLibrary";
 import { setupFixture } from "../../src/testing/setupFixture";
@@ -52,8 +53,11 @@ describe("Token Constants", () => {
     // A single fixture is used for the test suite
     await setupTest();
 
-    // Get address book
-    const addressBook: AddressBook = await getAddressBook(hardhat.network.name);
+    // Get the network name
+    const networkName: string = getNetworkName();
+
+    // Get the contract addresses
+    const addressBook: AddressBook = await getAddressBook(networkName);
 
     // Get the contracts
     contracts = getContractLibrary(deployer, addressBook);

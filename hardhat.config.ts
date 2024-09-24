@@ -28,7 +28,6 @@ const config: HardhatUserConfig = {
       accounts: mnemonic ? { mnemonic } : undefined,
       allowUnlimitedContractSize: true,
       tags: [
-        "ChainID",
         "TestTokens",
         "UniswapV3",
         "LiquidityPools",
@@ -44,7 +43,6 @@ const config: HardhatUserConfig = {
       accounts: mnemonic ? { mnemonic } : undefined,
       allowUnlimitedContractSize: true,
       tags: [
-        "ChainID",
         "TestTokens",
         "UniswapV3",
         "LiquidityPools",

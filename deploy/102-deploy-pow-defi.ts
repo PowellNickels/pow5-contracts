@@ -23,6 +23,7 @@ import {
   UNIV3_STAKE_FARM_CONTRACT,
 } from "../src/hardhat/contracts/dapp";
 import { getAddressBook } from "../src/hardhat/getAddressBook";
+import { getNetworkName } from "../src/hardhat/hardhatUtils";
 import { AddressBook } from "../src/interfaces/addressBook";
 import { POW1_DECIMALS } from "../src/utils/constants";
 
@@ -59,7 +60,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   };
 
   // Get the network name
-  const networkName: string = hardhat_re.network.name;
+  const networkName: string = getNetworkName();
 
   // Get the contract addresses
   const addressBook: AddressBook = await getAddressBook(networkName);

@@ -15,6 +15,7 @@ import { DeployFunction, DeployOptions } from "hardhat-deploy/types";
 import { WRAPPED_NATIVE_TOKEN_CONTRACT } from "../src/hardhat/contracts/depends";
 import { USDC_CONTRACT } from "../src/hardhat/contracts/testing";
 import { getAddressBook } from "../src/hardhat/getAddressBook";
+import { getNetworkName } from "../src/hardhat/hardhatUtils";
 import { AddressBook } from "../src/interfaces/addressBook";
 
 //
@@ -33,7 +34,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   };
 
   // Get the network name
-  const networkName: string = hardhat_re.network.name;
+  const networkName: string = getNetworkName();
 
   // Get the contract addresses
   const addressBook: AddressBook = await getAddressBook(networkName);
@@ -43,7 +44,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   //////////////////////////////////////////////////////////////////////////////
 
   // Deploy wrapped native token
-  if (addressBook.wrappedNativeToken) {
+  if (addressBook.wrappedNativeToken && networkName !== "localhost") {
     console.log(
       `Using ${WRAPPED_NATIVE_TOKEN_CONTRACT} at ${addressBook.wrappedNativeToken}`,
     );
@@ -54,7 +55,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   }
 
   // Deploy USDC token
-  if (addressBook.usdcToken) {
+  if (addressBook.usdcToken && networkName !== "localhost") {
     console.log(`Using ${USDC_CONTRACT} at ${addressBook.usdcToken}`);
   } else {
     console.log(`Deploying ${USDC_CONTRACT}`);

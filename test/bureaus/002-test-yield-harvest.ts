@@ -12,6 +12,7 @@ import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
+import { getNetworkName } from "../../src/hardhat/hardhatUtils";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { ContractLibrary } from "../../src/interfaces/contractLibrary";
 import { ETH_PRICE } from "../../src/testing/defiMetrics";
@@ -81,8 +82,11 @@ describe("Bureau 2: Yield Harvest", () => {
     // A single fixture is used for the test suite
     await setupTest();
 
+    // Get the network name
+    const networkName: string = getNetworkName();
+
     // Get the address book
-    addressBook = await getAddressBook(hardhat.network.name);
+    addressBook = await getAddressBook(networkName);
 
     // Get the contract library
     deployerContracts = getContractLibrary(deployer, addressBook);

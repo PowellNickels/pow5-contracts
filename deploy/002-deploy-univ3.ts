@@ -24,6 +24,7 @@ import {
   wrappedNativeTokenAbi,
 } from "../src/hardhat/contracts/depends";
 import { getAddressBook, writeAddress } from "../src/hardhat/getAddressBook";
+import { getNetworkName } from "../src/hardhat/hardhatUtils";
 import { AddressBook } from "../src/interfaces/addressBook";
 
 //
@@ -45,7 +46,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   };
 
   // Get the network name
-  const networkName: string = hardhat_re.network.name;
+  const networkName: string = getNetworkName();
 
   // Get the contract addresses
   const addressBook: AddressBook = await getAddressBook(networkName);
@@ -71,7 +72,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Deploy UniswapV3Factory
   //
 
-  if (addressBook.uniswapV3Factory) {
+  if (addressBook.uniswapV3Factory && networkName !== "localhost") {
     console.log(
       `Using ${UNISWAP_V3_FACTORY_CONTRACT} at ${addressBook.uniswapV3Factory}`,
     );
@@ -96,7 +97,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // use the saved address.
   //
 
-  if (addressBook.uniswapV3NftDescriptor && networkName !== "hardhat") {
+  if (addressBook.uniswapV3NftDescriptor && networkName !== "localhost") {
     console.log(
       `Using ${UNISWAP_V3_NFT_DESCRIPTOR_CONTRACT} at ${addressBook.uniswapV3NftDescriptor}`,
     );
@@ -139,7 +140,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Deploy NonfungiblePositionManager
   //
 
-  if (addressBook.uniswapV3NftManager) {
+  if (addressBook.uniswapV3NftManager && networkName !== "localhost") {
     console.log(
       `Using ${UNISWAP_V3_NFT_MANAGER_CONTRACT} at ${addressBook.uniswapV3NftManager}`,
     );
@@ -160,7 +161,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Deploy UniswapV3Staker
   //
 
-  if (addressBook.uniswapV3Staker) {
+  if (addressBook.uniswapV3Staker && networkName !== "localhost") {
     console.log(
       `Using ${UNISWAP_V3_STAKER_CONTRACT} at ${addressBook.uniswapV3Staker}`,
     );

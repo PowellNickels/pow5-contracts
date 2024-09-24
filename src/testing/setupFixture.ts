@@ -11,7 +11,6 @@
 
 import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
 import { ethers } from "ethers";
-import * as hardhat from "hardhat";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeploymentsExtension } from "hardhat-deploy/types";
 import { getUnnamedSigners } from "hardhat-deploy-ethers/dist/src/helpers";
@@ -54,6 +53,7 @@ import {
   usdcTokenAbi,
 } from "../hardhat/contracts/testing";
 import { getAddressBook } from "../hardhat/getAddressBook";
+import { getNetworkName } from "../hardhat/hardhatUtils";
 import { AddressBook } from "../interfaces/addressBook";
 import { ContractLibraryEthers } from "../interfaces/contractLibraryEthers";
 
@@ -72,8 +72,8 @@ async function setupFixture(
   const signers: SignerWithAddress[] = await getUnnamedSigners(hardhat_re);
   const beneficiary: SignerWithAddress = signers[1];
 
-  // Get network name
-  const networkName: string = hardhat.network.name;
+  // Get the network name
+  const networkName: string = getNetworkName();
 
   // Load contract addresses
   const addressBook: AddressBook = await getAddressBook(networkName);

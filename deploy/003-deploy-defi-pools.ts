@@ -27,6 +27,7 @@ import {
   WRAPPED_NATIVE_USDC_POOL_FACTORY_CONTRACT,
 } from "../src/hardhat/contracts/depends";
 import { getAddressBook, writeAddress } from "../src/hardhat/getAddressBook";
+import { getNetworkName } from "../src/hardhat/hardhatUtils";
 import { AddressBook } from "../src/interfaces/addressBook";
 import {
   USDC_ETH_LP_ETH_AMOUNT_BASE,
@@ -55,7 +56,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   };
 
   // Get the network name
-  const networkName: string = hardhat_re.network.name;
+  const networkName: string = getNetworkName();
 
   // Get the contract addresses
   const addressBook: AddressBook = await getAddressBook(networkName);

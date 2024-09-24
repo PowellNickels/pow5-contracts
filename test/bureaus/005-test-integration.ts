@@ -14,6 +14,7 @@ import { TestERC20MintableContract } from "../../src/contracts/test/token/erc20/
 import { AccessControlContract } from "../../src/contracts/zeppelin/access/accessControlContract";
 import { ERC20Contract } from "../../src/contracts/zeppelin/token/erc20/erc20Contract";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
+import { getNetworkName } from "../../src/hardhat/hardhatUtils";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { ContractLibrary } from "../../src/interfaces/contractLibrary";
 import { ETH_PRICE, USDC_PRICE } from "../../src/testing/defiMetrics";
@@ -104,8 +105,11 @@ describe("Bureau integration test", () => {
     // A single fixture is used for the test suite
     await setupTest();
 
+    // Get the network name
+    const networkName: string = getNetworkName();
+
     // Get the address book
-    addressBook = await getAddressBook(hardhat.network.name);
+    addressBook = await getAddressBook(networkName);
 
     // Get the contract libraries
     deployerContracts = getContractLibrary(deployer, addressBook);

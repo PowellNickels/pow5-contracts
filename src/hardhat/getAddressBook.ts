@@ -314,6 +314,20 @@ const getContractAddress = async (
     addressBook[networkName] = {};
   }
 
+  // Look up address in deployments system, if available
+  const deployments = (hardhat as any).deployments;
+  if (deployments && deployments.get) {
+    try {
+      const contractDeployment = await hardhat.deployments.get(contractName);
+      if (contractDeployment && contractDeployment.address) {
+        addressBook[networkName][contractName as keyof AddressBook] =
+          contractDeployment.address;
+        return contractDeployment.address;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {}
+  }
+
   // Look up address if the contract has a known deployment
   const deploymentAddress = loadDeployment(networkName, contractName);
   if (deploymentAddress) {
@@ -321,17 +335,6 @@ const getContractAddress = async (
       deploymentAddress;
     return deploymentAddress;
   }
-
-  // Look up address in deployments system
-  try {
-    const contractDeployment = await hardhat.deployments.get(contractName);
-    if (contractDeployment && contractDeployment.address) {
-      addressBook[networkName][contractName as keyof AddressBook] =
-        contractDeployment.address;
-      return contractDeployment.address;
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (e) {}
 
   // Not found
   return;
@@ -344,6 +347,14 @@ function writeAddress(
   abi: { [key: string]: any },
 ): void {
   console.log(`Deployed ${contractName} to ${address}`);
+
+  // Create the directories if they don't exist
+  if (!fs.existsSync(`${__dirname}/../../deployments`)) {
+    fs.mkdirSync(`${__dirname}/../../deployments`);
+  }
+  if (!fs.existsSync(`${__dirname}/../../deployments/${networkName}`)) {
+    fs.mkdirSync(`${__dirname}/../../deployments/${networkName}`);
+  }
 
   // Write the file
   const addressFile = `${__dirname}/../../deployments/${networkName}/${contractName}.json`;

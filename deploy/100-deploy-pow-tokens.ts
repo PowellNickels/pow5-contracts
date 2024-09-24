@@ -23,6 +23,7 @@ import {
   POW5_TOKEN_CONTRACT,
 } from "../src/hardhat/contracts/dapp";
 import { getAddressBook } from "../src/hardhat/getAddressBook";
+import { getNetworkName } from "../src/hardhat/hardhatUtils";
 import { AddressBook } from "../src/interfaces/addressBook";
 
 //
@@ -39,7 +40,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   };
 
   // Get the network name
-  const networkName: string = hardhat_re.network.name;
+  const networkName: string = getNetworkName();
 
   // Get the contract addresses
   const addressBook: AddressBook = await getAddressBook(networkName);
@@ -52,7 +53,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Deploy POW1 token
   //
 
-  if (addressBook.pow1Token) {
+  if (addressBook.pow1Token && networkName !== "localhost") {
     console.log(`Using ${POW1_TOKEN_CONTRACT} at ${addressBook.pow1Token}`);
   } else {
     console.log(`Deploying ${POW1_TOKEN_CONTRACT}`);
@@ -69,7 +70,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Deploy POW5 token
   //
 
-  if (addressBook.pow5Token) {
+  if (addressBook.pow5Token && networkName !== "localhost") {
     console.log(`Using ${POW5_TOKEN_CONTRACT} at ${addressBook.pow5Token}`);
   } else {
     console.log(`Deploying ${POW5_TOKEN_CONTRACT}`);
@@ -86,7 +87,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Deploy LPPOW1 token
   //
 
-  if (addressBook.lpPow1Token) {
+  if (addressBook.lpPow1Token && networkName !== "localhost") {
     console.log(`Using ${LPPOW1_TOKEN_CONTRACT} at ${addressBook.lpPow1Token}`);
   } else {
     console.log(`Deploying ${LPPOW1_TOKEN_CONTRACT}`);
@@ -103,7 +104,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Deploy LPPOW5 token
   //
 
-  if (addressBook.lpPow5Token) {
+  if (addressBook.lpPow5Token && networkName !== "localhost") {
     console.log(`Using ${LPPOW5_TOKEN_CONTRACT} at ${addressBook.lpPow5Token}`);
   } else {
     console.log(`Deploying ${LPPOW5_TOKEN_CONTRACT}`);
@@ -120,7 +121,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Deploy NOPOW5 token
   //
 
-  if (addressBook.noPow5Token) {
+  if (addressBook.noPow5Token && networkName !== "localhost") {
     console.log(`Using ${NOPOW5_TOKEN_CONTRACT} at ${addressBook.noPow5Token}`);
   } else {
     console.log(`Deploying ${NOPOW5_TOKEN_CONTRACT}`);
@@ -137,7 +138,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Deploy LP-NFT template contract
   //
 
-  if (addressBook.lpNft) {
+  if (addressBook.lpNft && networkName !== "localhost") {
     console.log(`Using ${LPNFT_CONTRACT} at ${addressBook.lpNft}`);
   } else {
     console.log(`Deploying ${LPNFT_CONTRACT}`);
@@ -159,7 +160,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Deploy LP-SFT token
   //
 
-  if (addressBook.lpSft) {
+  if (addressBook.lpSft && networkName !== "localhost") {
     console.log(`Using ${LPSFT_CONTRACT} at ${addressBook.lpSft}`);
   } else {
     console.log(`Deploying ${LPSFT_CONTRACT}`);
@@ -182,7 +183,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Deploy NOLPSFT token
   //
 
-  if (addressBook.noLpSft) {
+  if (addressBook.noLpSft && networkName !== "localhost") {
     console.log(`Using ${NOLPSFT_CONTRACT} at ${addressBook.noLpSft}`);
   } else {
     console.log(`Deploying ${NOLPSFT_CONTRACT}`);

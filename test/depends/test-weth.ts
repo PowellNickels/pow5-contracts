@@ -15,6 +15,7 @@ import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
+import { getNetworkName } from "../../src/hardhat/hardhatUtils";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { ContractLibrary } from "../../src/interfaces/contractLibrary";
 import { setupFixture } from "../../src/testing/setupFixture";
@@ -52,8 +53,11 @@ describe("W-ETH", () => {
     // A single fixture is used for the test suite
     await setupTest();
 
-    // Get address book
-    addressBook = await getAddressBook(hardhat.network.name);
+    // Get the network name
+    const networkName: string = getNetworkName();
+
+    // Get the address book
+    addressBook = await getAddressBook(networkName);
 
     // Get contract library
     contracts = getContractLibrary(deployer, addressBook);
