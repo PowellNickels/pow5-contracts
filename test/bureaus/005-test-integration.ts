@@ -11,6 +11,7 @@ import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { TestERC20MintableContract } from "../../src/contracts/test/token/erc20/extensions/testErc20MintableContract";
+import { AccessControlContract } from "../../src/contracts/zeppelin/access/accessControlContract";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { ContractLibrary } from "../../src/interfaces/contractLibrary";
@@ -136,55 +137,78 @@ describe("Bureau integration test", () => {
       yieldHarvestContract,
     }: ContractLibrary = deployerContracts;
 
-    // Grant LPSFT roles
-    await lpPow1Contract.grantRole(ERC20_ISSUER_ROLE, lpSftContract.address);
-    await lpPow5Contract.grantRole(ERC20_ISSUER_ROLE, lpSftContract.address);
+    // Declarative structure for roles with contract and address pairs
+    const roleAssignments: Record<
+      string,
+      Array<{ contract: AccessControlContract; address: string }>
+    > = {
+      // ERC20_ISSUER_ROLE
+      [ERC20_ISSUER_ROLE]: [
+        {
+          contract: pow1Contract,
+          address: await deployer.getAddress(),
+        },
+        {
+          contract: pow5Contract,
+          address: defiManagerContract.address,
+        },
+        {
+          contract: noPow5Contract,
+          address: defiManagerContract.address,
+        },
+        {
+          contract: lpPow1Contract,
+          address: lpSftContract.address,
+        },
+        {
+          contract: lpPow5Contract,
+          address: lpSftContract.address,
+        },
+      ],
+      // LPSFT_ISSUER_ROLE
+      [LPSFT_ISSUER_ROLE]: [
+        {
+          contract: lpSftContract,
+          address: pow1LpNftStakeFarmContract.address,
+        },
+        {
+          contract: lpSftContract,
+          address: pow5LpNftStakeFarmContract.address,
+        },
+        {
+          contract: noLpSftContract,
+          address: yieldHarvestContract.address,
+        },
+      ],
+      // DEFI_OPERATOR_ROLE
+      [DEFI_OPERATOR_ROLE]: [
+        {
+          contract: defiManagerContract,
+          address: liquidityForgeContract.address,
+        },
+      ],
+      // LPSFT_FARM_OPERATOR_ROLE
+      [LPSFT_FARM_OPERATOR_ROLE]: [
+        {
+          contract: pow1LpSftLendFarmContract,
+          address: yieldHarvestContract.address,
+        },
+      ],
+      // ERC20_FARM_OPERATOR_ROLE
+      [ERC20_FARM_OPERATOR_ROLE]: [
+        {
+          contract: pow5InterestFarmContract,
+          address: liquidityForgeContract.address,
+        },
+      ],
+    };
 
-    // Grant DeFi Manager roles
-    await pow5Contract.grantRole(
-      ERC20_ISSUER_ROLE,
-      defiManagerContract.address,
-    );
-    await noPow5Contract.grantRole(
-      ERC20_ISSUER_ROLE,
-      defiManagerContract.address,
-    );
-
-    // Grant farm roles
-    await lpSftContract.grantRole(
-      LPSFT_ISSUER_ROLE,
-      pow1LpNftStakeFarmContract.address,
-    );
-    await lpSftContract.grantRole(
-      LPSFT_ISSUER_ROLE,
-      pow5LpNftStakeFarmContract.address,
-    );
-
-    // Grant Yield Harvest roles
-    await noLpSftContract.grantRole(
-      LPSFT_ISSUER_ROLE,
-      yieldHarvestContract.address,
-    );
-
-    await defiManagerContract.grantRole(
-      DEFI_OPERATOR_ROLE,
-      liquidityForgeContract.address,
-    );
-
-    await pow1LpSftLendFarmContract.grantRole(
-      LPSFT_FARM_OPERATOR_ROLE,
-      yieldHarvestContract.address,
-    );
-    await pow5InterestFarmContract.grantRole(
-      ERC20_FARM_OPERATOR_ROLE,
-      liquidityForgeContract.address,
-    );
-
-    // For testing
-    await pow1Contract.grantRole(
-      ERC20_ISSUER_ROLE,
-      await deployer.getAddress(),
-    );
+    // Loop over the declarative structure to grant roles
+    for (const [role, assignments] of Object.entries(roleAssignments)) {
+      for (const { contract, address } of assignments) {
+        await contract.grantRole(role, address);
+      }
+    }
   });
 
   //////////////////////////////////////////////////////////////////////////////
