@@ -14,7 +14,6 @@ import * as hardhat from "hardhat";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { ContractLibrary } from "../../src/interfaces/contractLibrary";
-import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
 import { ETH_PRICE } from "../../src/testing/defiMetrics";
 import { setupFixture } from "../../src/testing/setupFixture";
 import {
@@ -75,7 +74,6 @@ describe("Bureau 3: Liquidity Forge", () => {
 
   let deployer: SignerWithAddress;
   let beneficiary: SignerWithAddress;
-  let ethersContracts: ContractLibraryEthers;
   let addressBook: AddressBook;
   let deployerContracts: ContractLibrary;
   let beneficiaryContracts: ContractLibrary;
@@ -93,7 +91,7 @@ describe("Bureau 3: Liquidity Forge", () => {
     beneficiary = signers[1];
 
     // A single fixture is used for the test suite
-    ethersContracts = await setupTest();
+    await setupTest();
 
     // Get the address book
     addressBook = await getAddressBook(hardhat.network.name);
@@ -235,13 +233,13 @@ describe("Bureau 3: Liquidity Forge", () => {
   it("should grant ERC20_FARM_OPERATOR_ROLE to LiquidityForge", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow5InterestFarmContract } = ethersContracts;
+    const { pow5InterestFarmContract } = deployerContracts;
 
     // Grant ERC20_FARM_OPERATOR_ROLE to LiquidityForge
-    const tx: ethers.ContractTransactionResponse = await (
-      pow5InterestFarmContract.connect(deployer) as ethers.Contract
-    ).grantRole(ERC20_FARM_OPERATOR_ROLE, addressBook.liquidityForge!);
-    await tx.wait();
+    await pow5InterestFarmContract.grantRole(
+      ERC20_FARM_OPERATOR_ROLE,
+      addressBook.liquidityForge!,
+    );
   });
 
   //////////////////////////////////////////////////////////////////////////////

@@ -11,10 +11,10 @@ import chai from "chai";
 import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
+import uniswapV3NftManagerAbi from "../../src/abi/contracts/depends/uniswap-v3-periphery/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { ContractLibrary } from "../../src/interfaces/contractLibrary";
-import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
 import { ETH_PRICE } from "../../src/testing/defiMetrics";
 import { setupFixture } from "../../src/testing/setupFixture";
 import {
@@ -99,7 +99,6 @@ describe("Bureau 1: Dutch Auction", () => {
 
   let deployer: SignerWithAddress;
   let beneficiary: SignerWithAddress;
-  let ethersContracts: ContractLibraryEthers;
   let addressBook: AddressBook;
   let deployerContracts: ContractLibrary;
   let beneficiaryContracts: ContractLibrary;
@@ -118,7 +117,7 @@ describe("Bureau 1: Dutch Auction", () => {
     beneficiary = signers[1];
 
     // A single fixture is used for the test suite
-    ethersContracts = await setupTest();
+    await setupTest();
 
     // Get the address book
     addressBook = await getAddressBook(hardhat.network.name);
@@ -489,12 +488,11 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should approve POW1Swapper to spend WETH", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { wrappedNativeContract } = deployerContracts;
-    const { pow1SwapperContract } = ethersContracts;
+    const { pow1SwapperContract, wrappedNativeContract } = deployerContracts;
 
     // Approve POW1Swapper spending WETH
     await wrappedNativeContract.approve(
-      await pow1SwapperContract.getAddress(),
+      pow1SwapperContract.address,
       WETH_DUST_AMOUNT,
     );
   });
@@ -502,13 +500,13 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should swap WETH dust for POW1 dust", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1SwapperContract } = ethersContracts;
+    const { pow1SwapperContract } = deployerContracts;
 
     // Swap WETH for POW1
-    const tx: ethers.ContractTransactionResponse = await (
-      pow1SwapperContract.connect(deployer) as ethers.Contract
-    ).buyGameToken(WETH_DUST_AMOUNT, await deployer.getAddress());
-    await tx.wait();
+    await pow1SwapperContract.buyGameToken(
+      WETH_DUST_AMOUNT,
+      await deployer.getAddress(),
+    );
   });
 
   it("should check POW1 balance", async function (): Promise<void> {
@@ -718,7 +716,11 @@ describe("Bureau 1: Dutch Auction", () => {
     this.timeout(10 * 1000);
 
     const { dutchAuctionContract } = deployerContracts;
-    const { uniswapV3NftManagerContract } = ethersContracts;
+    const uniswapV3NftManagerContract: ethers.Contract = new ethers.Contract(
+      addressBook.uniswapV3NftManager!,
+      uniswapV3NftManagerAbi,
+      beneficiary,
+    );
 
     // Check total supply
     const totalSupply: bigint = await uniswapV3NftManagerContract.totalSupply();

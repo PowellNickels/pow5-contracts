@@ -11,10 +11,12 @@ import chai from "chai";
 import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
+import uniswapV3NftManagerAbi from "../../src/abi/contracts/depends/uniswap-v3-periphery/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
+import { TestERC20MintableContract } from "../../src/contracts/test/token/erc20/extensions/testErc20MintableContract";
+import { ERC20Contract } from "../../src/contracts/zeppelin/token/erc20/erc20Contract";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { ContractLibrary } from "../../src/interfaces/contractLibrary";
-import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
 import { ETH_PRICE, USDC_PRICE } from "../../src/testing/defiMetrics";
 import { setupFixture } from "../../src/testing/setupFixture";
 import {
@@ -116,7 +118,6 @@ describe("Bureau 4: Reverse Repo", () => {
 
   let deployer: SignerWithAddress;
   let beneficiary: SignerWithAddress;
-  let ethersContracts: ContractLibraryEthers;
   let addressBook: AddressBook;
   let deployerContracts: ContractLibrary;
   let beneficiaryContracts: ContractLibrary;
@@ -135,7 +136,7 @@ describe("Bureau 4: Reverse Repo", () => {
     beneficiary = signers[1];
 
     // A single fixture is used for the test suite
-    ethersContracts = await setupTest();
+    await setupTest();
 
     // Get the address book
     addressBook = await getAddressBook(hardhat.network.name);
@@ -356,14 +357,14 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should mint USDC to deployer", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { usdcTokenContract } = ethersContracts;
+    const usdcTokenContract: TestERC20MintableContract =
+      new TestERC20MintableContract(deployer, addressBook.usdcToken!);
 
     // Mint USDC to deployer
-    const tx: ethers.ContractTransactionResponse = await usdcTokenContract.mint(
+    await usdcTokenContract.mint(
       await deployer.getAddress(),
       INITIAL_USDC_AMOUNT,
     );
-    await tx.wait();
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -402,7 +403,7 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should initialize the LPPOW5 pool", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow5PoolContract } = ethersContracts;
+    const { pow5PoolContract } = deployerContracts;
 
     // The initial sqrt price [sqrt(amountToken1/amountToken0)] as a Q64.96 value
     const INITIAL_PRICE: bigint = encodePriceSqrt(
@@ -411,9 +412,7 @@ describe("Bureau 4: Reverse Repo", () => {
     );
 
     // Initialize the Uniswap V3 pool
-    const tx: ethers.ContractTransactionResponse =
-      await pow5PoolContract.initialize(INITIAL_PRICE);
-    await tx.wait();
+    await pow5PoolContract.initialize(INITIAL_PRICE);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -444,7 +443,7 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should create incentive for LPPOW5", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow5LpNftStakeFarmContract } = ethersContracts;
+    const { pow5LpNftStakeFarmContract } = deployerContracts;
 
     // Calculate DeFi properties
     const pow1Value: string = ethers.formatUnits(
@@ -459,10 +458,7 @@ describe("Bureau 4: Reverse Repo", () => {
     );
 
     // Create incentive
-    const tx: ethers.ContractTransactionResponse = await (
-      pow5LpNftStakeFarmContract.connect(deployer) as ethers.Contract
-    ).createIncentive(LPPOW5_REWARD_AMOUNT);
-    await tx.wait();
+    await pow5LpNftStakeFarmContract.createIncentive(LPPOW5_REWARD_AMOUNT);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -485,13 +481,16 @@ describe("Bureau 4: Reverse Repo", () => {
     this.timeout(60 * 1000);
 
     const { reverseRepoContract } = deployerContracts;
-    const { usdcTokenContract } = ethersContracts;
+    const usdcTokenContract: ERC20Contract = new ERC20Contract(
+      deployer,
+      addressBook.usdcToken!,
+    );
 
     // Approve ReverseRepo spending USDC
-    const tx: ethers.ContractTransactionResponse = await (
-      usdcTokenContract.connect(deployer) as ethers.Contract
-    ).approve(reverseRepoContract.address, INITIAL_USDC_AMOUNT);
-    await tx.wait();
+    await usdcTokenContract.approve(
+      reverseRepoContract.address,
+      INITIAL_USDC_AMOUNT,
+    );
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -581,7 +580,10 @@ describe("Bureau 4: Reverse Repo", () => {
   });
 
   it("should check beneficiary USDC balance after initialization", async function (): Promise<void> {
-    const { usdcTokenContract } = ethersContracts;
+    const usdcTokenContract: ERC20Contract = new ERC20Contract(
+      deployer,
+      addressBook.usdcToken!,
+    );
 
     // Check USDC balance
     const usdcBalance: bigint = await usdcTokenContract.balanceOf(
@@ -608,15 +610,18 @@ describe("Bureau 4: Reverse Repo", () => {
   });
 
   it("should log Uniswap pool reserves", async function (): Promise<void> {
-    const { pow5Contract } = beneficiaryContracts;
-    const { pow5PoolContract, usdcTokenContract } = ethersContracts;
+    const { pow5Contract, pow5PoolContract } = beneficiaryContracts;
+    const usdcTokenContract: ERC20Contract = new ERC20Contract(
+      deployer,
+      addressBook.usdcToken!,
+    );
 
     // Get Uniswap pool reserves
     const pow5Balance: bigint = await pow5Contract.balanceOf(
-      await pow5PoolContract.getAddress(),
+      pow5PoolContract.address,
     );
     const usdcBalance: bigint = await usdcTokenContract.balanceOf(
-      await pow5PoolContract.getAddress(),
+      pow5PoolContract.address,
     );
 
     // Calculate DeFi metrics
@@ -718,14 +723,14 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should mint USDC to beneficiary", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { usdcTokenContract } = ethersContracts;
+    const usdcTokenContract: TestERC20MintableContract =
+      new TestERC20MintableContract(deployer, addressBook.usdcToken!);
 
     // Mint USDC to beneficiary
-    const tx: ethers.ContractTransactionResponse = await usdcTokenContract.mint(
+    await usdcTokenContract.mint(
       await beneficiary.getAddress(),
       PURCHASE_USDC_AMOUNT,
     );
-    await tx.wait();
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -736,13 +741,16 @@ describe("Bureau 4: Reverse Repo", () => {
     this.timeout(60 * 1000);
 
     const { reverseRepoContract } = deployerContracts;
-    const { usdcTokenContract } = ethersContracts;
+    const usdcTokenContract: ERC20Contract = new ERC20Contract(
+      beneficiary,
+      addressBook.usdcToken!,
+    );
 
     // Approve ReverseRepo spending USDC
-    const tx: ethers.ContractTransactionResponse = await (
-      usdcTokenContract.connect(beneficiary) as ethers.Contract
-    ).approve(reverseRepoContract.address, PURCHASE_USDC_AMOUNT);
-    await tx.wait();
+    await usdcTokenContract.approve(
+      reverseRepoContract.address,
+      PURCHASE_USDC_AMOUNT,
+    );
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -811,7 +819,10 @@ describe("Bureau 4: Reverse Repo", () => {
   });
 
   it("should check USDC balance after purchase", async function (): Promise<void> {
-    const { usdcTokenContract } = ethersContracts;
+    const usdcTokenContract: ERC20Contract = new ERC20Contract(
+      deployer,
+      addressBook.usdcToken!,
+    );
 
     // Check USDC balance
     const usdcBalance: bigint = await usdcTokenContract.balanceOf(
@@ -825,15 +836,18 @@ describe("Bureau 4: Reverse Repo", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   it("should log Uniswap pool reserves", async function (): Promise<void> {
-    const { pow5Contract } = beneficiaryContracts;
-    const { pow5PoolContract, usdcTokenContract } = ethersContracts;
+    const { pow5Contract, pow5PoolContract } = beneficiaryContracts;
+    const usdcTokenContract: ERC20Contract = new ERC20Contract(
+      deployer,
+      addressBook.usdcToken!,
+    );
 
     // Get Uniswap pool reserves
     const pow5Balance: bigint = await pow5Contract.balanceOf(
-      await pow5PoolContract.getAddress(),
+      pow5PoolContract.address,
     );
     const usdcBalance: bigint = await usdcTokenContract.balanceOf(
-      await pow5PoolContract.getAddress(),
+      pow5PoolContract.address,
     );
 
     // Calculate DeFi metrics
@@ -932,7 +946,10 @@ describe("Bureau 4: Reverse Repo", () => {
 
   it("should check earnings and losses after liquidation", async function (): Promise<void> {
     const { pow1Contract, pow5Contract } = beneficiaryContracts;
-    const { usdcTokenContract } = ethersContracts;
+    const usdcTokenContract: ERC20Contract = new ERC20Contract(
+      deployer,
+      addressBook.usdcToken!,
+    );
 
     // Check balances
     const pow1Balance: bigint = await pow1Contract.balanceOf(
@@ -1005,7 +1022,10 @@ describe("Bureau 4: Reverse Repo", () => {
 
   it("should check balances after liquidation", async function (): Promise<void> {
     const { pow1Contract, pow5Contract } = beneficiaryContracts;
-    const { usdcTokenContract } = ethersContracts;
+    const usdcTokenContract: ERC20Contract = new ERC20Contract(
+      deployer,
+      addressBook.usdcToken!,
+    );
 
     // Check balances
     const pow1Balance: bigint = await pow1Contract.balanceOf(
@@ -1072,7 +1092,11 @@ describe("Bureau 4: Reverse Repo", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   it("should check POW5 LP-NFT owner after liquidation", async function (): Promise<void> {
-    const { uniswapV3NftManagerContract } = ethersContracts;
+    const uniswapV3NftManagerContract: ethers.Contract = new ethers.Contract(
+      addressBook.uniswapV3NftManager!,
+      uniswapV3NftManagerAbi,
+      beneficiary,
+    );
 
     // Check LP-NFT owner
     const owner: string = await uniswapV3NftManagerContract.ownerOf(
@@ -1082,7 +1106,7 @@ describe("Bureau 4: Reverse Repo", () => {
   });
 
   it("should check POW5 LP-SFT owner after liquidation", async function (): Promise<void> {
-    const { lpSftContract } = ethersContracts;
+    const { lpSftContract } = deployerContracts;
 
     // Check LP-SFT owner
     const owner: string = await lpSftContract.ownerOf(PURCHASED_LPNFT_TOKEN_ID);

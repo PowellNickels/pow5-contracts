@@ -14,7 +14,6 @@ import * as hardhat from "hardhat";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { ContractLibrary } from "../../src/interfaces/contractLibrary";
-import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
 import { ETH_PRICE } from "../../src/testing/defiMetrics";
 import { setupFixture } from "../../src/testing/setupFixture";
 import {
@@ -63,7 +62,6 @@ describe("Bureau 2: Yield Harvest", () => {
 
   let deployer: SignerWithAddress;
   let beneficiary: SignerWithAddress;
-  let ethersContracts: ContractLibraryEthers;
   let addressBook: AddressBook;
   let deployerContracts: ContractLibrary;
   let beneficiaryContracts: ContractLibrary;
@@ -81,7 +79,7 @@ describe("Bureau 2: Yield Harvest", () => {
     beneficiary = signers[1];
 
     // A single fixture is used for the test suite
-    ethersContracts = await setupTest();
+    await setupTest();
 
     // Get the address book
     addressBook = await getAddressBook(hardhat.network.name);
@@ -184,13 +182,13 @@ describe("Bureau 2: Yield Harvest", () => {
   it("should grant LPSFT_FARM_OPERATOR_ROLE to YieldHarvest", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1LpSftLendFarmContract } = deployerContracts;
-    const { yieldHarvestContract } = ethersContracts;
+    const { pow1LpSftLendFarmContract, yieldHarvestContract } =
+      deployerContracts;
 
     // Grant LPSFT_FARM_OPERATOR_ROLE to YieldHarvest
     await pow1LpSftLendFarmContract.grantRole(
       LPSFT_FARM_OPERATOR_ROLE,
-      await yieldHarvestContract.getAddress(),
+      yieldHarvestContract.address,
     );
   });
 
@@ -201,23 +199,19 @@ describe("Bureau 2: Yield Harvest", () => {
   it("should mint POW1 reward to the POW1 LP-SFT lend farm", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1LpSftLendFarmContract } = deployerContracts;
-    const { pow1TokenContract } = ethersContracts;
+    const { pow1Contract, pow1LpSftLendFarmContract } = deployerContracts;
 
     // Grant issuer role to deployer
-    const grantTx: ethers.ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as ethers.Contract
-    ).grantRole(ERC20_ISSUER_ROLE, await deployer.getAddress());
-    await grantTx.wait();
+    await pow1Contract.grantRole(
+      ERC20_ISSUER_ROLE,
+      await deployer.getAddress(),
+    );
 
     // Mint POW1 to the POW1 LP-SFT lend farm
-    const mintTx: ethers.ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as ethers.Contract
-    ).mint(
+    await pow1Contract.mint(
       pow1LpSftLendFarmContract.address,
       ethers.parseUnits("5000", POW1_DECIMALS), // TODO: Handle rewards
     );
-    await mintTx.wait();
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -227,7 +221,7 @@ describe("Bureau 2: Yield Harvest", () => {
   it("should verify LP-SFT is not lent before lending", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { lpSftContract, noLpSftContract } = ethersContracts;
+    const { lpSftContract, noLpSftContract } = deployerContracts;
 
     chai
       .expect(await lpSftContract.ownerOf(LPPOW1_LPNFT_TOKEN_ID))
@@ -255,8 +249,8 @@ describe("Bureau 2: Yield Harvest", () => {
   it("should verify LP-SFT is lent to YieldHarvest", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { yieldHarvestContract } = deployerContracts;
-    const { lpSftContract, noLpSftContract } = ethersContracts;
+    const { lpSftContract, noLpSftContract, yieldHarvestContract } =
+      deployerContracts;
 
     chai
       .expect(await lpSftContract.ownerOf(LPPOW1_LPNFT_TOKEN_ID))
@@ -288,7 +282,7 @@ describe("Bureau 2: Yield Harvest", () => {
   it("should verify LP-SFT is not lent after withdrawing", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { lpSftContract, noLpSftContract } = ethersContracts;
+    const { lpSftContract, noLpSftContract } = deployerContracts;
 
     chai
       .expect(await lpSftContract.ownerOf(LPPOW1_LPNFT_TOKEN_ID))

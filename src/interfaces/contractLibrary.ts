@@ -27,6 +27,7 @@ import { POW5Contract } from "../contracts/token/erc20/pow5Contract";
 import { WrappedNativeContract } from "../contracts/token/erc20/wrappedNativeContract";
 import { LPSFTContract } from "../contracts/token/erc1155/lpSftContract";
 import { NOLPSFTContract } from "../contracts/token/erc1155/noLpSftContract";
+import { UniV3SwapperContract } from "../contracts/token/routes/uniV3SwapperContract";
 import { UniswapV3PoolContract } from "../contracts/uniswap/pool/uniswapV3PoolContract";
 import { ERC20Contract } from "../contracts/zeppelin/token/erc20/erc20Contract";
 
@@ -46,11 +47,13 @@ interface ContractLibrary {
   pow1LpNftStakeFarmContract: POW1LpNftStakeFarmContract;
   pow1LpSftLendFarmContract: POW1LpSftLendFarmContract;
   pow1PoolContract: UniswapV3PoolContract;
+  pow1SwapperContract: UniV3SwapperContract;
   pow5Contract: POW5Contract;
   pow5InterestFarmContract: POW5InterestFarmContract;
   pow5LpNftStakeFarmContract: POW5LpNftStakeFarmContract;
   pow5LpSftLendFarmContract: POW5LpSftLendFarmContract;
   pow5PoolContract: UniswapV3PoolContract;
+  pow5SwapperContract: UniV3SwapperContract;
   reverseRepoContract: ReverseRepoContract;
   usdcContract: ERC20Contract;
   wrappedNativeContract: WrappedNativeContract;
