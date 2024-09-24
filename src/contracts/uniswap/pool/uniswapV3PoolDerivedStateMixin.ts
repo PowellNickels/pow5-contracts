@@ -1,0 +1,63 @@
+/*
+ * Copyright (C) 2024 Powell Nickels
+ * https://github.com/PowellNickels/pow5-contracts
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * See the file LICENSE.txt for more information.
+ */
+
+import { ethers } from "ethers";
+
+import { IUniswapV3PoolDerivedState } from "../../../types/contracts/interfaces/uniswap-v3-core/pool/IUniswapV3PoolDerivedState";
+import { IUniswapV3PoolDerivedState__factory } from "../../../types/factories/contracts/interfaces/uniswap-v3-core/pool/IUniswapV3PoolDerivedState__factory";
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
+function UniswapV3PoolDerivedStateMixin<T extends new (...args: any[]) => {}>(
+  Base: T,
+) {
+  return class extends Base {
+    private uniswapV3PoolDerivedState: IUniswapV3PoolDerivedState;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    constructor(...args: any[]) {
+      super(...args);
+      const [signer, contractAddress] = args as [ethers.Signer, string];
+      this.uniswapV3PoolDerivedState =
+        IUniswapV3PoolDerivedState__factory.connect(contractAddress, signer);
+    }
+
+    async observe(secondsAgos: Array<number>): Promise<{
+      tickCumulatives: Array<bigint>;
+      secondsPerLiquidityCumulativeX128s: Array<bigint>;
+    }> {
+      const result = await this.uniswapV3PoolDerivedState.observe(secondsAgos);
+      return {
+        tickCumulatives: result.tickCumulatives,
+        secondsPerLiquidityCumulativeX128s:
+          result.secondsPerLiquidityCumulativeX128s,
+      };
+    }
+
+    async snapshotCumulativesInside(
+      tickLower: number,
+      tickUpper: number,
+    ): Promise<{
+      tickCumulativeInside: bigint;
+      secondsPerLiquidityInsideX128: bigint;
+      secondsInside: number;
+    }> {
+      const result =
+        await this.uniswapV3PoolDerivedState.snapshotCumulativesInside(
+          tickLower,
+          tickUpper,
+        );
+      return {
+        tickCumulativeInside: result.tickCumulativeInside,
+        secondsPerLiquidityInsideX128: result.secondsPerLiquidityInsideX128,
+        secondsInside: Number(result.secondsInside),
+      };
+    }
+  };
+}
+
+export { UniswapV3PoolDerivedStateMixin };

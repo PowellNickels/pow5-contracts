@@ -292,33 +292,65 @@ describe("Bureau integration test", () => {
     this.timeout(60 * 1000);
 
     const {
+      pow1Contract,
       pow1PoolContract,
-      pow1PoolerContract,
+      pow5Contract,
       pow5PoolContract,
-      pow5PoolerContract,
-    } = ethersContracts;
+      usdcContract,
+      wrappedNativeContract,
+    } = deployerContracts;
+
+    // Get POW1 pool token order
+    let pow1IsToken0: boolean;
+    const pow1Token0: string = (await pow1PoolContract.token0()).toLowerCase();
+    const pow1Token1: string = (await pow1PoolContract.token1()).toLowerCase();
+    if (
+      pow1Token0 === pow1Contract.address.toLowerCase() &&
+      pow1Token1 === wrappedNativeContract.address.toLowerCase()
+    ) {
+      pow1IsToken0 = true;
+    } else if (
+      pow1Token0 === wrappedNativeContract.address.toLowerCase() &&
+      pow1Token1 === pow1Contract.address.toLowerCase()
+    ) {
+      pow1IsToken0 = false;
+    } else {
+      throw new Error("POW1 pool tokens are incorrect");
+    }
 
     // Initialize the Uniswap V3 pool for POW1
-    const pow1IsToken0: boolean = await pow1PoolerContract.gameIsToken0();
-    const txPow1Initialize: ethers.ContractTransactionResponse =
-      await pow1PoolContract.initialize(
-        encodePriceSqrt(
-          pow1IsToken0 ? INITIAL_WETH_AMOUNT : INITIAL_POW1_SUPPLY,
-          pow1IsToken0 ? INITIAL_POW1_SUPPLY : INITIAL_WETH_AMOUNT,
-        ),
-      );
-    await txPow1Initialize.wait();
+    await pow1PoolContract.initialize(
+      encodePriceSqrt(
+        pow1IsToken0 ? INITIAL_WETH_AMOUNT : INITIAL_POW1_SUPPLY,
+        pow1IsToken0 ? INITIAL_POW1_SUPPLY : INITIAL_WETH_AMOUNT,
+      ),
+    );
+
+    // Get POW5 pool token order
+    let pow5IsToken0: boolean;
+    const pow5Token0: string = (await pow5PoolContract.token0()).toLowerCase();
+    const pow5Token1: string = (await pow5PoolContract.token1()).toLowerCase();
+    if (
+      pow5Token0 === pow5Contract.address.toLowerCase() &&
+      pow5Token1 === usdcContract.address.toLowerCase()
+    ) {
+      pow5IsToken0 = true;
+    } else if (
+      pow5Token0 === usdcContract.address.toLowerCase() &&
+      pow5Token1 === pow5Contract.address.toLowerCase()
+    ) {
+      pow5IsToken0 = false;
+    } else {
+      throw new Error("POW1 pool tokens are incorrect");
+    }
 
     // Initialize the Uniswap V3 pool for POW5
-    const pow5IsToken0: boolean = await pow5PoolerContract.gameIsToken0();
-    const txPow5Initialize: ethers.ContractTransactionResponse =
-      await pow5PoolContract.initialize(
-        encodePriceSqrt(
-          pow5IsToken0 ? INITIAL_USDC_AMOUNT : INITIAL_POW5_DEPOSIT,
-          pow5IsToken0 ? INITIAL_POW5_DEPOSIT : INITIAL_USDC_AMOUNT,
-        ),
-      );
-    await txPow5Initialize.wait();
+    await pow5PoolContract.initialize(
+      encodePriceSqrt(
+        pow5IsToken0 ? INITIAL_USDC_AMOUNT : INITIAL_POW5_DEPOSIT,
+        pow5IsToken0 ? INITIAL_POW5_DEPOSIT : INITIAL_USDC_AMOUNT,
+      ),
+    );
   });
 
   //////////////////////////////////////////////////////////////////////////////

@@ -104,9 +104,9 @@ describe("Bureau 2: Yield Harvest", () => {
       lpSftContract,
       pow1Contract,
       pow1LpNftStakeFarmContract,
+      pow1PoolContract,
       wrappedNativeContract,
     } = deployerContracts;
-    const { pow1PoolContract, pow1PoolerContract } = ethersContracts;
 
     // Setup roles
     await lpPow1Contract.grantRole(ERC20_ISSUER_ROLE, lpSftContract.address);
@@ -129,15 +129,29 @@ describe("Bureau 2: Yield Harvest", () => {
     );
 
     // Initialize the Uniswap V3 pool
-    const pow1IsToken0: boolean = await pow1PoolerContract.gameIsToken0();
-    const tx: ethers.ContractTransactionResponse =
-      await pow1PoolContract.initialize(
-        encodePriceSqrt(
-          pow1IsToken0 ? INITIAL_WETH_AMOUNT : INITIAL_POW1_SUPPLY,
-          pow1IsToken0 ? INITIAL_POW1_SUPPLY : INITIAL_WETH_AMOUNT,
-        ),
-      );
-    await tx.wait();
+    let pow1IsToken0: boolean;
+    const token0: string = (await pow1PoolContract.token0()).toLowerCase();
+    const token1: string = (await pow1PoolContract.token1()).toLowerCase();
+    if (
+      token0 === pow1Contract.address.toLowerCase() &&
+      token1 === wrappedNativeContract.address.toLowerCase()
+    ) {
+      pow1IsToken0 = true;
+    } else if (
+      token0 === wrappedNativeContract.address.toLowerCase() &&
+      token1 === pow1Contract.address.toLowerCase()
+    ) {
+      pow1IsToken0 = false;
+    } else {
+      throw new Error("POW1 pool tokens are incorrect");
+    }
+    chai.expect(pow1IsToken0).to.be.a("boolean");
+    await pow1PoolContract.initialize(
+      encodePriceSqrt(
+        pow1IsToken0 ? INITIAL_WETH_AMOUNT : INITIAL_POW1_SUPPLY,
+        pow1IsToken0 ? INITIAL_POW1_SUPPLY : INITIAL_WETH_AMOUNT,
+      ),
+    );
 
     // Initialize DutchAuction
     await dutchAuctionContract.initialize(

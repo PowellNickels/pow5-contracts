@@ -158,9 +158,9 @@ describe("Bureau 4: Reverse Repo", () => {
       lpSftContract,
       pow1Contract,
       pow1LpNftStakeFarmContract,
+      pow1PoolContract,
       wrappedNativeContract,
     } = deployerContracts;
-    const { pow1PoolContract, pow1PoolerContract } = ethersContracts;
 
     // Setup roles
     await lpPow1Contract.grantRole(ERC20_ISSUER_ROLE, lpSftContract.address);
@@ -173,7 +173,22 @@ describe("Bureau 4: Reverse Repo", () => {
     await wrappedNativeContract.deposit(INITIAL_WETH_AMOUNT);
 
     // Get pool token order
-    const pow1IsToken0: boolean = await pow1PoolerContract.gameIsToken0();
+    let pow1IsToken0: boolean;
+    const token0: string = (await pow1PoolContract.token0()).toLowerCase();
+    const token1: string = (await pow1PoolContract.token1()).toLowerCase();
+    if (
+      token0 === pow1Contract.address.toLowerCase() &&
+      token1 === wrappedNativeContract.address.toLowerCase()
+    ) {
+      pow1IsToken0 = true;
+    } else if (
+      token0 === wrappedNativeContract.address.toLowerCase() &&
+      token1 === pow1Contract.address.toLowerCase()
+    ) {
+      pow1IsToken0 = false;
+    } else {
+      throw new Error("POW1 pool tokens are incorrect");
+    }
 
     // The initial sqrt price [sqrt(amountToken1/amountToken0)] as a Q64.96 value
     const INITIAL_PRICE: bigint = encodePriceSqrt(
@@ -182,9 +197,7 @@ describe("Bureau 4: Reverse Repo", () => {
     );
 
     // Initialize the Uniswap V3 pool
-    const tx: ethers.ContractTransactionResponse =
-      await pow1PoolContract.initialize(INITIAL_PRICE);
-    await tx.wait();
+    await pow1PoolContract.initialize(INITIAL_PRICE);
 
     // Approve tokens
     await pow1Contract.approve(
@@ -295,10 +308,24 @@ describe("Bureau 4: Reverse Repo", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   it("should get pool token order for LPPOW5", async function (): Promise<void> {
-    const { pow5PoolerContract } = ethersContracts;
+    const { pow5Contract, pow5PoolContract, usdcContract } = deployerContracts;
 
     // Get pool token order
-    pow5IsToken0 = await pow5PoolerContract.gameIsToken0();
+    const token0: string = (await pow5PoolContract.token0()).toLowerCase();
+    const token1: string = (await pow5PoolContract.token1()).toLowerCase();
+    if (
+      token0 === pow5Contract.address.toLowerCase() &&
+      token1 === usdcContract.address.toLowerCase()
+    ) {
+      pow5IsToken0 = true;
+    } else if (
+      token0 === usdcContract.address.toLowerCase() &&
+      token1 === pow5Contract.address.toLowerCase()
+    ) {
+      pow5IsToken0 = false;
+    } else {
+      throw new Error("POW5 pool tokens are incorrect");
+    }
     chai.expect(pow5IsToken0).to.be.a("boolean");
 
     console.log(

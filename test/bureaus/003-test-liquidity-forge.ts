@@ -115,9 +115,9 @@ describe("Bureau 3: Liquidity Forge", () => {
       lpPow1Contract,
       lpSftContract,
       pow1Contract,
+      pow1PoolContract,
       wrappedNativeContract,
     } = deployerContracts;
-    const { pow1PoolContract, pow1PoolerContract } = ethersContracts;
 
     // Setup roles
     await lpPow1Contract.grantRole(ERC20_ISSUER_ROLE, addressBook.lpSft!);
@@ -137,7 +137,22 @@ describe("Bureau 3: Liquidity Forge", () => {
     );
 
     // Get pool token order
-    const pow1IsToken0: boolean = await pow1PoolerContract.gameIsToken0();
+    let pow1IsToken0: boolean;
+    const token0: string = (await pow1PoolContract.token0()).toLowerCase();
+    const token1: string = (await pow1PoolContract.token1()).toLowerCase();
+    if (
+      token0 === pow1Contract.address.toLowerCase() &&
+      token1 === wrappedNativeContract.address.toLowerCase()
+    ) {
+      pow1IsToken0 = true;
+    } else if (
+      token0 === wrappedNativeContract.address.toLowerCase() &&
+      token1 === pow1Contract.address.toLowerCase()
+    ) {
+      pow1IsToken0 = false;
+    } else {
+      throw new Error("POW1 pool tokens are incorrect");
+    }
 
     // The initial sqrt price [sqrt(amountToken1/amountToken0)] as a Q64.96 value
     const INITIAL_PRICE: bigint = encodePriceSqrt(
@@ -146,9 +161,7 @@ describe("Bureau 3: Liquidity Forge", () => {
     );
 
     // Initialize the Uniswap V3 pool
-    const tx: ethers.ContractTransactionResponse =
-      await pow1PoolContract.initialize(INITIAL_PRICE);
-    await tx.wait();
+    await pow1PoolContract.initialize(INITIAL_PRICE);
 
     // Initialize DutchAuction
     await dutchAuctionContract.initialize(

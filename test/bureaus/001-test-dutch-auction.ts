@@ -191,10 +191,26 @@ describe("Bureau 1: Dutch Auction", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   it("should get pool token order for LPPOW5", async function (): Promise<void> {
-    const { pow1PoolerContract } = ethersContracts;
+    const { pow1Contract, pow1PoolContract, wrappedNativeContract } =
+      deployerContracts;
 
-    // Get pool token order
-    pow1IsToken0 = await pow1PoolerContract.gameIsToken0();
+    const token0: string = (await pow1PoolContract.token0()).toLowerCase();
+    const token1: string = (await pow1PoolContract.token1()).toLowerCase();
+
+    if (
+      token0 === pow1Contract.address.toLowerCase() &&
+      token1 === wrappedNativeContract.address.toLowerCase()
+    ) {
+      pow1IsToken0 = true;
+    } else if (
+      token0 === wrappedNativeContract.address.toLowerCase() &&
+      token1 === pow1Contract.address.toLowerCase()
+    ) {
+      pow1IsToken0 = false;
+    } else {
+      throw new Error("POW1 pool tokens are incorrect");
+    }
+
     chai.expect(pow1IsToken0).to.be.a("boolean");
 
     console.log(
@@ -209,7 +225,7 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should initialize the LPPOW1 pool", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1PoolContract } = ethersContracts;
+    const { pow1PoolContract } = deployerContracts;
 
     // The initial sqrt price [sqrt(amountToken1/amountToken0)] as a Q64.96 value
     const INITIAL_PRICE: bigint = encodePriceSqrt(
@@ -218,9 +234,7 @@ describe("Bureau 1: Dutch Auction", () => {
     );
 
     // Initialize the Uniswap V3 pool
-    const tx: ethers.ContractTransactionResponse =
-      await pow1PoolContract.initialize(INITIAL_PRICE);
-    await tx.wait();
+    await pow1PoolContract.initialize(INITIAL_PRICE);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -339,15 +353,15 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   it("should log Uniswap pool reserves", async function (): Promise<void> {
-    const { pow1Contract, wrappedNativeContract } = deployerContracts;
-    const { pow1PoolContract } = ethersContracts;
+    const { pow1Contract, pow1PoolContract, wrappedNativeContract } =
+      deployerContracts;
 
     // Get Uniswap pool reserves
     const pow1Balance: bigint = await pow1Contract.balanceOf(
-      await pow1PoolContract.getAddress(),
+      pow1PoolContract.address,
     );
     const wethBalance: bigint = await wrappedNativeContract.balanceOf(
-      await pow1PoolContract.getAddress(),
+      pow1PoolContract.address,
     );
 
     // Log Uniswap pool reserves
@@ -520,15 +534,15 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   it("should log Uniswap pool reserves", async function (): Promise<void> {
-    const { pow1Contract, wrappedNativeContract } = deployerContracts;
-    const { pow1PoolContract } = ethersContracts;
+    const { pow1Contract, pow1PoolContract, wrappedNativeContract } =
+      deployerContracts;
 
     // Get Uniswap pool reserves
     const pow1Balance: bigint = await pow1Contract.balanceOf(
-      await pow1PoolContract.getAddress(),
+      pow1PoolContract.address,
     );
     const wethBalance: bigint = await wrappedNativeContract.balanceOf(
-      await pow1PoolContract.getAddress(),
+      pow1PoolContract.address,
     );
 
     // Log Uniswap pool reserves
@@ -655,15 +669,15 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   it("should log Uniswap pool reserves", async function (): Promise<void> {
-    const { pow1Contract, wrappedNativeContract } = deployerContracts;
-    const { pow1PoolContract } = ethersContracts;
+    const { pow1Contract, pow1PoolContract, wrappedNativeContract } =
+      deployerContracts;
 
     // Get Uniswap pool reserves
     const pow1Balance: bigint = await pow1Contract.balanceOf(
-      await pow1PoolContract.getAddress(),
+      pow1PoolContract.address,
     );
     const wethBalance: bigint = await wrappedNativeContract.balanceOf(
-      await pow1PoolContract.getAddress(),
+      pow1PoolContract.address,
     );
 
     console.log(
@@ -813,15 +827,15 @@ describe("Bureau 1: Dutch Auction", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   it("should log Uniswap pool reserves", async function (): Promise<void> {
-    const { pow1Contract, wrappedNativeContract } = deployerContracts;
-    const { pow1PoolContract } = ethersContracts;
+    const { pow1Contract, pow1PoolContract, wrappedNativeContract } =
+      deployerContracts;
 
     // Get Uniswap pool reserves
     const pow1Balance: bigint = await pow1Contract.balanceOf(
-      await pow1PoolContract.getAddress(),
+      pow1PoolContract.address,
     );
     const wethBalance: bigint = await wrappedNativeContract.balanceOf(
-      await pow1PoolContract.getAddress(),
+      pow1PoolContract.address,
     );
 
     console.log(

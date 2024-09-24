@@ -29,6 +29,7 @@ import { POW5Contract } from "../contracts/token/erc20/pow5Contract";
 import { WrappedNativeContract } from "../contracts/token/erc20/wrappedNativeContract";
 import { LPSFTContract } from "../contracts/token/erc1155/lpSftContract";
 import { NOLPSFTContract } from "../contracts/token/erc1155/noLpSftContract";
+import { UniswapV3PoolContract } from "../contracts/uniswap/pool/uniswapV3PoolContract";
 import { ERC20Contract } from "../contracts/zeppelin/token/erc20/erc20Contract";
 import { AddressBook } from "../interfaces/addressBook";
 import { ContractLibrary } from "../interfaces/contractLibrary";
@@ -68,6 +69,7 @@ function getContractLibrary(
       signer,
       addressBook.pow1LpSftLendFarm!,
     ),
+    pow1PoolContract: new UniswapV3PoolContract(signer, addressBook.pow1Pool!),
     pow5Contract: new POW5Contract(signer, addressBook.pow5Token!),
     pow5InterestFarmContract: new POW5InterestFarmContract(
       signer,
@@ -81,6 +83,7 @@ function getContractLibrary(
       signer,
       addressBook.pow5LpSftLendFarm!,
     ),
+    pow5PoolContract: new UniswapV3PoolContract(signer, addressBook.pow5Pool!),
     reverseRepoContract: new ReverseRepoContract(
       signer,
       addressBook.reverseRepo!,
