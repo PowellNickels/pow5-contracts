@@ -6,7 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { Signer } from "ethers";
+import { ethers } from "ethers";
 
 import { BaseContract } from "../baseContract";
 import { DutchAuctionMixin } from "./dutchAuctionMixin";
@@ -14,7 +14,7 @@ import { DutchAuctionMixin } from "./dutchAuctionMixin";
 const DutchAuctionContractBase = DutchAuctionMixin(BaseContract);
 
 class DutchAuctionContract extends DutchAuctionContractBase {
-  constructor(signer: Signer, contractAddress: string) {
+  constructor(signer: ethers.Signer, contractAddress: string) {
     super(signer, contractAddress);
   }
 }

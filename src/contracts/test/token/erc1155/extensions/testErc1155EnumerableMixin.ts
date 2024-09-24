@@ -6,11 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import {
-  ContractTransactionReceipt,
-  ContractTransactionResponse,
-  Signer,
-} from "ethers";
+import { ethers } from "ethers";
 
 import { TestERC1155Enumerable } from "../../../../../types/contracts/test/token/erc1155/extensions/TestERC1155Enumerable";
 import { TestERC1155Enumerable__factory } from "../../../../../types/factories/contracts/test/token/erc1155/extensions/TestERC1155Enumerable__factory";
@@ -25,7 +21,7 @@ function TestERC1155EnumerableMixin<T extends new (...args: any[]) => {}>(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [Signer, string];
+      const [signer, contractAddress] = args as [ethers.Signer, string];
       this.testErc1155Enumerable = TestERC1155Enumerable__factory.connect(
         contractAddress,
         signer,
@@ -35,37 +31,37 @@ function TestERC1155EnumerableMixin<T extends new (...args: any[]) => {}>(
     async mintNFT(
       account: string,
       nftTokenId: bigint,
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse =
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
         await this.testErc1155Enumerable.mintNFT(account, nftTokenId);
-      return (await tx.wait()) as ContractTransactionReceipt;
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
 
     async batchMintNFT(
       account: string,
       nftTokenIds: bigint[],
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse =
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
         await this.testErc1155Enumerable.batchMintNFT(account, nftTokenIds);
-      return (await tx.wait()) as ContractTransactionReceipt;
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
 
     async burnNFT(
       account: string,
       nftTokenId: bigint,
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse =
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
         await this.testErc1155Enumerable.burnNFT(account, nftTokenId);
-      return (await tx.wait()) as ContractTransactionReceipt;
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
 
     async batchBurnNFT(
       account: string,
       nftTokenIds: bigint[],
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse =
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
         await this.testErc1155Enumerable.batchBurnNFT(account, nftTokenIds);
-      return (await tx.wait()) as ContractTransactionReceipt;
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
   };
 }

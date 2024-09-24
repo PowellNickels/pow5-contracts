@@ -6,7 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { Signer } from "ethers";
+import { ethers } from "ethers";
 
 import { BaseContract } from "../baseContract";
 import { AccessControlMixin } from "../zeppelin/access/accessControlMixin";
@@ -18,7 +18,7 @@ const FarmContract = FarmMixin(AccessControlContract);
 const ERC20InterestFarmContract = ERC20InterestFarmMixin(FarmContract);
 
 class POW5InterestFarmContract extends ERC20InterestFarmContract {
-  constructor(signer: Signer, contractAddress: string) {
+  constructor(signer: ethers.Signer, contractAddress: string) {
     super(signer, contractAddress);
   }
 }

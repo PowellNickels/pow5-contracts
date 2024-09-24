@@ -6,7 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { Signer } from "ethers";
+import { ethers } from "ethers";
 
 import { IERC1155MetadataURI } from "../../../../../types/@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI";
 import { IERC1155MetadataURI__factory } from "../../../../../types/factories/@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI__factory";
@@ -21,7 +21,7 @@ function ERC1155MetadataURIMixin<T extends new (...args: any[]) => {}>(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [Signer, string];
+      const [signer, contractAddress] = args as [ethers.Signer, string];
       this.erc1155MetadataUri = IERC1155MetadataURI__factory.connect(
         contractAddress,
         signer,

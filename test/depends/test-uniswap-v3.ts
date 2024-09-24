@@ -11,14 +11,7 @@
 
 import BigNumber from "bignumber.js";
 import chai from "chai";
-import {
-  ContractTransactionReceipt,
-  ContractTransactionResponse,
-  ethers,
-  EventLog,
-  Log,
-  Result,
-} from "ethers";
+import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
@@ -157,7 +150,7 @@ describe("Uniswap V3", () => {
     });
 
     // Deposit ETH into W-ETH contract
-    const tx: ContractTransactionResponse =
+    const tx: ethers.ContractTransactionResponse =
       await wrappedNativeTokenContract.deposit({
         value: USDC_ETH_LP_ETH_AMOUNT_BASE,
       });
@@ -170,7 +163,7 @@ describe("Uniswap V3", () => {
     const { usdcTokenContract } = contracts;
 
     // Perform mint
-    const tx: ContractTransactionResponse = await usdcTokenContract.mint(
+    const tx: ethers.ContractTransactionResponse = await usdcTokenContract.mint(
       beneficiaryAddress,
       USDC_ETH_LP_USDC_AMOUNT_BASE,
     );
@@ -184,7 +177,7 @@ describe("Uniswap V3", () => {
       contracts;
 
     // Approve WETH/USDC pool to spend WETH
-    const approveTx: ContractTransactionResponse =
+    const approveTx: ethers.ContractTransactionResponse =
       await wrappedNativeTokenContract.approve(
         await uniswapV3NftManagerContract.getAddress(),
         USDC_ETH_LP_ETH_AMOUNT_BASE,
@@ -198,7 +191,7 @@ describe("Uniswap V3", () => {
     const { usdcTokenContract, uniswapV3NftManagerContract } = contracts;
 
     // Approve WETH/USDC pool to spend USDC
-    const approveTx: ContractTransactionResponse =
+    const approveTx: ethers.ContractTransactionResponse =
       await usdcTokenContract.approve(
         await uniswapV3NftManagerContract.getAddress(),
         USDC_ETH_LP_USDC_AMOUNT_BASE,
@@ -255,18 +248,19 @@ describe("Uniswap V3", () => {
       beneficiaryAddress, // recipient
       ethers.MaxUint256, // deadline
     ];
-    const mintTx: ContractTransactionResponse =
+    const mintTx: ethers.ContractTransactionResponse =
       await uniswapV3NftManagerContract.mint(mintParams);
 
-    const receipt: ContractTransactionReceipt | null = await mintTx.wait();
+    const receipt: ethers.ContractTransactionReceipt | null =
+      await mintTx.wait();
     chai.expect(receipt).to.not.be.null;
 
     // Check events
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.equal(5);
 
     // EventLogs 0-1 give UndecodedEventLog by ethers, 2 is just a Log
-    const log3: EventLog = logs[3] as EventLog;
+    const log3: ethers.EventLog = logs[3] as ethers.EventLog;
     chai
       .expect(log3.address)
       .to.equal(await uniswapV3NftManagerContract.getAddress());
@@ -276,7 +270,7 @@ describe("Uniswap V3", () => {
     chai.expect(log3.args[1]).to.equal(beneficiaryAddress);
     chai.expect(log3.args[2]).to.equal(NFT_TOKEN_ID);
 
-    const log4: EventLog = logs[4] as EventLog;
+    const log4: ethers.EventLog = logs[4] as ethers.EventLog;
     chai
       .expect(log4.address)
       .to.equal(await uniswapV3NftManagerContract.getAddress());
@@ -308,7 +302,7 @@ describe("Uniswap V3", () => {
       usdcTokenContract,
     } = contracts;
 
-    const positions: Result[] =
+    const positions: ethers.Result[] =
       await uniswapV3NftManagerContract.positions(NFT_TOKEN_ID);
     chai.expect(positions.length).to.equal(12);
     chai.expect(positions[0]).to.equal(0n); // nonce for permits

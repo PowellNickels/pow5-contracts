@@ -6,7 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { Signer } from "ethers";
+import { ethers } from "ethers";
 
 import { BaseContract } from "../baseContract";
 import { LiquidityForgeMixin } from "./liquidityForgeMixin";
@@ -14,7 +14,7 @@ import { LiquidityForgeMixin } from "./liquidityForgeMixin";
 const LiquidityForgeContractBase = LiquidityForgeMixin(BaseContract);
 
 class LiquidityForgeContract extends LiquidityForgeContractBase {
-  constructor(signer: Signer, contractAddress: string) {
+  constructor(signer: ethers.Signer, contractAddress: string) {
     super(signer, contractAddress);
   }
 }

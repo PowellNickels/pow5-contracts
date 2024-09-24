@@ -11,7 +11,7 @@
 
 import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
 import chai from "chai";
-import { ContractTransactionReceipt, ethers, EventLog, Log } from "ethers";
+import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
@@ -69,15 +69,15 @@ describe("W-ETH", () => {
     const { wrappedNativeContract } = contracts;
 
     // Perform deposit
-    const receipt: ContractTransactionReceipt =
+    const receipt: ethers.ContractTransactionReceipt =
       await wrappedNativeContract.deposit(DEPOSIT_AMOUNT);
     chai.expect(receipt).to.not.be.null;
 
     // Check events
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.address).to.equal(addressBook.wrappedNativeToken!);
     chai.expect(log.fragment.name).to.equal("Deposit");
     chai.expect(log.args.length).to.equal(2);
@@ -105,15 +105,15 @@ describe("W-ETH", () => {
     const { wrappedNativeContract } = contracts;
 
     // Perform withdraw
-    const receipt: ContractTransactionReceipt =
+    const receipt: ethers.ContractTransactionReceipt =
       await wrappedNativeContract.withdraw(DEPOSIT_AMOUNT);
     chai.expect(receipt).to.not.be.null;
 
     // Check events
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.address).to.equal(addressBook.wrappedNativeToken!);
     chai.expect(log.fragment.name).to.equal("Withdrawal");
     chai.expect(log.args.length).to.equal(2);

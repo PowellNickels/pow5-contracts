@@ -6,7 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { Signer } from "ethers";
+import { ethers } from "ethers";
 
 import { TestStringUtils } from "../../../types/contracts/test/utils/TestStringUtils";
 import { TestStringUtils__factory } from "../../../types/factories/contracts/test/utils/TestStringUtils__factory";
@@ -19,7 +19,7 @@ function TestStringUtilsMixin<T extends new (...args: any[]) => {}>(Base: T) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [Signer, string];
+      const [signer, contractAddress] = args as [ethers.Signer, string];
       this.testStringUtils = TestStringUtils__factory.connect(
         contractAddress,
         signer,

@@ -6,7 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { Signer } from "ethers";
+import { ethers } from "ethers";
 
 import { BaseContract } from "../baseContract";
 import { ReverseRepoMixin } from "./reverseRepoMixin";
@@ -14,7 +14,7 @@ import { ReverseRepoMixin } from "./reverseRepoMixin";
 const ReverseRepoContractBase = ReverseRepoMixin(BaseContract);
 
 class ReverseRepoContract extends ReverseRepoContractBase {
-  constructor(signer: Signer, contractAddress: string) {
+  constructor(signer: ethers.Signer, contractAddress: string) {
     super(signer, contractAddress);
   }
 }

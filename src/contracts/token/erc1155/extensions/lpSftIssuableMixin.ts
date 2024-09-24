@@ -6,11 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import {
-  ContractTransactionReceipt,
-  ContractTransactionResponse,
-  Signer,
-} from "ethers";
+import { ethers } from "ethers";
 
 import { ILPSFTIssuable } from "../../../../types/contracts/src/interfaces/token/ERC1155/extensions/ILPSFTIssuable";
 import { ILPSFTIssuable__factory } from "../../../../types/factories/contracts/src/interfaces/token/ERC1155/extensions/ILPSFTIssuable__factory";
@@ -23,7 +19,7 @@ function LPSFTIssuableMixin<T extends new (...args: any[]) => {}>(Base: T) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [Signer, string];
+      const [signer, contractAddress] = args as [ethers.Signer, string];
       this.lpSftIssuable = ILPSFTIssuable__factory.connect(
         contractAddress,
         signer,
@@ -34,43 +30,38 @@ function LPSFTIssuableMixin<T extends new (...args: any[]) => {}>(Base: T) {
       to: string,
       sftTokenId: bigint,
       data: Uint8Array,
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse = await this.lpSftIssuable.mint(
-        to,
-        sftTokenId,
-        data,
-      );
-      return (await tx.wait()) as ContractTransactionReceipt;
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
+        await this.lpSftIssuable.mint(to, sftTokenId, data);
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
 
     async mintBatch(
       to: string,
       sftTokenIds: bigint[],
       data: Uint8Array,
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse =
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
         await this.lpSftIssuable.mintBatch(to, sftTokenIds, data);
-      return (await tx.wait()) as ContractTransactionReceipt;
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
 
     async burn(
       from: string,
       sftTokenId: bigint,
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse = await this.lpSftIssuable.burn(
-        from,
-        sftTokenId,
-      );
-      return (await tx.wait()) as ContractTransactionReceipt;
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
+        await this.lpSftIssuable.burn(from, sftTokenId);
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
 
     async burnBatch(
       from: string,
       sftTokenIds: bigint[],
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse =
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
         await this.lpSftIssuable.burnBatch(from, sftTokenIds);
-      return (await tx.wait()) as ContractTransactionReceipt;
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
   };
 }

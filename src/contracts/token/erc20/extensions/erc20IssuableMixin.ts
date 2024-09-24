@@ -6,11 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import {
-  ContractTransactionReceipt,
-  ContractTransactionResponse,
-  Signer,
-} from "ethers";
+import { ethers } from "ethers";
 
 import { IERC20Issuable } from "../../../../types/contracts/src/interfaces/token/ERC20/extensions/IERC20Issuable";
 import { IERC20Issuable__factory } from "../../../../types/factories/contracts/src/interfaces/token/ERC20/extensions/IERC20Issuable__factory";
@@ -23,7 +19,7 @@ function ERC20IssuableMixin<T extends new (...args: any[]) => {}>(Base: T) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [Signer, string];
+      const [signer, contractAddress] = args as [ethers.Signer, string];
       this.erc20Issuable = IERC20Issuable__factory.connect(
         contractAddress,
         signer,
@@ -33,23 +29,19 @@ function ERC20IssuableMixin<T extends new (...args: any[]) => {}>(Base: T) {
     async mint(
       to: string,
       amount: bigint,
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse = await this.erc20Issuable.mint(
-        to,
-        amount,
-      );
-      return (await tx.wait()) as ContractTransactionReceipt;
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
+        await this.erc20Issuable.mint(to, amount);
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
 
     async burn(
       from: string,
       amount: bigint,
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse = await this.erc20Issuable.burn(
-        from,
-        amount,
-      );
-      return (await tx.wait()) as ContractTransactionReceipt;
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
+        await this.erc20Issuable.burn(from, amount);
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
   };
 }

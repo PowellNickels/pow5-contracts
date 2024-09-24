@@ -8,7 +8,7 @@
 
 import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
 import chai from "chai";
-import { Contract, ContractTransactionResponse, ethers } from "ethers";
+import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
@@ -146,7 +146,7 @@ describe("Bureau 3: Liquidity Forge", () => {
     );
 
     // Initialize the Uniswap V3 pool
-    const tx: ContractTransactionResponse =
+    const tx: ethers.ContractTransactionResponse =
       await pow1PoolContract.initialize(INITIAL_PRICE);
     await tx.wait();
 
@@ -174,8 +174,8 @@ describe("Bureau 3: Liquidity Forge", () => {
       LPSFT_ISSUER_ROLE,
       addressBook.yieldHarvest!,
     );
-    const tx: ContractTransactionResponse = await (
-      pow1LpSftLendFarmContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow1LpSftLendFarmContract.connect(deployer) as ethers.Contract
     ).grantRole(LPSFT_FARM_OPERATOR_ROLE, addressBook.yieldHarvest!);
     await tx.wait();
     await pow1Contract.grantRole(
@@ -225,8 +225,8 @@ describe("Bureau 3: Liquidity Forge", () => {
     const { pow5InterestFarmContract } = ethersContracts;
 
     // Grant ERC20_FARM_OPERATOR_ROLE to LiquidityForge
-    const tx: ContractTransactionResponse = await (
-      pow5InterestFarmContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow5InterestFarmContract.connect(deployer) as ethers.Contract
     ).grantRole(ERC20_FARM_OPERATOR_ROLE, addressBook.liquidityForge!);
     await tx.wait();
   });

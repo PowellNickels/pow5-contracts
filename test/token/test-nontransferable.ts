@@ -11,7 +11,7 @@
 
 import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
 import chai from "chai";
-import { Contract, ContractTransactionResponse, ethers } from "ethers";
+import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
@@ -88,8 +88,8 @@ describe("ERC20Nontransferable", () => {
     const { pow1TokenContract } = contracts;
 
     // Grant issuer role to deployer
-    const tx: ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow1TokenContract.connect(deployer) as ethers.Contract
     ).grantRole(ERC20_ISSUER_ROLE, await deployer.getAddress());
     await tx.wait();
   });
@@ -100,8 +100,8 @@ describe("ERC20Nontransferable", () => {
     const { pow5TokenContract } = contracts;
 
     // Grant issuer role to deployer
-    const tx: ContractTransactionResponse = await (
-      pow5TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow5TokenContract.connect(deployer) as ethers.Contract
     ).grantRole(ERC20_ISSUER_ROLE, await deployer.getAddress());
     await tx.wait();
   });
@@ -112,8 +112,8 @@ describe("ERC20Nontransferable", () => {
     const { lpPow1TokenContract } = contracts;
 
     // Grant issuer role to deployer
-    const tx: ContractTransactionResponse = await (
-      lpPow1TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      lpPow1TokenContract.connect(deployer) as ethers.Contract
     ).grantRole(ERC20_ISSUER_ROLE, await deployer.getAddress());
     await tx.wait();
   });
@@ -124,8 +124,8 @@ describe("ERC20Nontransferable", () => {
     const { lpPow5TokenContract } = contracts;
 
     // Grant issuer role to deployer
-    const tx: ContractTransactionResponse = await (
-      lpPow5TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      lpPow5TokenContract.connect(deployer) as ethers.Contract
     ).grantRole(ERC20_ISSUER_ROLE, await deployer.getAddress());
     await tx.wait();
   });
@@ -136,8 +136,8 @@ describe("ERC20Nontransferable", () => {
     const { noPow5TokenContract } = contracts;
 
     // Grant issuer role to deployer
-    const tx: ContractTransactionResponse = await (
-      noPow5TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      noPow5TokenContract.connect(deployer) as ethers.Contract
     ).grantRole(ERC20_ISSUER_ROLE, await deployer.getAddress());
     await tx.wait();
   });
@@ -152,8 +152,8 @@ describe("ERC20Nontransferable", () => {
     const { pow1TokenContract } = contracts;
 
     // Mint POW1
-    const tx: ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow1TokenContract.connect(deployer) as ethers.Contract
     ).mint(await deployer.getAddress(), POW1_AMOUNT);
     await tx.wait();
   });
@@ -164,8 +164,8 @@ describe("ERC20Nontransferable", () => {
     const { pow5TokenContract } = contracts;
 
     // Mint POW5
-    const tx: ContractTransactionResponse = await (
-      pow5TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow5TokenContract.connect(deployer) as ethers.Contract
     ).mint(await deployer.getAddress(), POW5_AMOUNT);
     await tx.wait();
   });
@@ -176,8 +176,8 @@ describe("ERC20Nontransferable", () => {
     const { lpPow1TokenContract } = contracts;
 
     // Mint LPPOW1
-    const tx: ContractTransactionResponse = await (
-      lpPow1TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      lpPow1TokenContract.connect(deployer) as ethers.Contract
     ).mint(await deployer.getAddress(), LPPOW1_AMOUNT);
     await tx.wait();
   });
@@ -188,8 +188,8 @@ describe("ERC20Nontransferable", () => {
     const { lpPow5TokenContract } = contracts;
 
     // Mint LPPOW5
-    const tx: ContractTransactionResponse = await (
-      lpPow5TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      lpPow5TokenContract.connect(deployer) as ethers.Contract
     ).mint(await deployer.getAddress(), LPPOW5_AMOUNT);
     await tx.wait();
   });
@@ -200,8 +200,8 @@ describe("ERC20Nontransferable", () => {
     const { noPow5TokenContract } = contracts;
 
     // Mint NOPOW5
-    const tx: ContractTransactionResponse = await (
-      noPow5TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      noPow5TokenContract.connect(deployer) as ethers.Contract
     ).mint(await deployer.getAddress(), NOPOW5_AMOUNT);
     await tx.wait();
   });
@@ -216,8 +216,8 @@ describe("ERC20Nontransferable", () => {
     const { pow1TokenContract } = contracts;
 
     // Transfer POW1
-    const tx: ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow1TokenContract.connect(deployer) as ethers.Contract
     ).transfer(beneficiaryAddress, POW1_AMOUNT);
     await tx.wait();
   });
@@ -228,8 +228,8 @@ describe("ERC20Nontransferable", () => {
     const { pow5TokenContract } = contracts;
 
     // Transfer POW5
-    const tx: ContractTransactionResponse = await (
-      pow5TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow5TokenContract.connect(deployer) as ethers.Contract
     ).transfer(beneficiaryAddress, POW5_AMOUNT);
     await tx.wait();
   });
@@ -241,7 +241,7 @@ describe("ERC20Nontransferable", () => {
 
     // Attempt to transfer LPPOW1
     try {
-      await (lpPow1TokenContract.connect(deployer) as Contract).transfer(
+      await (lpPow1TokenContract.connect(deployer) as ethers.Contract).transfer(
         beneficiaryAddress,
         LPPOW1_AMOUNT,
       );
@@ -258,7 +258,7 @@ describe("ERC20Nontransferable", () => {
 
     // Attempt to transfer LPPOW5
     try {
-      await (lpPow5TokenContract.connect(deployer) as Contract).transfer(
+      await (lpPow5TokenContract.connect(deployer) as ethers.Contract).transfer(
         beneficiaryAddress,
         LPPOW5_AMOUNT,
       );
@@ -275,7 +275,7 @@ describe("ERC20Nontransferable", () => {
 
     // Attempt to transfer NOPOW5
     try {
-      await (noPow5TokenContract.connect(deployer) as Contract).transfer(
+      await (noPow5TokenContract.connect(deployer) as ethers.Contract).transfer(
         beneficiaryAddress,
         NOPOW5_AMOUNT,
       );

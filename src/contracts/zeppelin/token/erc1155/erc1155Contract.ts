@@ -6,7 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { Signer } from "ethers";
+import { ethers } from "ethers";
 
 import { BaseContract } from "../../../baseContract";
 import { ERC1155Mixin } from "./erc1155Mixin";
@@ -16,7 +16,7 @@ const ERC1155MetadataURIContract = ERC1155MetadataURIMixin(BaseContract);
 const ERC1155ContractBase = ERC1155Mixin(ERC1155MetadataURIContract);
 
 class ERC1155Contract extends ERC1155ContractBase {
-  constructor(signer: Signer, contractAddress: string) {
+  constructor(signer: ethers.Signer, contractAddress: string) {
     super(signer, contractAddress);
   }
 }

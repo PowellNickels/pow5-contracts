@@ -11,15 +11,7 @@
 
 import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
 import chai from "chai";
-import {
-  Contract,
-  ContractTransactionReceipt,
-  ContractTransactionResponse,
-  ethers,
-  EventLog,
-  Log,
-  Result,
-} from "ethers";
+import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
@@ -143,7 +135,7 @@ describe("Token Pools", () => {
     const { wrappedNativeTokenContract } = contracts;
 
     // Wrap ETH
-    const tx: ContractTransactionResponse =
+    const tx: ethers.ContractTransactionResponse =
       await wrappedNativeTokenContract.deposit({ value: WETH_TOKEN_AMOUNT });
     await tx.wait();
   });
@@ -158,7 +150,7 @@ describe("Token Pools", () => {
     const { usdcTokenContract } = contracts;
 
     // Mint USDC
-    const tx: ContractTransactionResponse = await usdcTokenContract.mint(
+    const tx: ethers.ContractTransactionResponse = await usdcTokenContract.mint(
       beneficiaryAddress,
       USDC_TOKEN_AMOUNT,
     );
@@ -175,8 +167,8 @@ describe("Token Pools", () => {
     const { pow1TokenContract } = contracts;
 
     // Grant issuer role to deployer
-    const tx: ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow1TokenContract.connect(deployer) as ethers.Contract
     ).grantRole(ERC20_ISSUER_ROLE, await deployer.getAddress());
     await tx.wait();
   });
@@ -187,8 +179,8 @@ describe("Token Pools", () => {
     const { pow1TokenContract } = contracts;
 
     // Mint POW1
-    const tx: ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow1TokenContract.connect(deployer) as ethers.Contract
     ).mint(await deployer.getAddress(), LPPOW1_REWARD_AMOUNT);
     await tx.wait();
   });
@@ -199,8 +191,8 @@ describe("Token Pools", () => {
     const { pow1TokenContract } = contracts;
 
     // Mint POW1
-    const tx: ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow1TokenContract.connect(deployer) as ethers.Contract
     ).mint(await deployer.getAddress(), LPPOW5_REWARD_AMOUNT);
     await tx.wait();
   });
@@ -220,11 +212,11 @@ describe("Token Pools", () => {
     const { pow1TokenContract } = contracts;
 
     // Transfer POW1 to beneficiary
-    const tx: ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow1TokenContract.connect(deployer) as ethers.Contract
     ).transfer(beneficiaryAddress, INITIAL_POW1_SUPPLY);
 
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
+    const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
   });
 
@@ -249,18 +241,19 @@ describe("Token Pools", () => {
     const { pow1TokenContract, pow1StakerContract } = contracts;
 
     // Grant issuer role to POW1Staker
-    const txStaker: ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as Contract
+    const txStaker: ethers.ContractTransactionResponse = await (
+      pow1TokenContract.connect(deployer) as ethers.Contract
     ).grantRole(ERC20_ISSUER_ROLE, await pow1StakerContract.getAddress());
 
     // Check events
-    const receipt: ContractTransactionReceipt | null = await txStaker.wait();
+    const receipt: ethers.ContractTransactionReceipt | null =
+      await txStaker.wait();
     chai.expect(receipt).to.not.be.null;
 
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.address).to.equal(await pow1TokenContract.getAddress());
     chai.expect(log.fragment.name).to.equal("RoleGranted");
     chai.expect(log.args.length).to.equal(3);
@@ -301,18 +294,19 @@ describe("Token Pools", () => {
     const { pow1TokenContract, pow5StakerContract } = contracts;
 
     // Grant issuer role to pow5Staker
-    const txStaker: ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as Contract
+    const txStaker: ethers.ContractTransactionResponse = await (
+      pow1TokenContract.connect(deployer) as ethers.Contract
     ).grantRole(ERC20_ISSUER_ROLE, await pow5StakerContract.getAddress());
 
     // Check events
-    const receipt: ContractTransactionReceipt | null = await txStaker.wait();
+    const receipt: ethers.ContractTransactionReceipt | null =
+      await txStaker.wait();
     chai.expect(receipt).to.not.be.null;
 
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.address).to.equal(await pow1TokenContract.getAddress());
     chai.expect(log.fragment.name).to.equal("RoleGranted");
     chai.expect(log.args.length).to.equal(3);
@@ -353,18 +347,18 @@ describe("Token Pools", () => {
     const { lpSftContract, pow1StakerContract } = contracts;
 
     // Grant issuer role
-    const tx: ContractTransactionResponse = await (
-      lpSftContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      lpSftContract.connect(deployer) as ethers.Contract
     ).grantRole(LPSFT_ISSUER_ROLE, await pow1StakerContract.getAddress());
 
     // Check events
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
+    const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
 
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.address).to.equal(await lpSftContract.getAddress());
     chai.expect(log.fragment.name).to.equal("RoleGranted");
     chai.expect(log.args.length).to.equal(3);
@@ -405,18 +399,18 @@ describe("Token Pools", () => {
     const { lpSftContract, pow5StakerContract } = contracts;
 
     // Grant issuer role
-    const tx: ContractTransactionResponse = await (
-      lpSftContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      lpSftContract.connect(deployer) as ethers.Contract
     ).grantRole(LPSFT_ISSUER_ROLE, await pow5StakerContract.getAddress());
 
     // Check events
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
+    const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
 
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.address).to.equal(await lpSftContract.getAddress());
     chai.expect(log.fragment.name).to.equal("RoleGranted");
     chai.expect(log.args.length).to.equal(3);
@@ -446,8 +440,8 @@ describe("Token Pools", () => {
     const { lpPow1TokenContract, lpSftContract } = contracts;
 
     // Grant issuer role
-    const tx: ContractTransactionResponse = await (
-      lpPow1TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      lpPow1TokenContract.connect(deployer) as ethers.Contract
     ).grantRole(ERC20_ISSUER_ROLE, await lpSftContract.getAddress());
     await tx.wait();
   });
@@ -458,8 +452,8 @@ describe("Token Pools", () => {
     const { lpPow5TokenContract, lpSftContract } = contracts;
 
     // Grant issuer role
-    const tx: ContractTransactionResponse = await (
-      lpPow5TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      lpPow5TokenContract.connect(deployer) as ethers.Contract
     ).grantRole(ERC20_ISSUER_ROLE, await lpSftContract.getAddress());
     await tx.wait();
   });
@@ -474,18 +468,18 @@ describe("Token Pools", () => {
     const { pow1TokenContract, pow1StakerContract } = contracts;
 
     // Approve POW1Staker spending POW1
-    const tx: ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow1TokenContract.connect(deployer) as ethers.Contract
     ).approve(await pow1StakerContract.getAddress(), LPPOW1_REWARD_AMOUNT);
 
     // Check events
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
+    const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
 
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.address).to.equal(await pow1TokenContract.getAddress());
     chai.expect(log.fragment.name).to.equal("Approval");
     chai.expect(log.args.length).to.equal(3);
@@ -515,18 +509,18 @@ describe("Token Pools", () => {
     const { pow1TokenContract, pow5StakerContract } = contracts;
 
     // Approve POW5Staker spending POW1
-    const tx: ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow1TokenContract.connect(deployer) as ethers.Contract
     ).approve(await pow5StakerContract.getAddress(), LPPOW5_REWARD_AMOUNT);
 
     // Check events
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
+    const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
 
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.address).to.equal(await pow1TokenContract.getAddress());
     chai.expect(log.fragment.name).to.equal("Approval");
     chai.expect(log.args.length).to.equal(3);
@@ -556,21 +550,21 @@ describe("Token Pools", () => {
     const { pow1TokenContract, pow1StakerContract } = contracts;
 
     // Create incentive
-    const tx: ContractTransactionResponse = await (
-      pow1StakerContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow1StakerContract.connect(deployer) as ethers.Contract
     ).createIncentive(LPPOW1_REWARD_AMOUNT);
 
     // Check events
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
+    const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
 
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.equal(5);
 
     // Loop through logs looking for IncentiveCreated event
     for (const log of logs) {
-      if (log instanceof EventLog) {
-        const eventLog: EventLog = log as EventLog;
+      if (log instanceof ethers.EventLog) {
+        const eventLog: ethers.EventLog = log as ethers.EventLog;
         if (log.fragment.name === "IncentiveCreated") {
           // Found the event
           chai
@@ -611,21 +605,21 @@ describe("Token Pools", () => {
     const { pow1TokenContract, pow5StakerContract } = contracts;
 
     // Create incentive
-    const tx: ContractTransactionResponse = await (
-      pow5StakerContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow5StakerContract.connect(deployer) as ethers.Contract
     ).createIncentive(LPPOW5_REWARD_AMOUNT);
 
     // Check events
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
+    const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
 
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.equal(5);
 
     // Loop through logs looking for IncentiveCreated event
     for (const log of logs) {
-      if (log instanceof EventLog) {
-        const eventLog: EventLog = log as EventLog;
+      if (log instanceof ethers.EventLog) {
+        const eventLog: ethers.EventLog = log as ethers.EventLog;
         if (log.fragment.name === "IncentiveCreated") {
           // Found the event
           chai
@@ -682,17 +676,17 @@ describe("Token Pools", () => {
     );
 
     // Initialize the Uniswap V3 pool
-    const tx: ContractTransactionResponse =
+    const tx: ethers.ContractTransactionResponse =
       await pow1PoolContract.initialize(INITIAL_PRICE);
 
     // Check events
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
+    const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
 
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.equal(1);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.address).to.equal(await pow1PoolContract.getAddress());
     chai.expect(log.fragment.name).to.equal("Initialize");
     chai.expect(log.args.length).to.equal(2);
@@ -732,17 +726,17 @@ describe("Token Pools", () => {
     );
 
     // Initialize the Uniswap V3 pool
-    const tx: ContractTransactionResponse =
+    const tx: ethers.ContractTransactionResponse =
       await pow5PoolContract.initialize(INITIAL_PRICE);
 
     // Check events
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
+    const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
 
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.equal(1);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.address).to.equal(await pow5PoolContract.getAddress());
     chai.expect(log.fragment.name).to.equal("Initialize");
     chai.expect(log.args.length).to.equal(2);
@@ -780,19 +774,20 @@ describe("Token Pools", () => {
     const { pow1StakerContract, pow1TokenContract } = contracts;
 
     // Approve POW1Staker spending POW1
-    const tx: ContractTransactionResponse = await pow1TokenContract.approve(
-      await pow1StakerContract.getAddress(),
-      INITIAL_POW1_SUPPLY,
-    );
+    const tx: ethers.ContractTransactionResponse =
+      await pow1TokenContract.approve(
+        await pow1StakerContract.getAddress(),
+        INITIAL_POW1_SUPPLY,
+      );
 
     // Check events
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
+    const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
 
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.address).to.equal(await pow1TokenContract.getAddress());
     chai.expect(log.fragment.name).to.equal("Approval");
     chai.expect(log.args.length).to.equal(3);
@@ -807,20 +802,20 @@ describe("Token Pools", () => {
     const { pow1StakerContract, wrappedNativeTokenContract } = contracts;
 
     // Approve POW1Staker spending WETH
-    const tx: ContractTransactionResponse =
+    const tx: ethers.ContractTransactionResponse =
       await wrappedNativeTokenContract.approve(
         await pow1StakerContract.getAddress(),
         WETH_TOKEN_AMOUNT,
       );
 
     // Check events
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
+    const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
 
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai
       .expect(log.address)
       .to.equal(await wrappedNativeTokenContract.getAddress());
@@ -861,24 +856,25 @@ describe("Token Pools", () => {
       ).toLocaleString()} ETH ($${wethDepositValue.toLocaleString()})`,
     );
 
-    const mintTx: ContractTransactionResponse =
+    const mintTx: ethers.ContractTransactionResponse =
       await pow1StakerContract.stakeNFTImbalance(
         INITIAL_POW1_SUPPLY, // gameTokenAmount
         WETH_TOKEN_AMOUNT, // assetTokenAmount
         beneficiaryAddress, // recipient
       );
 
-    const receipt: ContractTransactionReceipt | null = await mintTx.wait();
+    const receipt: ethers.ContractTransactionReceipt | null =
+      await mintTx.wait();
     chai.expect(receipt).to.not.be.null;
 
     // Check events
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(19); // 20 events for perfectly balanced liquidity
 
     // Loop through logs looking for NFTStaked event
     for (const log of logs) {
-      if (log instanceof EventLog) {
-        const eventLog: EventLog = log as EventLog;
+      if (log instanceof ethers.EventLog) {
+        const eventLog: ethers.EventLog = log as ethers.EventLog;
         if (log.fragment.name === "NFTStaked") {
           // Found the event
           chai
@@ -919,7 +915,7 @@ describe("Token Pools", () => {
         .toLocaleString()} LPPOW1 ($${lpPow1Value.toLocaleString()})`,
     );
 
-    const positions: Result[] =
+    const positions: ethers.Result[] =
       await uniswapV3NftManagerContract.positions(POW1_LPNFT_TOKEN_ID);
     chai.expect(positions.length).to.equal(12);
     chai.expect(positions[0]).to.equal(0n); // nonce for permits
@@ -1030,8 +1026,8 @@ describe("Token Pools", () => {
     const { pow5TokenContract } = contracts;
 
     // Grant issuer role to deployer
-    const tx: ContractTransactionResponse = await (
-      pow5TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow5TokenContract.connect(deployer) as ethers.Contract
     ).grantRole(ERC20_ISSUER_ROLE, await deployer.getAddress());
     await tx.wait();
   });
@@ -1042,8 +1038,8 @@ describe("Token Pools", () => {
     const { pow5TokenContract } = contracts;
 
     // Mint POW5
-    const tx: ContractTransactionResponse = await (
-      pow5TokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow5TokenContract.connect(deployer) as ethers.Contract
     ).mint(beneficiaryAddress, INITIAL_POW5_DEPOSIT);
     await tx.wait();
   });
@@ -1072,19 +1068,20 @@ describe("Token Pools", () => {
     const { pow5StakerContract, pow5TokenContract } = contracts;
 
     // Approve POW5Staker spending POW5
-    const tx: ContractTransactionResponse = await pow5TokenContract.approve(
-      await pow5StakerContract.getAddress(),
-      INITIAL_POW5_DEPOSIT,
-    );
+    const tx: ethers.ContractTransactionResponse =
+      await pow5TokenContract.approve(
+        await pow5StakerContract.getAddress(),
+        INITIAL_POW5_DEPOSIT,
+      );
 
     // Check events
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
+    const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
 
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.address).to.equal(await pow5TokenContract.getAddress());
     chai.expect(log.fragment.name).to.equal("Approval");
     chai.expect(log.args.length).to.equal(3);
@@ -1099,19 +1096,20 @@ describe("Token Pools", () => {
     const { pow5StakerContract, usdcTokenContract } = contracts;
 
     // Approve POW5Staker spending USDC
-    const tx: ContractTransactionResponse = await usdcTokenContract.approve(
-      await pow5StakerContract.getAddress(),
-      USDC_TOKEN_AMOUNT,
-    );
+    const tx: ethers.ContractTransactionResponse =
+      await usdcTokenContract.approve(
+        await pow5StakerContract.getAddress(),
+        USDC_TOKEN_AMOUNT,
+      );
 
     // Check events
-    const receipt: ContractTransactionReceipt | null = await tx.wait();
+    const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
     chai.expect(receipt).to.not.be.null;
 
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.address).to.equal(await usdcTokenContract.getAddress());
     chai.expect(log.fragment.name).to.equal("Approval");
     chai.expect(log.args.length).to.equal(3);
@@ -1153,24 +1151,25 @@ describe("Token Pools", () => {
       )} USDC ($${usdcValue.toLocaleString()})`,
     );
 
-    const mintTx: ContractTransactionResponse =
+    const mintTx: ethers.ContractTransactionResponse =
       await pow5StakerContract.stakeNFTImbalance(
         INITIAL_POW5_DEPOSIT, // gameTokenAmount
         USDC_TOKEN_AMOUNT, // assetTokenAmount
         beneficiaryAddress, // recipient
       );
 
-    const receipt: ContractTransactionReceipt | null = await mintTx.wait();
+    const receipt: ethers.ContractTransactionReceipt | null =
+      await mintTx.wait();
     chai.expect(receipt).to.not.be.null;
 
     // Check events
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(19); // 20 events for perfectly balanced liquidity
 
     // Loop through logs looking for NFTStaked event
     for (const log of logs) {
-      if (log instanceof EventLog) {
-        const eventLog: EventLog = log as EventLog;
+      if (log instanceof ethers.EventLog) {
+        const eventLog: ethers.EventLog = log as ethers.EventLog;
         if (log.fragment.name === "NFTStaked") {
           // Found the event
           chai
@@ -1213,7 +1212,7 @@ describe("Token Pools", () => {
         .toLocaleString()} LPPOW5`,
     );
 
-    const positions: Result[] =
+    const positions: ethers.Result[] =
       await uniswapV3NftManagerContract.positions(POW5_LPNFT_TOKEN_ID);
     chai.expect(positions.length).to.equal(12);
     chai.expect(positions[0]).to.equal(0n); // nonce for permits

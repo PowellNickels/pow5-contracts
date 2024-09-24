@@ -6,7 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { Signer } from "ethers";
+import { ethers } from "ethers";
 
 import { IYieldHarvest } from "../../types/contracts/src/interfaces/bureaus/IYieldHarvest";
 import { IYieldHarvest__factory } from "../../types/factories/contracts/src/interfaces/bureaus/IYieldHarvest__factory";
@@ -19,7 +19,7 @@ function YieldHarvestMixin<T extends new (...args: any[]) => {}>(Base: T) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [Signer, string];
+      const [signer, contractAddress] = args as [ethers.Signer, string];
       this.yieldHarvest = IYieldHarvest__factory.connect(
         contractAddress,
         signer,

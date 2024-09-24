@@ -9,7 +9,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { Signer } from "ethers";
+import { ethers } from "ethers";
 
 import { DutchAuctionContract } from "../contracts/bureaus/dutchAuctionContract";
 import { LiquidityForgeContract } from "../contracts/bureaus/liquidityForgeContract";
@@ -34,7 +34,7 @@ import { ContractLibrary } from "../interfaces/contractLibrary";
 //
 
 function getContractLibrary(
-  signer: Signer,
+  signer: ethers.Signer,
   addressBook: AddressBook,
 ): ContractLibrary {
   return {

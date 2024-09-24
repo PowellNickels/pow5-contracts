@@ -7,7 +7,7 @@
  */
 
 import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
-import { Contract, ContractTransactionResponse, ethers } from "ethers";
+import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
@@ -160,12 +160,12 @@ describe("Bureau integration test", () => {
       addressBook.liquidityForge!,
     );
 
-    const txPow1LendFarm: ContractTransactionResponse = await (
-      pow1LpSftLendFarmContract.connect(deployer) as Contract
+    const txPow1LendFarm: ethers.ContractTransactionResponse = await (
+      pow1LpSftLendFarmContract.connect(deployer) as ethers.Contract
     ).grantRole(LPSFT_FARM_OPERATOR_ROLE, addressBook.yieldHarvest!);
     await txPow1LendFarm.wait();
-    const txPow5InterestFarm: ContractTransactionResponse = await (
-      pow5InterestFarmContract.connect(deployer) as Contract
+    const txPow5InterestFarm: ethers.ContractTransactionResponse = await (
+      pow5InterestFarmContract.connect(deployer) as ethers.Contract
     ).grantRole(ERC20_FARM_OPERATOR_ROLE, addressBook.liquidityForge!);
     await txPow5InterestFarm.wait();
 
@@ -197,7 +197,7 @@ describe("Bureau integration test", () => {
     await pow1Contract.mint(await deployer.getAddress(), LPPOW5_REWARD_AMOUNT);
 
     // Mint USDC
-    const txMintUsdc: ContractTransactionResponse =
+    const txMintUsdc: ethers.ContractTransactionResponse =
       await usdcTokenContract.mint(
         await deployer.getAddress(),
         INITIAL_USDC_AMOUNT,
@@ -231,8 +231,8 @@ describe("Bureau integration test", () => {
 
     // Approve Reverse Repo
     await pow5Contract.approve(addressBook.reverseRepo!, INITIAL_POW5_DEPOSIT);
-    const txApproveUsdc: ContractTransactionResponse = await (
-      usdcTokenContract.connect(deployer) as Contract
+    const txApproveUsdc: ethers.ContractTransactionResponse = await (
+      usdcTokenContract.connect(deployer) as ethers.Contract
     ).approve(addressBook.reverseRepo!, INITIAL_USDC_AMOUNT);
     await txApproveUsdc.wait();
   });
@@ -253,7 +253,7 @@ describe("Bureau integration test", () => {
 
     // Initialize the Uniswap V3 pool for POW1
     const pow1IsToken0: boolean = await pow1PoolerContract.gameIsToken0();
-    const txPow1Initialize: ContractTransactionResponse =
+    const txPow1Initialize: ethers.ContractTransactionResponse =
       await pow1PoolContract.initialize(
         encodePriceSqrt(
           pow1IsToken0 ? INITIAL_WETH_AMOUNT : INITIAL_POW1_SUPPLY,
@@ -264,7 +264,7 @@ describe("Bureau integration test", () => {
 
     // Initialize the Uniswap V3 pool for POW5
     const pow5IsToken0: boolean = await pow5PoolerContract.gameIsToken0();
-    const txPow5Initialize: ContractTransactionResponse =
+    const txPow5Initialize: ethers.ContractTransactionResponse =
       await pow5PoolContract.initialize(
         encodePriceSqrt(
           pow5IsToken0 ? INITIAL_USDC_AMOUNT : INITIAL_POW5_DEPOSIT,
@@ -284,8 +284,8 @@ describe("Bureau integration test", () => {
     const { pow5LpNftStakeFarmContract } = ethersContracts;
 
     // Create LPPOW5 incentive
-    const txCreatePow5Incentive: ContractTransactionResponse = await (
-      pow5LpNftStakeFarmContract.connect(deployer) as Contract
+    const txCreatePow5Incentive: ethers.ContractTransactionResponse = await (
+      pow5LpNftStakeFarmContract.connect(deployer) as ethers.Contract
     ).createIncentive(LPPOW5_REWARD_AMOUNT);
     await txCreatePow5Incentive.wait();
   });

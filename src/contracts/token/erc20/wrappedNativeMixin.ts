@@ -6,11 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import {
-  ContractTransactionReceipt,
-  ContractTransactionResponse,
-  Signer,
-} from "ethers";
+import { ethers } from "ethers";
 
 import { WETH9 } from "../../../types/contracts/depends/canonical-weth/WETH9";
 import { WETH9__factory } from "../../../types/factories/contracts/depends/canonical-weth/WETH9__factory";
@@ -23,21 +19,22 @@ function WrappedNativeMixin<T extends new (...args: any[]) => {}>(Base: T) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [Signer, string];
+      const [signer, contractAddress] = args as [ethers.Signer, string];
       this.wrappedNative = WETH9__factory.connect(contractAddress, signer);
     }
 
-    async deposit(wad: bigint): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse = await this.wrappedNative.deposit({
-        value: wad,
-      });
-      return (await tx.wait()) as ContractTransactionReceipt;
+    async deposit(wad: bigint): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
+        await this.wrappedNative.deposit({
+          value: wad,
+        });
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
 
-    async withdraw(wad: bigint): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse =
+    async withdraw(wad: bigint): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
         await this.wrappedNative.withdraw(wad);
-      return (await tx.wait()) as ContractTransactionReceipt;
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
   };
 }

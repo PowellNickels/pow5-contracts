@@ -6,7 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { Signer } from "ethers";
+import { ethers } from "ethers";
 
 import { BaseContract } from "../../baseContract";
 import { AccessControlMixin } from "../../zeppelin/access/accessControlMixin";
@@ -26,7 +26,7 @@ const LPSFTIssuableContract = LPSFTIssuableMixin(ERC1155EnumerableContract);
 const LPNFTHolderContract = LPNFTHolderMixin(LPSFTIssuableContract);
 
 class LPSFTContract extends LPNFTHolderContract {
-  constructor(signer: Signer, contractAddress: string) {
+  constructor(signer: ethers.Signer, contractAddress: string) {
     super(signer, contractAddress);
   }
 }

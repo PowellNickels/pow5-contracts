@@ -8,7 +8,7 @@
 
 import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
 import chai from "chai";
-import { Contract, ContractTransactionResponse, ethers } from "ethers";
+import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
@@ -126,12 +126,13 @@ describe("Bureau 2: Yield Harvest", () => {
 
     // Initialize the Uniswap V3 pool
     const pow1IsToken0: boolean = await pow1PoolerContract.gameIsToken0();
-    const tx: ContractTransactionResponse = await pow1PoolContract.initialize(
-      encodePriceSqrt(
-        pow1IsToken0 ? INITIAL_WETH_AMOUNT : INITIAL_POW1_SUPPLY,
-        pow1IsToken0 ? INITIAL_POW1_SUPPLY : INITIAL_WETH_AMOUNT,
-      ),
-    );
+    const tx: ethers.ContractTransactionResponse =
+      await pow1PoolContract.initialize(
+        encodePriceSqrt(
+          pow1IsToken0 ? INITIAL_WETH_AMOUNT : INITIAL_POW1_SUPPLY,
+          pow1IsToken0 ? INITIAL_POW1_SUPPLY : INITIAL_WETH_AMOUNT,
+        ),
+      );
     await tx.wait();
 
     // Initialize DutchAuction
@@ -168,8 +169,8 @@ describe("Bureau 2: Yield Harvest", () => {
     const { pow1LpSftLendFarmContract, yieldHarvestContract } = ethersContracts;
 
     // Grant LPSFT_FARM_OPERATOR_ROLE to YieldHarvest
-    const tx: ContractTransactionResponse = await (
-      pow1LpSftLendFarmContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow1LpSftLendFarmContract.connect(deployer) as ethers.Contract
     ).grantRole(
       LPSFT_FARM_OPERATOR_ROLE,
       await yieldHarvestContract.getAddress(),
@@ -187,14 +188,14 @@ describe("Bureau 2: Yield Harvest", () => {
     const { pow1LpSftLendFarmContract, pow1TokenContract } = ethersContracts;
 
     // Grant issuer role to deployer
-    const grantTx: ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as Contract
+    const grantTx: ethers.ContractTransactionResponse = await (
+      pow1TokenContract.connect(deployer) as ethers.Contract
     ).grantRole(ERC20_ISSUER_ROLE, await deployer.getAddress());
     await grantTx.wait();
 
     // Mint POW1 to the POW1 LP-SFT lend farm
-    const mintTx: ContractTransactionResponse = await (
-      pow1TokenContract.connect(deployer) as Contract
+    const mintTx: ethers.ContractTransactionResponse = await (
+      pow1TokenContract.connect(deployer) as ethers.Contract
     ).mint(
       await pow1LpSftLendFarmContract.getAddress(),
       ethers.parseUnits("5000", POW1_DECIMALS), // TODO: Handle rewards

@@ -6,7 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { Signer } from "ethers";
+import { ethers } from "ethers";
 
 import { IERC20Metadata } from "../../../../../types/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata";
 import { IERC20Metadata__factory } from "../../../../../types/factories/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata__factory";
@@ -19,7 +19,7 @@ function ERC20MetadataMixin<T extends new (...args: any[]) => {}>(Base: T) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [Signer, string];
+      const [signer, contractAddress] = args as [ethers.Signer, string];
       this.erc20Metadata = IERC20Metadata__factory.connect(
         contractAddress,
         signer,

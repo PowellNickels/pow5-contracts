@@ -6,11 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import {
-  ContractTransactionReceipt,
-  ContractTransactionResponse,
-  Signer,
-} from "ethers";
+import { ethers } from "ethers";
 
 import { IDeFiManager } from "../../types/contracts/src/interfaces/defi/IDeFiManager";
 import { IDeFiManager__factory } from "../../types/factories/contracts/src/interfaces/defi/IDeFiManager__factory";
@@ -23,7 +19,7 @@ function DeFiManagerMixin<T extends new (...args: any[]) => {}>(Base: T) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [Signer, string];
+      const [signer, contractAddress] = args as [ethers.Signer, string];
       this.defiManager = IDeFiManager__factory.connect(contractAddress, signer);
     }
 
@@ -71,24 +67,19 @@ function DeFiManagerMixin<T extends new (...args: any[]) => {}>(Base: T) {
       tokenId: bigint,
       amount: bigint,
       recipient: string,
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse = await this.defiManager.issuePow5(
-        tokenId,
-        amount,
-        recipient,
-      );
-      return (await tx.wait()) as ContractTransactionReceipt;
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
+        await this.defiManager.issuePow5(tokenId, amount, recipient);
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
 
     async repayPow5(
       tokenId: bigint,
       amount: bigint,
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse = await this.defiManager.repayPow5(
-        tokenId,
-        amount,
-      );
-      return (await tx.wait()) as ContractTransactionReceipt;
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
+        await this.defiManager.repayPow5(tokenId, amount);
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
   };
 }

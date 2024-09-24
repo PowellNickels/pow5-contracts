@@ -11,7 +11,7 @@
 
 import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
 import chai from "chai";
-import { ContractTransactionReceipt, EventLog, Log } from "ethers";
+import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { TestERC1155EnumerableContract } from "../../src/contracts/test/token/erc1155/extensions/testErc1155EnumerableContract";
@@ -84,7 +84,7 @@ describe("ERC1155Enumerable", () => {
     this.timeout(60 * 1000);
 
     // Mint NFT
-    const receipt: ContractTransactionReceipt =
+    const receipt: ethers.ContractTransactionReceipt =
       await testERC1155EnumerableContract.mintNFT(
         await beneficiary.getAddress(),
         nftTokenId1,
@@ -92,10 +92,10 @@ describe("ERC1155Enumerable", () => {
     chai.expect(receipt).to.not.be.null;
 
     // Check events
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.fragment.name).to.equal("TransferSingle");
     chai.expect(log.args[0]).to.equal(await beneficiary.getAddress());
     chai.expect(log.args[1]).to.equal(ZERO_ADDRESS);
@@ -153,7 +153,7 @@ describe("ERC1155Enumerable", () => {
   it("should burn first NFT", async function () {
     this.timeout(60 * 1000);
 
-    const receipt: ContractTransactionReceipt =
+    const receipt: ethers.ContractTransactionReceipt =
       await testERC1155EnumerableContract.burnNFT(
         await beneficiary.getAddress(),
         nftTokenId1,
@@ -161,10 +161,10 @@ describe("ERC1155Enumerable", () => {
     chai.expect(receipt).to.not.be.null;
 
     // Check events
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.fragment.name).to.equal("TransferSingle");
     chai.expect(log.args[0]).to.equal(await beneficiary.getAddress());
     chai.expect(log.args[1]).to.equal(await beneficiary.getAddress());
@@ -227,7 +227,7 @@ describe("ERC1155Enumerable", () => {
     this.timeout(60 * 1000);
 
     // Use tokens with ID 3 and 1 to verify correct sorting later
-    const receipt: ContractTransactionReceipt =
+    const receipt: ethers.ContractTransactionReceipt =
       await testERC1155EnumerableContract.batchMintNFT(
         await beneficiary.getAddress(),
         [nftTokenId3, nftTokenId1],
@@ -235,10 +235,10 @@ describe("ERC1155Enumerable", () => {
     chai.expect(receipt).to.not.be.null;
 
     // Check events
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.fragment.name).to.equal("TransferBatch");
     chai.expect(log.args[0]).to.equal(await beneficiary.getAddress());
     chai.expect(log.args[1]).to.equal(ZERO_ADDRESS);
@@ -283,7 +283,7 @@ describe("ERC1155Enumerable", () => {
     this.timeout(60 * 1000);
 
     // Burn NFTs
-    const receipt: ContractTransactionReceipt =
+    const receipt: ethers.ContractTransactionReceipt =
       await testERC1155EnumerableContract.batchBurnNFT(
         await beneficiary.getAddress(),
         [nftTokenId3, nftTokenId1],
@@ -291,10 +291,10 @@ describe("ERC1155Enumerable", () => {
     chai.expect(receipt).to.not.be.null;
 
     // Check events
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.fragment.name).to.equal("TransferBatch");
     chai.expect(log.args[0]).to.equal(await beneficiary.getAddress());
     chai.expect(log.args[1]).to.equal(await beneficiary.getAddress());
@@ -349,7 +349,7 @@ describe("ERC1155Enumerable", () => {
     this.timeout(60 * 1000);
 
     // Transfer NFTs
-    const receipt: ContractTransactionReceipt =
+    const receipt: ethers.ContractTransactionReceipt =
       await testERC1155EnumerableContract.safeBatchTransferFrom(
         await beneficiary.getAddress(),
         await deployer.getAddress(),
@@ -360,10 +360,10 @@ describe("ERC1155Enumerable", () => {
     chai.expect(receipt).to.not.be.null;
 
     // Check events
-    const logs: (EventLog | Log)[] = receipt!.logs;
+    const logs: (ethers.EventLog | ethers.Log)[] = receipt!.logs;
     chai.expect(logs.length).to.be.greaterThan(0);
 
-    const log: EventLog = logs[0] as EventLog;
+    const log: ethers.EventLog = logs[0] as ethers.EventLog;
     chai.expect(log.fragment.name).to.equal("TransferBatch");
     chai.expect(log.args[0]).to.equal(await beneficiary.getAddress());
     chai.expect(log.args[1]).to.equal(await beneficiary.getAddress());

@@ -6,7 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { Signer } from "ethers";
+import { ethers } from "ethers";
 
 import { BaseContract } from "../../baseContract";
 import { ERC20Mixin } from "../../zeppelin/token/erc20/erc20Mixin";
@@ -16,7 +16,7 @@ const ERC20Contract = ERC20Mixin(BaseContract);
 const WrappedNativeContractBase = WrappedNativeMixin(ERC20Contract);
 
 class WrappedNativeContract extends WrappedNativeContractBase {
-  constructor(signer: Signer, contractAddress: string) {
+  constructor(signer: ethers.Signer, contractAddress: string) {
     super(signer, contractAddress);
   }
 }

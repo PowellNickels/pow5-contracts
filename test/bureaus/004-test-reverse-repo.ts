@@ -8,7 +8,7 @@
 
 import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
 import chai from "chai";
-import { Contract, ContractTransactionResponse, ethers } from "ethers";
+import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
@@ -181,7 +181,7 @@ describe("Bureau 4: Reverse Repo", () => {
     );
 
     // Initialize the Uniswap V3 pool
-    const tx: ContractTransactionResponse =
+    const tx: ethers.ContractTransactionResponse =
       await pow1PoolContract.initialize(INITIAL_PRICE);
     await tx.wait();
 
@@ -216,8 +216,8 @@ describe("Bureau 4: Reverse Repo", () => {
       LPSFT_ISSUER_ROLE,
       addressBook.yieldHarvest!,
     );
-    const tx: ContractTransactionResponse = await (
-      pow1LpSftLendFarmContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow1LpSftLendFarmContract.connect(deployer) as ethers.Contract
     ).grantRole(LPSFT_FARM_OPERATOR_ROLE, addressBook.yieldHarvest!);
     await tx.wait();
     await pow1Contract.grantRole(
@@ -258,8 +258,8 @@ describe("Bureau 4: Reverse Repo", () => {
       DEFI_OPERATOR_ROLE,
       addressBook.liquidityForge!,
     );
-    const tx: ContractTransactionResponse = await (
-      pow5InterestFarmContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow5InterestFarmContract.connect(deployer) as ethers.Contract
     ).grantRole(ERC20_FARM_OPERATOR_ROLE, addressBook.liquidityForge!);
     await tx.wait();
     await pow5Contract.grantRole(ERC20_ISSUER_ROLE, addressBook.defiManager!);
@@ -315,7 +315,7 @@ describe("Bureau 4: Reverse Repo", () => {
     const { usdcTokenContract } = ethersContracts;
 
     // Mint USDC to deployer
-    const tx: ContractTransactionResponse = await usdcTokenContract.mint(
+    const tx: ethers.ContractTransactionResponse = await usdcTokenContract.mint(
       await deployer.getAddress(),
       INITIAL_USDC_AMOUNT,
     );
@@ -367,7 +367,7 @@ describe("Bureau 4: Reverse Repo", () => {
     );
 
     // Initialize the Uniswap V3 pool
-    const tx: ContractTransactionResponse =
+    const tx: ethers.ContractTransactionResponse =
       await pow5PoolContract.initialize(INITIAL_PRICE);
     await tx.wait();
   });
@@ -415,8 +415,8 @@ describe("Bureau 4: Reverse Repo", () => {
     );
 
     // Create incentive
-    const tx: ContractTransactionResponse = await (
-      pow5LpNftStakeFarmContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow5LpNftStakeFarmContract.connect(deployer) as ethers.Contract
     ).createIncentive(LPPOW5_REWARD_AMOUNT);
     await tx.wait();
   });
@@ -440,8 +440,8 @@ describe("Bureau 4: Reverse Repo", () => {
     const { usdcTokenContract } = ethersContracts;
 
     // Approve ReverseRepo spending USDC
-    const tx: ContractTransactionResponse = await (
-      usdcTokenContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      usdcTokenContract.connect(deployer) as ethers.Contract
     ).approve(addressBook.reverseRepo!, INITIAL_USDC_AMOUNT);
     await tx.wait();
   });
@@ -673,7 +673,7 @@ describe("Bureau 4: Reverse Repo", () => {
     const { usdcTokenContract } = ethersContracts;
 
     // Mint USDC to beneficiary
-    const tx: ContractTransactionResponse = await usdcTokenContract.mint(
+    const tx: ethers.ContractTransactionResponse = await usdcTokenContract.mint(
       await beneficiary.getAddress(),
       PURCHASE_USDC_AMOUNT,
     );
@@ -690,8 +690,8 @@ describe("Bureau 4: Reverse Repo", () => {
     const { usdcTokenContract } = ethersContracts;
 
     // Approve ReverseRepo spending USDC
-    const tx: ContractTransactionResponse = await (
-      usdcTokenContract.connect(beneficiary) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      usdcTokenContract.connect(beneficiary) as ethers.Contract
     ).approve(addressBook.reverseRepo!, PURCHASE_USDC_AMOUNT);
     await tx.wait();
   });

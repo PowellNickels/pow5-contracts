@@ -6,7 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { Signer } from "ethers";
+import { ethers } from "ethers";
 
 import { BaseContract } from "../../../baseContract";
 import { ERC20Mixin } from "./erc20Mixin";
@@ -14,7 +14,7 @@ import { ERC20Mixin } from "./erc20Mixin";
 const ERC20ContractBase = ERC20Mixin(BaseContract);
 
 class ERC20Contract extends ERC20ContractBase {
-  constructor(signer: Signer, contractAddress: string) {
+  constructor(signer: ethers.Signer, contractAddress: string) {
     super(signer, contractAddress);
   }
 }

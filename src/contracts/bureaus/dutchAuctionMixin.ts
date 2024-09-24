@@ -6,11 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import {
-  ContractTransactionReceipt,
-  ContractTransactionResponse,
-  Signer,
-} from "ethers";
+import { ethers } from "ethers";
 
 import { IDutchAuction } from "../../types/contracts/src/interfaces/bureaus/IDutchAuction";
 import { IDutchAuction__factory } from "../../types/factories/contracts/src/interfaces/bureaus/IDutchAuction__factory";
@@ -23,7 +19,7 @@ function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [Signer, string];
+      const [signer, contractAddress] = args as [ethers.Signer, string];
       this.dutchAuction = IDutchAuction__factory.connect(
         contractAddress,
         signer,
@@ -34,14 +30,14 @@ function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
       gameTokenAmount: bigint,
       assetTokenAmount: bigint,
       receiver: string,
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse =
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
         await this.dutchAuction.initialize(
           gameTokenAmount,
           assetTokenAmount,
           receiver,
         );
-      return (await tx.wait()) as ContractTransactionReceipt;
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
 
     async setAuction(
@@ -49,21 +45,23 @@ function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
       targetPrice: bigint,
       priceDecayConstant: bigint,
       dustLossAmount: bigint,
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse =
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
         await this.dutchAuction.setAuction(
           slot,
           targetPrice,
           priceDecayConstant,
           dustLossAmount,
         );
-      return (await tx.wait()) as ContractTransactionReceipt;
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
 
-    async removeAuction(slot: bigint): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse =
+    async removeAuction(
+      slot: bigint,
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
         await this.dutchAuction.removeAuction(slot);
-      return (await tx.wait()) as ContractTransactionReceipt;
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
 
     async getPrice(slot: bigint): Promise<bigint> {
@@ -75,20 +73,21 @@ function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
       gameTokenAmount: bigint,
       assetTokenAmount: bigint,
       receiver: string,
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse = await this.dutchAuction.purchase(
-        slot,
-        gameTokenAmount,
-        assetTokenAmount,
-        receiver,
-      );
-      return (await tx.wait()) as ContractTransactionReceipt;
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
+        await this.dutchAuction.purchase(
+          slot,
+          gameTokenAmount,
+          assetTokenAmount,
+          receiver,
+        );
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
 
-    async exit(tokenId: bigint): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse =
+    async exit(tokenId: bigint): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
         await this.dutchAuction.exit(tokenId);
-      return (await tx.wait()) as ContractTransactionReceipt;
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
   };
 }

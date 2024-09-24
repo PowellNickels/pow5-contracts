@@ -6,7 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { Signer } from "ethers";
+import { ethers } from "ethers";
 
 import { IFarm } from "../../types/contracts/src/interfaces/defi/IFarm";
 import { IFarm__factory } from "../../types/factories/contracts/src/interfaces/defi/IFarm__factory";
@@ -19,7 +19,7 @@ function FarmMixin<T extends new (...args: any[]) => {}>(Base: T) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [Signer, string];
+      const [signer, contractAddress] = args as [ethers.Signer, string];
       this.farm = IFarm__factory.connect(contractAddress, signer);
     }
 

@@ -8,7 +8,7 @@
 
 import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
 import chai from "chai";
-import { Contract, ContractTransactionResponse, ethers } from "ethers";
+import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
@@ -218,7 +218,7 @@ describe("Bureau 1: Dutch Auction", () => {
     );
 
     // Initialize the Uniswap V3 pool
-    const tx: ContractTransactionResponse =
+    const tx: ethers.ContractTransactionResponse =
       await pow1PoolContract.initialize(INITIAL_PRICE);
     await tx.wait();
   });
@@ -486,8 +486,8 @@ describe("Bureau 1: Dutch Auction", () => {
     const { pow1SwapperContract } = ethersContracts;
 
     // Swap WETH for POW1
-    const tx: ContractTransactionResponse = await (
-      pow1SwapperContract.connect(deployer) as Contract
+    const tx: ethers.ContractTransactionResponse = await (
+      pow1SwapperContract.connect(deployer) as ethers.Contract
     ).buyGameToken(WETH_DUST_AMOUNT, await deployer.getAddress());
     await tx.wait();
   });

@@ -11,7 +11,7 @@
 
 import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
 import chai from "chai";
-import { Signer } from "ethers";
+import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
@@ -47,7 +47,7 @@ describe("Token Constants", () => {
 
     // Use ethers to get the accounts
     const signers: SignerWithAddress[] = await hardhat.ethers.getSigners();
-    const deployer: Signer = signers[0];
+    const deployer: ethers.Signer = signers[0];
 
     // A single fixture is used for the test suite
     await setupTest();

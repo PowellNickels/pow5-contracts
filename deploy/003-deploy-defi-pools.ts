@@ -10,7 +10,7 @@
  */
 
 import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
-import { ContractTransactionResponse, ethers } from "ethers";
+import { ethers } from "ethers";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import {
   DeployFunction,
@@ -136,7 +136,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
 
   // Initialize pool
   console.log(`Initializing ${WRAPPED_NATIVE_USDC_POOL_CONTRACT}`);
-  const initializeTx: Promise<ContractTransactionResponse> =
+  const initializeTx: Promise<ethers.ContractTransactionResponse> =
     wrappedNativeUsdcPoolContract.initialize(sqrtPriceX96);
 
   // Failure is not fatal, pool may already have been initialized

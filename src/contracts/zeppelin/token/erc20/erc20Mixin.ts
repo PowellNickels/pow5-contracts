@@ -6,11 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import {
-  ContractTransactionReceipt,
-  ContractTransactionResponse,
-  Signer,
-} from "ethers";
+import { ethers } from "ethers";
 
 import { IERC20 } from "../../../../types/@openzeppelin/contracts/token/ERC20/IERC20";
 import { IERC20__factory } from "../../../../types/factories/@openzeppelin/contracts/token/ERC20/IERC20__factory";
@@ -23,7 +19,7 @@ function ERC20Mixin<T extends new (...args: any[]) => {}>(Base: T) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [Signer, string];
+      const [signer, contractAddress] = args as [ethers.Signer, string];
       this.erc20 = IERC20__factory.connect(contractAddress, signer);
     }
 
@@ -38,12 +34,12 @@ function ERC20Mixin<T extends new (...args: any[]) => {}>(Base: T) {
     async transfer(
       to: string,
       value: bigint,
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse = await this.erc20.transfer(
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse = await this.erc20.transfer(
         to,
         value,
       );
-      return (await tx.wait()) as ContractTransactionReceipt;
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
 
     async allowance(owner: string, spender: string): Promise<bigint> {
@@ -53,25 +49,22 @@ function ERC20Mixin<T extends new (...args: any[]) => {}>(Base: T) {
     async approve(
       spender: string,
       value: bigint,
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse = await this.erc20.approve(
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse = await this.erc20.approve(
         spender,
         value,
       );
-      return (await tx.wait()) as ContractTransactionReceipt;
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
 
     async transferFrom(
       from: string,
       to: string,
       value: bigint,
-    ): Promise<ContractTransactionReceipt> {
-      const tx: ContractTransactionResponse = await this.erc20.transferFrom(
-        from,
-        to,
-        value,
-      );
-      return (await tx.wait()) as ContractTransactionReceipt;
+    ): Promise<ethers.ContractTransactionReceipt> {
+      const tx: ethers.ContractTransactionResponse =
+        await this.erc20.transferFrom(from, to, value);
+      return (await tx.wait()) as ethers.ContractTransactionReceipt;
     }
   };
 }

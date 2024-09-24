@@ -6,7 +6,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { Signer } from "ethers";
+import { ethers } from "ethers";
 
 import { BaseContract } from "../../baseContract";
 import { TestStringUtilsMixin } from "./testStringUtilsMixin";
@@ -14,7 +14,7 @@ import { TestStringUtilsMixin } from "./testStringUtilsMixin";
 const TestStringUtilsContractBase = TestStringUtilsMixin(BaseContract);
 
 class TestStringUtilsContract extends TestStringUtilsContractBase {
-  constructor(signer: Signer, contractAddress: string) {
+  constructor(signer: ethers.Signer, contractAddress: string) {
     super(signer, contractAddress);
   }
 }
