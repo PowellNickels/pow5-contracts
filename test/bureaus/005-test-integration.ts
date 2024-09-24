@@ -10,6 +10,7 @@ import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src
 import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
+import { TestERC20MintableContract } from "../../src/contracts/test/token/erc20/extensions/testErc20MintableContract";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { ContractLibrary } from "../../src/interfaces/contractLibrary";
@@ -120,53 +121,63 @@ describe("Bureau integration test", () => {
 
     const {
       defiManagerContract,
+      liquidityForgeContract,
       lpPow1Contract,
       lpPow5Contract,
       lpSftContract,
       noLpSftContract,
       noPow5Contract,
       pow1Contract,
+      pow1LpNftStakeFarmContract,
       pow1LpSftLendFarmContract,
       pow5Contract,
       pow5InterestFarmContract,
-    } = deployerContracts;
+      pow5LpNftStakeFarmContract,
+      yieldHarvestContract,
+    }: ContractLibrary = deployerContracts;
 
     // Grant LPSFT roles
-    await lpPow1Contract.grantRole(ERC20_ISSUER_ROLE, addressBook.lpSft!);
-    await lpPow5Contract.grantRole(ERC20_ISSUER_ROLE, addressBook.lpSft!);
+    await lpPow1Contract.grantRole(ERC20_ISSUER_ROLE, lpSftContract.address);
+    await lpPow5Contract.grantRole(ERC20_ISSUER_ROLE, lpSftContract.address);
 
     // Grant DeFi Manager roles
-    await pow5Contract.grantRole(ERC20_ISSUER_ROLE, addressBook.defiManager!);
-    await noPow5Contract.grantRole(ERC20_ISSUER_ROLE, addressBook.defiManager!);
+    await pow5Contract.grantRole(
+      ERC20_ISSUER_ROLE,
+      defiManagerContract.address,
+    );
+    await noPow5Contract.grantRole(
+      ERC20_ISSUER_ROLE,
+      defiManagerContract.address,
+    );
 
     // Grant farm roles
     await lpSftContract.grantRole(
       LPSFT_ISSUER_ROLE,
-      addressBook.pow1LpNftStakeFarm!,
+      pow1LpNftStakeFarmContract.address,
     );
     await lpSftContract.grantRole(
       LPSFT_ISSUER_ROLE,
-      addressBook.pow5LpNftStakeFarm!,
+      pow5LpNftStakeFarmContract.address,
     );
 
     // Grant Yield Harvest roles
     await noLpSftContract.grantRole(
       LPSFT_ISSUER_ROLE,
-      addressBook.yieldHarvest!,
+      yieldHarvestContract.address,
     );
 
     await defiManagerContract.grantRole(
       DEFI_OPERATOR_ROLE,
-      addressBook.liquidityForge!,
+      liquidityForgeContract.address,
     );
 
     await pow1LpSftLendFarmContract.grantRole(
       LPSFT_FARM_OPERATOR_ROLE,
-      addressBook.yieldHarvest!,
+      yieldHarvestContract.address,
     );
     await pow5InterestFarmContract.grantRole(
       ERC20_FARM_OPERATOR_ROLE,
-      addressBook.liquidityForge!,
+      liquidityForgeContract.address,
     );
 
     // For testing
@@ -183,26 +194,26 @@ describe("Bureau integration test", () => {
   it("should obtain tokens", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1Contract, wrappedNativeContract } = deployerContracts;
-    const { usdcTokenContract } = ethersContracts;
+    const { pow1Contract, pow1LpSftLendFarmContract, wrappedNativeContract } =
+      deployerContracts;
+    const testErc20MintableContract: TestERC20MintableContract =
+      new TestERC20MintableContract(deployer, addressBook.usdcToken!);
 
     // Deposit W-ETH
     await wrappedNativeContract.deposit(INITIAL_WETH_AMOUNT);
 
     // Mint POW1
     await pow1Contract.mint(
-      addressBook.pow1LpSftLendFarm!,
+      pow1LpSftLendFarmContract.address,
       LPPOW1_REWARD_AMOUNT,
     );
     await pow1Contract.mint(await deployer.getAddress(), LPPOW5_REWARD_AMOUNT);
 
     // Mint USDC
-    const txMintUsdc: ethers.ContractTransactionResponse =
-      await usdcTokenContract.mint(
-        await deployer.getAddress(),
-        INITIAL_USDC_AMOUNT,
-      );
-    await txMintUsdc.wait();
+    await testErc20MintableContract.mint(
+      await deployer.getAddress(),
+      INITIAL_USDC_AMOUNT,
+    );
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -212,28 +223,40 @@ describe("Bureau integration test", () => {
   it("should approve tokens", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1Contract, pow5Contract, wrappedNativeContract } =
-      deployerContracts;
+    const {
+      dutchAuctionContract,
+      pow1Contract,
+      pow5Contract,
+      pow5LpNftStakeFarmContract,
+      reverseRepoContract,
+      wrappedNativeContract,
+    } = deployerContracts;
     const { usdcTokenContract } = ethersContracts;
 
     // Approve Dutch Auction
-    await pow1Contract.approve(addressBook.dutchAuction!, INITIAL_POW1_SUPPLY);
+    await pow1Contract.approve(
+      dutchAuctionContract.address,
+      INITIAL_POW1_SUPPLY,
+    );
     await wrappedNativeContract.approve(
-      addressBook.dutchAuction!,
+      dutchAuctionContract.address,
       INITIAL_WETH_AMOUNT,
     );
 
     // Approve LPPOW5 stake farm
     await pow1Contract.approve(
-      addressBook.pow5LpNftStakeFarm!,
+      pow5LpNftStakeFarmContract.address,
       LPPOW5_REWARD_AMOUNT,
     );
 
     // Approve Reverse Repo
-    await pow5Contract.approve(addressBook.reverseRepo!, INITIAL_POW5_DEPOSIT);
+    await pow5Contract.approve(
+      reverseRepoContract.address,
+      INITIAL_POW5_DEPOSIT,
+    );
     const txApproveUsdc: ethers.ContractTransactionResponse = await (
       usdcTokenContract.connect(deployer) as ethers.Contract
-    ).approve(addressBook.reverseRepo!, INITIAL_USDC_AMOUNT);
+    ).approve(reverseRepoContract.address, INITIAL_USDC_AMOUNT);
     await txApproveUsdc.wait();
   });
 
@@ -311,12 +334,12 @@ describe("Bureau integration test", () => {
   it("should initialize YieldHarvest", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { lpSftContract } = beneficiaryContracts;
+    const { lpSftContract, yieldHarvestContract } = beneficiaryContracts;
 
     // Lend LP-SFT to YieldHarvest
     await lpSftContract.safeTransferFrom(
       await beneficiary.getAddress(),
-      addressBook.yieldHarvest!,
+      yieldHarvestContract.address,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
       new Uint8Array(),

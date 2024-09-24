@@ -157,15 +157,16 @@ describe("Bureau 4: Reverse Repo", () => {
       lpPow1Contract,
       lpSftContract,
       pow1Contract,
+      pow1LpNftStakeFarmContract,
       wrappedNativeContract,
     } = deployerContracts;
     const { pow1PoolContract, pow1PoolerContract } = ethersContracts;
 
     // Setup roles
-    await lpPow1Contract.grantRole(ERC20_ISSUER_ROLE, addressBook.lpSft!);
+    await lpPow1Contract.grantRole(ERC20_ISSUER_ROLE, lpSftContract.address);
     await lpSftContract.grantRole(
       LPSFT_ISSUER_ROLE,
-      addressBook.pow1LpNftStakeFarm!,
+      pow1LpNftStakeFarmContract.address,
     );
 
     // Obtain tokens
@@ -186,9 +187,12 @@ describe("Bureau 4: Reverse Repo", () => {
     await tx.wait();
 
     // Approve tokens
-    await pow1Contract.approve(addressBook.dutchAuction!, INITIAL_POW1_SUPPLY);
+    await pow1Contract.approve(
+      dutchAuctionContract.address,
+      INITIAL_POW1_SUPPLY,
+    );
     await wrappedNativeContract.approve(
-      addressBook.dutchAuction!,
+      dutchAuctionContract.address,
       INITIAL_WETH_AMOUNT,
     );
 
@@ -207,18 +211,22 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should initialize YieldHarvest", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { noLpSftContract, pow1Contract, pow1LpSftLendFarmContract } =
-      deployerContracts;
+    const {
+      noLpSftContract,
+      pow1Contract,
+      pow1LpSftLendFarmContract,
+      yieldHarvestContract,
+    } = deployerContracts;
     const { lpSftContract } = beneficiaryContracts;
 
     // Grant roles
     await noLpSftContract.grantRole(
       LPSFT_ISSUER_ROLE,
-      addressBook.yieldHarvest!,
+      yieldHarvestContract.address,
     );
     await pow1LpSftLendFarmContract.grantRole(
       LPSFT_FARM_OPERATOR_ROLE,
-      addressBook.yieldHarvest!,
+      yieldHarvestContract.address,
     );
     await pow1Contract.grantRole(
       ERC20_ISSUER_ROLE,
@@ -227,14 +235,14 @@ describe("Bureau 4: Reverse Repo", () => {
 
     // Mint POW1 to the POW1 LP-SFT lend farm
     await pow1Contract.mint(
-      addressBook.pow1LpSftLendFarm!,
+      pow1LpSftLendFarmContract.address,
       LPPOW1_REWARD_AMOUNT,
     );
 
     // Lend LP-SFT to YieldHarvest
     await lpSftContract.safeTransferFrom(
       await beneficiary.getAddress(),
-      addressBook.yieldHarvest!,
+      yieldHarvestContract.address,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
       new Uint8Array(),
@@ -248,22 +256,31 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should initialize LiquidityForge", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { defiManagerContract, noPow5Contract, pow5Contract } =
-      deployerContracts;
+    const {
+      defiManagerContract,
+      noPow5Contract,
+      pow5Contract,
+      pow5InterestFarmContract,
+    } = deployerContracts;
     const { liquidityForgeContract } = beneficiaryContracts;
-    const { pow5InterestFarmContract } = ethersContracts;
 
     // Grant roles
     await defiManagerContract.grantRole(
       DEFI_OPERATOR_ROLE,
-      addressBook.liquidityForge!,
+      liquidityForgeContract.address,
     );
-    const tx: ethers.ContractTransactionResponse = await (
-      pow5InterestFarmContract.connect(deployer) as ethers.Contract
-    ).grantRole(ERC20_FARM_OPERATOR_ROLE, addressBook.liquidityForge!);
-    await tx.wait();
-    await pow5Contract.grantRole(ERC20_ISSUER_ROLE, addressBook.defiManager!);
-    await noPow5Contract.grantRole(ERC20_ISSUER_ROLE, addressBook.defiManager!);
+    await pow5InterestFarmContract.grantRole(
+      ERC20_FARM_OPERATOR_ROLE,
+      liquidityForgeContract.address,
+    );
+    await pow5Contract.grantRole(
+      ERC20_ISSUER_ROLE,
+      defiManagerContract.address,
+    );
+    await noPow5Contract.grantRole(
+      ERC20_ISSUER_ROLE,
+      defiManagerContract.address,
+    );
 
     // Borrow POW5 from LiquidityForge
     await liquidityForgeContract.borrowPow5(
@@ -329,10 +346,10 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should grant LPPOW5 issuer role to LPSFT", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { lpPow5Contract } = deployerContracts;
+    const { lpPow5Contract, lpSftContract } = deployerContracts;
 
     // Grant ERC-20 issuer role to LP-SFT
-    await lpPow5Contract.grantRole(ERC20_ISSUER_ROLE, addressBook.lpSft!);
+    await lpPow5Contract.grantRole(ERC20_ISSUER_ROLE, lpSftContract.address);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -342,12 +359,12 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should grant LP-SFT minter role to LPPOW5 stake farm", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { lpSftContract } = deployerContracts;
+    const { lpSftContract, pow5LpNftStakeFarmContract } = deployerContracts;
 
     // Grant LP-SFT minter role to LPPOW1 stake farm
     await lpSftContract.grantRole(
       LPSFT_ISSUER_ROLE,
-      addressBook.pow5LpNftStakeFarm!,
+      pow5LpNftStakeFarmContract.address,
     );
   });
 
@@ -388,11 +405,11 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should approve POW5LpNftStakeFarm spending POW1", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1Contract } = deployerContracts;
+    const { pow1Contract, pow5LpNftStakeFarmContract } = deployerContracts;
 
     // Approve POW5LpNftStakeFarm spending POW1
     await pow1Contract.approve(
-      addressBook.pow5LpNftStakeFarm!,
+      pow5LpNftStakeFarmContract.address,
       LPPOW5_REWARD_AMOUNT,
     );
   });
@@ -428,21 +445,25 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should approve ReverseRepo to spend POW5", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow5Contract } = deployerContracts;
+    const { pow5Contract, reverseRepoContract } = deployerContracts;
 
     // Approve ReverseRepo spending POW5
-    await pow5Contract.approve(addressBook.reverseRepo!, INITIAL_POW5_DEPOSIT);
+    await pow5Contract.approve(
+      reverseRepoContract.address,
+      INITIAL_POW5_DEPOSIT,
+    );
   });
 
   it("should approve ReverseRepo to spend USDC", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
+    const { reverseRepoContract } = deployerContracts;
     const { usdcTokenContract } = ethersContracts;
 
     // Approve ReverseRepo spending USDC
     const tx: ethers.ContractTransactionResponse = await (
       usdcTokenContract.connect(deployer) as ethers.Contract
-    ).approve(addressBook.reverseRepo!, INITIAL_USDC_AMOUNT);
+    ).approve(reverseRepoContract.address, INITIAL_USDC_AMOUNT);
     await tx.wait();
   });
 
@@ -687,12 +708,13 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should approve ReverseRepo to spend USDC", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
+    const { reverseRepoContract } = deployerContracts;
     const { usdcTokenContract } = ethersContracts;
 
     // Approve ReverseRepo spending USDC
     const tx: ethers.ContractTransactionResponse = await (
       usdcTokenContract.connect(beneficiary) as ethers.Contract
-    ).approve(addressBook.reverseRepo!, PURCHASE_USDC_AMOUNT);
+    ).approve(reverseRepoContract.address, PURCHASE_USDC_AMOUNT);
     await tx.wait();
   });
 
@@ -862,10 +884,10 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should approve ReverseRepo to manager POW5 LP-SFTs", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { lpSftContract } = beneficiaryContracts;
+    const { lpSftContract, reverseRepoContract } = beneficiaryContracts;
 
     // Approve ReverseRepo to manage POW5 LP-SFT
-    await lpSftContract.setApprovalForAll(addressBook.reverseRepo!, true);
+    await lpSftContract.setApprovalForAll(reverseRepoContract.address, true);
   });
 
   it("should liquidate purchased POW5 LP-SFT", async function (): Promise<void> {
@@ -1154,11 +1176,11 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should approve LiquidityForge to spend POW5", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow5Contract } = beneficiaryContracts;
+    const { liquidityForgeContract, pow5Contract } = beneficiaryContracts;
 
     // Approve LiquidityForge to spend POW5
     await pow5Contract.approve(
-      addressBook.liquidityForge!,
+      liquidityForgeContract.address,
       INITIAL_POW5_AMOUNT,
     );
   });
@@ -1182,12 +1204,12 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should withdraw LP-SFT from YieldHarvest after POW5 loan is repaid", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { noLpSftContract } = beneficiaryContracts;
+    const { noLpSftContract, yieldHarvestContract } = beneficiaryContracts;
 
     // Withdraw LP-SFT from YieldHarvest
     await noLpSftContract.safeTransferFrom(
       await beneficiary.getAddress(),
-      addressBook.yieldHarvest!,
+      yieldHarvestContract.address,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
       new Uint8Array(),

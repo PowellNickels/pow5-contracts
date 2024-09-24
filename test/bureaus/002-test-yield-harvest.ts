@@ -103,24 +103,28 @@ describe("Bureau 2: Yield Harvest", () => {
       lpPow1Contract,
       lpSftContract,
       pow1Contract,
+      pow1LpNftStakeFarmContract,
       wrappedNativeContract,
     } = deployerContracts;
     const { pow1PoolContract, pow1PoolerContract } = ethersContracts;
 
     // Setup roles
-    await lpPow1Contract.grantRole(ERC20_ISSUER_ROLE, addressBook.lpSft!);
+    await lpPow1Contract.grantRole(ERC20_ISSUER_ROLE, lpSftContract.address);
     await lpSftContract.grantRole(
       LPSFT_ISSUER_ROLE,
-      addressBook.pow1LpNftStakeFarm!,
+      pow1LpNftStakeFarmContract.address,
     );
 
     // Obtain tokens
     await wrappedNativeContract.deposit(INITIAL_WETH_AMOUNT);
 
     // Approve tokens
-    await pow1Contract.approve(addressBook.dutchAuction!, INITIAL_POW1_SUPPLY);
+    await pow1Contract.approve(
+      dutchAuctionContract.address,
+      INITIAL_POW1_SUPPLY,
+    );
     await wrappedNativeContract.approve(
-      addressBook.dutchAuction!,
+      dutchAuctionContract.address,
       INITIAL_WETH_AMOUNT,
     );
 
@@ -150,12 +154,12 @@ describe("Bureau 2: Yield Harvest", () => {
   it("should grant LPSFT_ISSUER_ROLE to YieldHarvest", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { noLpSftContract } = deployerContracts;
+    const { noLpSftContract, yieldHarvestContract } = deployerContracts;
 
     // Grant LPSFT_ISSUER_ROLE to YieldHarvest
     await noLpSftContract.grantRole(
       LPSFT_ISSUER_ROLE,
-      addressBook.yieldHarvest!,
+      yieldHarvestContract.address,
     );
   });
 
@@ -222,12 +226,12 @@ describe("Bureau 2: Yield Harvest", () => {
   it("should lend LP-SFT to YieldHarvest", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { lpSftContract } = beneficiaryContracts;
+    const { lpSftContract, yieldHarvestContract } = beneficiaryContracts;
 
     // Lend LP-SFT to YieldHarvest
     await lpSftContract.safeTransferFrom(
       await beneficiary.getAddress(),
-      addressBook.yieldHarvest!,
+      yieldHarvestContract.address,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
       new Uint8Array(),
@@ -237,11 +241,12 @@ describe("Bureau 2: Yield Harvest", () => {
   it("should verify LP-SFT is lent to YieldHarvest", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
+    const { yieldHarvestContract } = deployerContracts;
     const { lpSftContract, noLpSftContract } = ethersContracts;
 
     chai
       .expect(await lpSftContract.ownerOf(LPPOW1_LPNFT_TOKEN_ID))
-      .to.equal(addressBook.yieldHarvest!);
+      .to.equal(yieldHarvestContract.address);
     chai
       .expect(await noLpSftContract.ownerOf(LPPOW1_LPNFT_TOKEN_ID))
       .to.equal(await beneficiary.getAddress());
@@ -254,12 +259,12 @@ describe("Bureau 2: Yield Harvest", () => {
   it("should withdraw LP-SFT from YieldHarvest", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { noLpSftContract } = beneficiaryContracts;
+    const { noLpSftContract, yieldHarvestContract } = beneficiaryContracts;
 
     // Withdraw LP-SFT from YieldHarvest
     await noLpSftContract.safeTransferFrom(
       await beneficiary.getAddress(),
-      addressBook.yieldHarvest!,
+      yieldHarvestContract.address,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
       new Uint8Array(),
