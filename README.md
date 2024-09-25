@@ -37,7 +37,7 @@ pnpm audit-ci
 #### Build smart contract dependencies
 
 ```bash
-pnpm depends
+pnpm build:depends
 ```
 
 #### Run static analysis suite
@@ -52,7 +52,7 @@ pnpm lint
 pnpm format
 ```
 
-#### Compile smart contracts and typescript sources
+#### Compile dependencies, smart contracts and typescript sources
 
 ```bash
 pnpm build

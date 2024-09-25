@@ -25,11 +25,11 @@
   ],
   "scripts": {
     "audit-ci": "audit-ci --config audit-ci.json",
-    "build": "pnpm build:solidity && pnpm build:typescript",
+    "build": "pnpm build:depends && pnpm build:solidity && pnpm build:typescript",
+    "build:depends": "bash tools/build-depends.sh",
     "build:solidity": "hardhat compile",
     "build:typescript": "tsc",
     "clean": "rimraf artifacts cache contracts/depends contracts/interfaces deployments/hardhat deployments/localhost dist node_modules src/abi src/types tools/repos",
-    "depends": "bash tools/build-depends.sh",
     "deploy": "pnpm deploy:development",
     "deploy:base": "hardhat deploy --network base --export export/abi/base.json",
     "deploy:development": "hardhat deploy --network hardhat",
