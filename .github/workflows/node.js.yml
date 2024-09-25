@@ -137,5 +137,26 @@ jobs:
       - name: pnpm build:typescript
         run: pnpm build:typescript
 
+      - name: Start dev chain in the background
+        run: |
+          pnpm start &
+          echo $! > dev_chain_pid.txt
+
+      - name: Wait for Hardhat node to be ready
+        run: |
+          while ! curl -s http://localhost:8545 > /dev/null; do
+            echo "Waiting for Hardhat node to be ready..."
+            sleep 1
+          done
+          echo "Hardhat node is up!"
+
+      - name: pnpm game:init
+        run: |
+          pnpm game:init
+
+      - name: Stop the dev chain
+        run: |
+          kill $(cat dev_chain_pid.txt)
+
       - name: pnpm test
         run: pnpm test
