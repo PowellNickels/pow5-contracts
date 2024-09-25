@@ -39,6 +39,7 @@
     "format": "pnpm format:prettier && pnpm format:eslint",
     "format:eslint": "eslint --fix .",
     "format:prettier": "prettier --write .",
+    "game:init": "ts-node src/game/init.ts",
     "lint": "pnpm lint:eslint && pnpm lint:prettier && pnpm lint:solhint && pnpm lint:slither",
     "lint:eslint": "eslint .",
     "lint:prettier": "prettier --check .",

@@ -41,7 +41,21 @@
     /*
      * Skip type checking all .d.ts files.
      */
-    "skipLibCheck": true
+    "skipLibCheck": true,
+
+    /*
+     * Include type definitions from 'node' and 'hardhat-deploy'
+     */
+    "types": ["node", "hardhat-deploy", "hardhat-deploy-ethers"]
   },
+
+  /*
+   * Include your source and test files
+   */
+  "include": ["src/**/*.ts", "test/**/*.ts"],
+
+  /*
+   * Exclude node_modules and any other directories you don't want to compile
+   */
   "exclude": ["node_modules", "tools"]
 }
