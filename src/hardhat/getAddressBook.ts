@@ -327,18 +327,15 @@ const getContractAddress = async (
   }
 
   // Look up address in deployments system, if available
-  const deployments = (hardhat as any).deployments;
-  if (deployments && deployments.get) {
-    try {
-      const contractDeployment = await hardhat.deployments.get(contractName);
-      if (contractDeployment && contractDeployment.address) {
-        addressBook[networkName][contractName as keyof AddressBook] =
-          contractDeployment.address as `0x${string}`;
-        return contractDeployment.address as `0x${string}`;
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {}
-  }
+  try {
+    const contractDeployment = await hardhat.deployments.get(contractName);
+    if (contractDeployment && contractDeployment.address) {
+      addressBook[networkName][contractName as keyof AddressBook] =
+        contractDeployment.address as `0x${string}`;
+      return contractDeployment.address as `0x${string}`;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e) {}
 
   // Look up address if the contract has a known deployment
   const deploymentAddress = loadDeployment(networkName, contractName);
