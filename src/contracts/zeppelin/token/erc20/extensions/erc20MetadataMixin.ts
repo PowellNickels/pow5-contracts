@@ -34,8 +34,8 @@ function ERC20MetadataMixin<T extends new (...args: any[]) => {}>(Base: T) {
       return await this.erc20Metadata.symbol();
     }
 
-    async decimals(): Promise<bigint> {
-      return await this.erc20Metadata.decimals();
+    async decimals(): Promise<number> {
+      return Number(await this.erc20Metadata.decimals());
     }
   };
 }

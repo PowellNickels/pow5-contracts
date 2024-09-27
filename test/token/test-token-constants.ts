@@ -70,36 +70,36 @@ describe("Token Constants", () => {
   it("should test POW1 decimals", async function () {
     const { pow1Contract } = contracts;
 
-    const pow1Decimals: bigint = await pow1Contract.decimals();
-    chai.expect(pow1Decimals).to.equal(BigInt(POW1_DECIMALS));
+    const pow1Decimals: number = await pow1Contract.decimals();
+    chai.expect(pow1Decimals).to.equal(POW1_DECIMALS);
   });
 
   it("should test POW5 decimals", async function () {
     const { pow5Contract } = contracts;
 
-    const pow5Decimals: bigint = await pow5Contract.decimals();
-    chai.expect(pow5Decimals).to.equal(BigInt(POW5_DECIMALS));
+    const pow5Decimals: number = await pow5Contract.decimals();
+    chai.expect(pow5Decimals).to.equal(POW5_DECIMALS);
   });
 
   it("should test LPPOW1 decimals", async function () {
     const { lpPow1Contract } = contracts;
 
-    const lpPow1Decimals: bigint = await lpPow1Contract.decimals();
-    chai.expect(lpPow1Decimals).to.equal(BigInt(LPPOW1_DECIMALS));
+    const lpPow1Decimals: number = await lpPow1Contract.decimals();
+    chai.expect(lpPow1Decimals).to.equal(LPPOW1_DECIMALS);
   });
 
   it("should test LPPOW5 decimals", async function () {
     const { lpPow5Contract } = contracts;
 
-    const lpPow5Decimals: bigint = await lpPow5Contract.decimals();
-    chai.expect(lpPow5Decimals).to.equal(BigInt(LPPOW5_DECIMALS));
+    const lpPow5Decimals: number = await lpPow5Contract.decimals();
+    chai.expect(lpPow5Decimals).to.equal(LPPOW5_DECIMALS);
   });
 
   it("should test NOPOW5 decimals", async function () {
     const { noPow5Contract } = contracts;
 
-    const noPow5Decimals: bigint = await noPow5Contract.decimals();
-    chai.expect(noPow5Decimals).to.equal(BigInt(NOPOW5_DECIMALS));
+    const noPow5Decimals: number = await noPow5Contract.decimals();
+    chai.expect(noPow5Decimals).to.equal(NOPOW5_DECIMALS);
   });
 
   //////////////////////////////////////////////////////////////////////////////
