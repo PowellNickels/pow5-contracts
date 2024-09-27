@@ -10,13 +10,13 @@ import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src
 import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
-import { TestERC20MintableContract } from "../../src/contracts/test/token/erc20/extensions/testErc20MintableContract";
-import { AccessControlContract } from "../../src/contracts/zeppelin/access/accessControlContract";
-import { ERC20Contract } from "../../src/contracts/zeppelin/token/erc20/erc20Contract";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { getNetworkName } from "../../src/hardhat/hardhatUtils";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { ContractLibrary } from "../../src/interfaces/contractLibrary";
+import { TestERC20MintableContract } from "../../src/interfaces/test/token/erc20/extensions/testErc20MintableContract";
+import { AccessControlContract } from "../../src/interfaces/zeppelin/access/accessControlContract";
+import { ERC20Contract } from "../../src/interfaces/zeppelin/token/erc20/erc20Contract";
 import { ETH_PRICE, USDC_PRICE } from "../../src/testing/defiMetrics";
 import { setupFixture } from "../../src/testing/setupFixture";
 import {

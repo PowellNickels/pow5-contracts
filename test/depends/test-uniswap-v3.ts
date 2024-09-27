@@ -14,7 +14,7 @@ import chai from "chai";
 import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
-import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
+import { ContractLibraryEthers } from "../../src/hardhat/contractLibraryEthers";
 import {
   ETH_PRICE,
   USDC_ETH_LP_ETH_AMOUNT_BASE,

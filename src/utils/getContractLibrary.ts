@@ -11,29 +11,29 @@
 
 import { ethers } from "ethers";
 
-import { DutchAuctionContract } from "../contracts/bureaus/dutchAuctionContract";
-import { LiquidityForgeContract } from "../contracts/bureaus/liquidityForgeContract";
-import { ReverseRepoContract } from "../contracts/bureaus/reverseRepoContract";
-import { YieldHarvestContract } from "../contracts/bureaus/yieldHarvestContract";
-import { DeFiManagerContract } from "../contracts/defi/defiManagerContract";
-import { POW1LpNftStakeFarmContract } from "../contracts/defi/pow1LpNftStakeFarmContract";
-import { POW1LpSftLendFarmContract } from "../contracts/defi/pow1LpSftLendFarmContract";
-import { POW5InterestFarmContract } from "../contracts/defi/pow5InterestFarmContract";
-import { POW5LpNftStakeFarmContract } from "../contracts/defi/pow5LpNftStakeFarmContract";
-import { POW5LpSftLendFarmContract } from "../contracts/defi/pow5LpSftLendFarmContract";
-import { LPPOW1Contract } from "../contracts/token/erc20/lpPow1Contract";
-import { LPPOW5Contract } from "../contracts/token/erc20/lpPow5Contract";
-import { NOPOW5Contract } from "../contracts/token/erc20/noPow5Contract";
-import { POW1Contract } from "../contracts/token/erc20/pow1Contract";
-import { POW5Contract } from "../contracts/token/erc20/pow5Contract";
-import { WrappedNativeContract } from "../contracts/token/erc20/wrappedNativeContract";
-import { LPSFTContract } from "../contracts/token/erc1155/lpSftContract";
-import { NOLPSFTContract } from "../contracts/token/erc1155/noLpSftContract";
-import { UniV3SwapperContract } from "../contracts/token/routes/uniV3SwapperContract";
-import { UniswapV3PoolContract } from "../contracts/uniswap/pool/uniswapV3PoolContract";
-import { ERC20Contract } from "../contracts/zeppelin/token/erc20/erc20Contract";
 import { AddressBook } from "../interfaces/addressBook";
+import { DutchAuctionContract } from "../interfaces/bureaus/dutchAuctionContract";
+import { LiquidityForgeContract } from "../interfaces/bureaus/liquidityForgeContract";
+import { ReverseRepoContract } from "../interfaces/bureaus/reverseRepoContract";
+import { YieldHarvestContract } from "../interfaces/bureaus/yieldHarvestContract";
 import { ContractLibrary } from "../interfaces/contractLibrary";
+import { DeFiManagerContract } from "../interfaces/defi/defiManagerContract";
+import { POW1LpNftStakeFarmContract } from "../interfaces/defi/pow1LpNftStakeFarmContract";
+import { POW1LpSftLendFarmContract } from "../interfaces/defi/pow1LpSftLendFarmContract";
+import { POW5InterestFarmContract } from "../interfaces/defi/pow5InterestFarmContract";
+import { POW5LpNftStakeFarmContract } from "../interfaces/defi/pow5LpNftStakeFarmContract";
+import { POW5LpSftLendFarmContract } from "../interfaces/defi/pow5LpSftLendFarmContract";
+import { LPPOW1Contract } from "../interfaces/token/erc20/lpPow1Contract";
+import { LPPOW5Contract } from "../interfaces/token/erc20/lpPow5Contract";
+import { NOPOW5Contract } from "../interfaces/token/erc20/noPow5Contract";
+import { POW1Contract } from "../interfaces/token/erc20/pow1Contract";
+import { POW5Contract } from "../interfaces/token/erc20/pow5Contract";
+import { WrappedNativeContract } from "../interfaces/token/erc20/wrappedNativeContract";
+import { LPSFTContract } from "../interfaces/token/erc1155/lpSftContract";
+import { NOLPSFTContract } from "../interfaces/token/erc1155/noLpSftContract";
+import { UniV3SwapperContract } from "../interfaces/token/routes/uniV3SwapperContract";
+import { UniswapV3PoolContract } from "../interfaces/uniswap/pool/uniswapV3PoolContract";
+import { ERC20Contract } from "../interfaces/zeppelin/token/erc20/erc20Contract";
 
 //
 // Utility functions

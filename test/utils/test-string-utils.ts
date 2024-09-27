@@ -11,9 +11,9 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import * as hardhat from "hardhat";
 
-import { TestStringUtilsContract } from "../../src/contracts/test/utils/testStringUtilsContract";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { AddressBook } from "../../src/interfaces/addressBook";
+import { TestStringUtilsContract } from "../../src/interfaces/test/utils/testStringUtilsContract";
 import { setupFixture } from "../../src/testing/setupFixture";
 
 // Setup Hardhat

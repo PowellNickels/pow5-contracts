@@ -13,7 +13,7 @@ import chai from "chai";
 import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
-import { ContractLibraryEthers } from "../../src/interfaces/contractLibraryEthers";
+import { ContractLibraryEthers } from "../../src/hardhat/contractLibraryEthers";
 import { setupFixture } from "../../src/testing/setupFixture";
 
 // Setup Hardhat

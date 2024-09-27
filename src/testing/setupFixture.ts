@@ -15,6 +15,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeploymentsExtension } from "hardhat-deploy/types";
 import { getUnnamedSigners } from "hardhat-deploy-ethers/dist/src/helpers";
 
+import { ContractLibraryEthers } from "../hardhat/contractLibraryEthers";
 import {
   defiManagerAbi,
   dutchAuctionAbi,
@@ -55,7 +56,6 @@ import {
 import { getAddressBook } from "../hardhat/getAddressBook";
 import { getNetworkName } from "../hardhat/hardhatUtils";
 import { AddressBook } from "../interfaces/addressBook";
-import { ContractLibraryEthers } from "../interfaces/contractLibraryEthers";
 
 //
 // Fixture setup
