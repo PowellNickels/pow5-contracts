@@ -289,8 +289,8 @@ describe("Bureau 1: Dutch Auction", () => {
     // Log DeFi metrics
     console.log(
       `    Depositing: ${ethers.formatUnits(
-        INITIAL_LPPOW1_AMOUNT,
-        LPPOW1_DECIMALS,
+        INITIAL_POW1_SUPPLY,
+        POW1_DECIMALS,
       )} POW1 ($${pow1Value})`,
     );
     console.log(
