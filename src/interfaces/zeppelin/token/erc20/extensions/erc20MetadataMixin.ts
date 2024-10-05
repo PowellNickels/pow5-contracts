@@ -10,19 +10,25 @@ import { ethers } from "ethers";
 
 import { IERC20Metadata } from "../../../../../types/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata";
 import { IERC20Metadata__factory } from "../../../../../types/factories/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata__factory";
+import { BaseMixin } from "../../../../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function ERC20MetadataMixin<T extends new (...args: any[]) => {}>(Base: T) {
-  return class extends Base {
+  return class extends BaseMixin(Base) {
     private erc20Metadata: IERC20Metadata;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [ethers.Signer, string];
+
+      const [contractRunner, contractAddress] = args as [
+        ethers.Provider | ethers.Signer,
+        string,
+      ];
+
       this.erc20Metadata = IERC20Metadata__factory.connect(
         contractAddress,
-        signer,
+        contractRunner,
       );
     }
 

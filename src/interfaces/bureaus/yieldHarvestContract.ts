@@ -14,8 +14,11 @@ import { YieldHarvestMixin } from "./yieldHarvestMixin";
 const YieldHarvestContractBase = YieldHarvestMixin(BaseContract);
 
 class YieldHarvestContract extends YieldHarvestContractBase {
-  constructor(signer: ethers.Signer, contractAddress: string) {
-    super(signer, contractAddress);
+  constructor(
+    contractRunner: ethers.Provider | ethers.Signer,
+    contractAddress: string,
+  ) {
+    super(contractRunner, contractAddress);
   }
 }
 

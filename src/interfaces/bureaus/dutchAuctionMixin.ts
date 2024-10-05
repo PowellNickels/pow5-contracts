@@ -10,19 +10,25 @@ import { ethers } from "ethers";
 
 import { IDutchAuction } from "../../types/contracts/src/interfaces/bureaus/IDutchAuction";
 import { IDutchAuction__factory } from "../../types/factories/contracts/src/interfaces/bureaus/IDutchAuction__factory";
+import { BaseMixin } from "../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
-  return class extends Base {
+  return class extends BaseMixin(Base) {
     private dutchAuction: IDutchAuction;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [ethers.Signer, string];
+
+      const [contractRunner, contractAddress] = args as [
+        ethers.Provider | ethers.Signer,
+        string,
+      ];
+
       this.dutchAuction = IDutchAuction__factory.connect(
         contractAddress,
-        signer,
+        contractRunner,
       );
     }
 
@@ -31,13 +37,16 @@ function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
       assetTokenAmount: bigint,
       receiver: string,
     ): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.dutchAuction.initialize(
-          gameTokenAmount,
-          assetTokenAmount,
-          receiver,
-        );
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.dutchAuction.initialize(
+            gameTokenAmount,
+            assetTokenAmount,
+            receiver,
+          );
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
 
     async isInitialized(): Promise<boolean> {
@@ -50,22 +59,28 @@ function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
       priceDecayConstant: bigint,
       dustLossAmount: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.dutchAuction.setAuction(
-          slot,
-          targetPrice,
-          priceDecayConstant,
-          dustLossAmount,
-        );
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.dutchAuction.setAuction(
+            slot,
+            targetPrice,
+            priceDecayConstant,
+            dustLossAmount,
+          );
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
 
     async removeAuction(
       slot: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.dutchAuction.removeAuction(slot);
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.dutchAuction.removeAuction(slot);
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
 
     async getPrice(slot: bigint): Promise<bigint> {
@@ -78,20 +93,26 @@ function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
       assetTokenAmount: bigint,
       receiver: string,
     ): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.dutchAuction.purchase(
-          slot,
-          gameTokenAmount,
-          assetTokenAmount,
-          receiver,
-        );
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.dutchAuction.purchase(
+            slot,
+            gameTokenAmount,
+            assetTokenAmount,
+            receiver,
+          );
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
 
     async exit(tokenId: bigint): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.dutchAuction.exit(tokenId);
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.dutchAuction.exit(tokenId);
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
   };
 }

@@ -14,8 +14,11 @@ import { FarmMixin } from "./farmMixin";
 const FarmContract = FarmMixin(BaseContract);
 
 class POW1LpNftStakeFarmContract extends FarmContract {
-  constructor(signer: ethers.Signer, contractAddress: string) {
-    super(signer, contractAddress);
+  constructor(
+    contractRunner: ethers.Provider | ethers.Signer,
+    contractAddress: string,
+  ) {
+    super(contractRunner, contractAddress);
   }
 }
 

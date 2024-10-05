@@ -10,20 +10,29 @@ import { ethers } from "ethers";
 
 import { IYieldHarvest } from "../../types/contracts/src/interfaces/bureaus/IYieldHarvest";
 import { IYieldHarvest__factory } from "../../types/factories/contracts/src/interfaces/bureaus/IYieldHarvest__factory";
+import { BaseMixin } from "../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function YieldHarvestMixin<T extends new (...args: any[]) => {}>(Base: T) {
-  return class extends Base {
+  return class extends BaseMixin(Base) {
     private yieldHarvest: IYieldHarvest;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [ethers.Signer, string];
+
+      const [contractRunner, contractAddress] = args as [
+        ethers.Provider | ethers.Signer,
+        string,
+      ];
+
       this.yieldHarvest = IYieldHarvest__factory.connect(
         contractAddress,
-        signer,
+        contractRunner,
       );
+
+      // TODO: Use yieldHarvest
+      this.yieldHarvest;
     }
   };
 }

@@ -26,8 +26,11 @@ const LPSFTIssuableContract = LPSFTIssuableMixin(ERC1155EnumerableContract);
 const LPNFTHolderContract = LPNFTHolderMixin(LPSFTIssuableContract);
 
 class LPSFTContract extends LPNFTHolderContract {
-  constructor(signer: ethers.Signer, contractAddress: string) {
-    super(signer, contractAddress);
+  constructor(
+    contractRunner: ethers.Provider | ethers.Signer,
+    contractAddress: string,
+  ) {
+    super(contractRunner, contractAddress);
   }
 }
 

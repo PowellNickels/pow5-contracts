@@ -10,21 +10,27 @@ import { ethers } from "ethers";
 
 import { IUniswapV3PoolState } from "../../../types/contracts/interfaces/uniswap-v3-core/pool/IUniswapV3PoolState";
 import { IUniswapV3PoolState__factory } from "../../../types/factories/contracts/interfaces/uniswap-v3-core/pool/IUniswapV3PoolState__factory";
+import { BaseMixin } from "../../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function UniswapV3PoolStateMixin<T extends new (...args: any[]) => {}>(
   Base: T,
 ) {
-  return class extends Base {
+  return class extends BaseMixin(Base) {
     private uniswapV3PoolState: IUniswapV3PoolState;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [ethers.Signer, string];
+
+      const [contractRunner, contractAddress] = args as [
+        ethers.Provider | ethers.Signer,
+        string,
+      ];
+
       this.uniswapV3PoolState = IUniswapV3PoolState__factory.connect(
         contractAddress,
-        signer,
+        contractRunner,
       );
     }
 
@@ -46,6 +52,7 @@ function UniswapV3PoolStateMixin<T extends new (...args: any[]) => {}>(
         feeProtocol: bigint;
         unlocked: boolean;
       } = await this.uniswapV3PoolState.slot0();
+
       return {
         sqrtPriceX96: result.sqrtPriceX96,
         tick: Number(result.tick),
@@ -96,6 +103,7 @@ function UniswapV3PoolStateMixin<T extends new (...args: any[]) => {}>(
         secondsOutside: bigint;
         initialized: boolean;
       } = await this.uniswapV3PoolState.ticks(tick);
+
       return {
         liquidityGross: result.liquidityGross,
         liquidityNet: result.liquidityNet,
@@ -134,6 +142,7 @@ function UniswapV3PoolStateMixin<T extends new (...args: any[]) => {}>(
         secondsPerLiquidityCumulativeX128: bigint;
         initialized: boolean;
       } = await this.uniswapV3PoolState.observations(index);
+
       return {
         blockTimestamp: Number(result.blockTimestamp),
         tickCumulative: result.tickCumulative,

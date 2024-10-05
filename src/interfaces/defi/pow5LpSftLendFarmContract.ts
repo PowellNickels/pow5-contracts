@@ -18,8 +18,11 @@ const FarmContract = FarmMixin(AccessControlContract);
 const LpSftLendFarmContract = LpSftLendFarmMixin(FarmContract);
 
 class POW5LpSftLendFarmContract extends LpSftLendFarmContract {
-  constructor(signer: ethers.Signer, contractAddress: string) {
-    super(signer, contractAddress);
+  constructor(
+    contractRunner: ethers.Provider | ethers.Signer,
+    contractAddress: string,
+  ) {
+    super(contractRunner, contractAddress);
   }
 }
 

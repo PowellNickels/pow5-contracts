@@ -10,19 +10,25 @@ import { ethers } from "ethers";
 
 import { IERC20InterestFarm } from "../../types/contracts/src/interfaces/defi/IERC20InterestFarm";
 import { IERC20InterestFarm__factory } from "../../types/factories/contracts/src/interfaces/defi/IERC20InterestFarm__factory";
+import { BaseMixin } from "../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function ERC20InterestFarmMixin<T extends new (...args: any[]) => {}>(Base: T) {
-  return class extends Base {
+  return class extends BaseMixin(Base) {
     private interestFarm: IERC20InterestFarm;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [ethers.Signer, string];
+
+      const [contractRunner, contractAddress] = args as [
+        ethers.Provider | ethers.Signer,
+        string,
+      ];
+
       this.interestFarm = IERC20InterestFarm__factory.connect(
         contractAddress,
-        signer,
+        contractRunner,
       );
     }
 
@@ -30,26 +36,35 @@ function ERC20InterestFarmMixin<T extends new (...args: any[]) => {}>(Base: T) {
       lpSftAddress: string,
       amount: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.interestFarm.recordLoan(lpSftAddress, amount);
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.interestFarm.recordLoan(lpSftAddress, amount);
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
 
     async recordRepayment(
       lpSftAddress: string,
       amount: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.interestFarm.recordRepayment(lpSftAddress, amount);
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.interestFarm.recordRepayment(lpSftAddress, amount);
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
 
     async claimReward(
       lpSftAddress: string,
     ): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.interestFarm.claimReward(lpSftAddress);
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.interestFarm.claimReward(lpSftAddress);
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
   };
 }

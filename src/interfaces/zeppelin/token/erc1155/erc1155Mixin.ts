@@ -10,17 +10,23 @@ import { ethers } from "ethers";
 
 import { IERC1155 } from "../../../../types/@openzeppelin/contracts/token/ERC1155/IERC1155";
 import { IERC1155__factory } from "../../../../types/factories/@openzeppelin/contracts/token/ERC1155/IERC1155__factory";
+import { BaseMixin } from "../../../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function ERC1155Mixin<T extends new (...args: any[]) => {}>(Base: T) {
-  return class extends Base {
+  return class extends BaseMixin(Base) {
     private erc1155: IERC1155;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [ethers.Signer, string];
-      this.erc1155 = IERC1155__factory.connect(contractAddress, signer);
+
+      const [contractRunner, contractAddress] = args as [
+        ethers.Provider | ethers.Signer,
+        string,
+      ];
+
+      this.erc1155 = IERC1155__factory.connect(contractAddress, contractRunner);
     }
 
     async balanceOf(account: string, id: bigint): Promise<bigint> {
@@ -35,9 +41,12 @@ function ERC1155Mixin<T extends new (...args: any[]) => {}>(Base: T) {
       operator: string,
       approved: boolean,
     ): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.erc1155.setApprovalForAll(operator, approved);
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.erc1155.setApprovalForAll(operator, approved);
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
 
     async isApprovedForAll(
@@ -54,9 +63,12 @@ function ERC1155Mixin<T extends new (...args: any[]) => {}>(Base: T) {
       value: bigint,
       data: Uint8Array,
     ): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.erc1155.safeTransferFrom(from, to, id, value, data);
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.erc1155.safeTransferFrom(from, to, id, value, data);
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
 
     async safeBatchTransferFrom(
@@ -66,9 +78,12 @@ function ERC1155Mixin<T extends new (...args: any[]) => {}>(Base: T) {
       values: bigint[],
       data: Uint8Array,
     ): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.erc1155.safeBatchTransferFrom(from, to, ids, values, data);
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.erc1155.safeBatchTransferFrom(from, to, ids, values, data);
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
   };
 }

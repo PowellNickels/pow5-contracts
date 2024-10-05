@@ -20,8 +20,11 @@ const AccessControlContract = AccessControlMixin(ERC20MetadataContract);
 const ERC20IssuableContract = ERC20IssuableMixin(AccessControlContract);
 
 class LPPOW5Contract extends ERC20IssuableContract {
-  constructor(signer: ethers.Signer, contractAddress: string) {
-    super(signer, contractAddress);
+  constructor(
+    contractRunner: ethers.Provider | ethers.Signer,
+    contractAddress: string,
+  ) {
+    super(contractRunner, contractAddress);
   }
 }
 

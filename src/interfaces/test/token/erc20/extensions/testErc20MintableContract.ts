@@ -16,8 +16,11 @@ const ERC20Contract = ERC20Mixin(BaseContract);
 const TestERC20MintableContractBase = TestERC20MintableMixin(ERC20Contract);
 
 class TestERC20MintableContract extends TestERC20MintableContractBase {
-  constructor(signer: ethers.Signer, contractAddress: string) {
-    super(signer, contractAddress);
+  constructor(
+    contractRunner: ethers.Provider | ethers.Signer,
+    contractAddress: string,
+  ) {
+    super(contractRunner, contractAddress);
   }
 }
 

@@ -10,19 +10,25 @@ import { ethers } from "ethers";
 
 import { IERC1155Enumerable } from "../../../../types/contracts/src/interfaces/token/ERC1155/extensions/IERC1155Enumerable";
 import { IERC1155Enumerable__factory } from "../../../../types/factories/contracts/src/interfaces/token/ERC1155/extensions/IERC1155Enumerable__factory";
+import { BaseMixin } from "../../../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function ERC1155EnumerableMixin<T extends new (...args: any[]) => {}>(Base: T) {
-  return class extends Base {
+  return class extends BaseMixin(Base) {
     private erc1155Enumerable: IERC1155Enumerable;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [ethers.Signer, string];
+
+      const [contractRunner, contractAddress] = args as [
+        ethers.Provider | ethers.Signer,
+        string,
+      ];
+
       this.erc1155Enumerable = IERC1155Enumerable__factory.connect(
         contractAddress,
-        signer,
+        contractRunner,
       );
     }
 

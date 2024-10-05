@@ -10,19 +10,25 @@ import { ethers } from "ethers";
 
 import { IUniV3Swapper } from "../../../types/contracts/src/interfaces/token/routes/IUniV3Swapper";
 import { IUniV3Swapper__factory } from "../../../types/factories/contracts/src/interfaces/token/routes/IUniV3Swapper__factory";
+import { BaseMixin } from "../../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function UniV3SwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
-  return class extends Base {
+  return class extends BaseMixin(Base) {
     private uniV3Swapper: IUniV3Swapper;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [ethers.Signer, string];
+
+      const [contractRunner, contractAddress] = args as [
+        ethers.Provider | ethers.Signer,
+        string,
+      ];
+
       this.uniV3Swapper = IUniV3Swapper__factory.connect(
         contractAddress,
-        signer,
+        contractRunner,
       );
     }
 
@@ -30,24 +36,33 @@ function UniV3SwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
       assetTokenAmount: bigint,
       recipient: string,
     ): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.uniV3Swapper.buyGameToken(assetTokenAmount, recipient);
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.uniV3Swapper.buyGameToken(assetTokenAmount, recipient);
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
 
     async sellGameToken(
       gameTokenAmount: bigint,
       recipient: string,
     ): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.uniV3Swapper.sellGameToken(gameTokenAmount, recipient);
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.uniV3Swapper.sellGameToken(gameTokenAmount, recipient);
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
 
     async exit(): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.uniV3Swapper.exit();
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.uniV3Swapper.exit();
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
   };
 }

@@ -14,8 +14,11 @@ import { AccessControlMixin } from "./accessControlMixin";
 const AccessControlContractBase = AccessControlMixin(BaseContract);
 
 class AccessControlContract extends AccessControlContractBase {
-  constructor(signer: ethers.Signer, contractAddress: string) {
-    super(signer, contractAddress);
+  constructor(
+    contractRunner: ethers.Provider | ethers.Signer,
+    contractAddress: string,
+  ) {
+    super(contractRunner, contractAddress);
   }
 }
 

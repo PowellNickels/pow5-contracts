@@ -14,8 +14,11 @@ import { TestStringUtilsMixin } from "./testStringUtilsMixin";
 const TestStringUtilsContractBase = TestStringUtilsMixin(BaseContract);
 
 class TestStringUtilsContract extends TestStringUtilsContractBase {
-  constructor(signer: ethers.Signer, contractAddress: string) {
-    super(signer, contractAddress);
+  constructor(
+    contractRunner: ethers.Provider | ethers.Signer,
+    contractAddress: string,
+  ) {
+    super(contractRunner, contractAddress);
   }
 }
 

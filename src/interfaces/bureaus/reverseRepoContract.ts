@@ -14,8 +14,11 @@ import { ReverseRepoMixin } from "./reverseRepoMixin";
 const ReverseRepoContractBase = ReverseRepoMixin(BaseContract);
 
 class ReverseRepoContract extends ReverseRepoContractBase {
-  constructor(signer: ethers.Signer, contractAddress: string) {
-    super(signer, contractAddress);
+  constructor(
+    contractRunner: ethers.Provider | ethers.Signer,
+    contractAddress: string,
+  ) {
+    super(contractRunner, contractAddress);
   }
 }
 

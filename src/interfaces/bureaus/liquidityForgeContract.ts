@@ -14,8 +14,11 @@ import { LiquidityForgeMixin } from "./liquidityForgeMixin";
 const LiquidityForgeContractBase = LiquidityForgeMixin(BaseContract);
 
 class LiquidityForgeContract extends LiquidityForgeContractBase {
-  constructor(signer: ethers.Signer, contractAddress: string) {
-    super(signer, contractAddress);
+  constructor(
+    contractRunner: ethers.Provider | ethers.Signer,
+    contractAddress: string,
+  ) {
+    super(contractRunner, contractAddress);
   }
 }
 

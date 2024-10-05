@@ -14,8 +14,11 @@ import { DutchAuctionMixin } from "./dutchAuctionMixin";
 const DutchAuctionContractBase = DutchAuctionMixin(BaseContract);
 
 class DutchAuctionContract extends DutchAuctionContractBase {
-  constructor(signer: ethers.Signer, contractAddress: string) {
-    super(signer, contractAddress);
+  constructor(
+    contractRunner: ethers.Provider | ethers.Signer,
+    contractAddress: string,
+  ) {
+    super(contractRunner, contractAddress);
   }
 }
 

@@ -21,15 +21,20 @@ class BaseContract {
   /**
    * @description The signer used to interact with the blockchain
    */
-  protected signer: ethers.Signer;
+  protected contractRunner: ethers.Provider | ethers.Signer;
 
   /**
    * @constructor
-   * @param {ethers.Signer} signer - The signer instance to interact with the contract
+   *
+   * @param {ethers.Provider | ethers.Signer} contractRunner - The provider or
+   * signer instance to interact with the contract
    * @param {string} contractAddress - The address of the contract
    */
-  constructor(signer: ethers.Signer, contractAddress: string) {
-    this.signer = signer;
+  constructor(
+    contractRunner: ethers.Provider | ethers.Signer,
+    contractAddress: string,
+  ) {
+    this.contractRunner = contractRunner;
     this.address = contractAddress;
   }
 }

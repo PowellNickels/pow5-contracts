@@ -10,17 +10,26 @@ import { ethers } from "ethers";
 
 import { IReverseRepo } from "../../types/contracts/src/interfaces/bureaus/IReverseRepo";
 import { IReverseRepo__factory } from "../../types/factories/contracts/src/interfaces/bureaus/IReverseRepo__factory";
+import { BaseMixin } from "../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function ReverseRepoMixin<T extends new (...args: any[]) => {}>(Base: T) {
-  return class extends Base {
+  return class extends BaseMixin(Base) {
     private reverseRepo: IReverseRepo;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
-      const [signer, contractAddress] = args as [ethers.Signer, string];
-      this.reverseRepo = IReverseRepo__factory.connect(contractAddress, signer);
+
+      const [contractRunner, contractAddress] = args as [
+        ethers.Provider | ethers.Signer,
+        string,
+      ];
+
+      this.reverseRepo = IReverseRepo__factory.connect(
+        contractAddress,
+        contractRunner,
+      );
     }
 
     async initialize(
@@ -28,13 +37,16 @@ function ReverseRepoMixin<T extends new (...args: any[]) => {}>(Base: T) {
       assetTokenAmount: bigint,
       receiver: string,
     ): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.reverseRepo.initialize(
-          gameTokenAmount,
-          assetTokenAmount,
-          receiver,
-        );
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.reverseRepo.initialize(
+            gameTokenAmount,
+            assetTokenAmount,
+            receiver,
+          );
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
 
     async purchase(
@@ -42,19 +54,25 @@ function ReverseRepoMixin<T extends new (...args: any[]) => {}>(Base: T) {
       assetTokenAmount: bigint,
       receiver: string,
     ): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.reverseRepo.purchase(
-          gameTokenAmount,
-          assetTokenAmount,
-          receiver,
-        );
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.reverseRepo.purchase(
+            gameTokenAmount,
+            assetTokenAmount,
+            receiver,
+          );
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
 
     async exit(tokenId: bigint): Promise<ethers.ContractTransactionReceipt> {
-      const tx: ethers.ContractTransactionResponse =
-        await this.reverseRepo.exit(tokenId);
-      return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.reverseRepo.exit(tokenId);
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
     }
   };
 }

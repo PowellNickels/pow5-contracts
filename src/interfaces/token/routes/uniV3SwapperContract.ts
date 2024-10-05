@@ -14,8 +14,11 @@ import { UniV3SwapperMixin } from "./uniV3SwapperMixin";
 const UniV3SwapperContractBase = UniV3SwapperMixin(BaseContract);
 
 class UniV3SwapperContract extends UniV3SwapperContractBase {
-  constructor(signer: ethers.Signer, contractAddress: string) {
-    super(signer, contractAddress);
+  constructor(
+    contractRunner: ethers.Provider | ethers.Signer,
+    contractAddress: string,
+  ) {
+    super(contractRunner, contractAddress);
   }
 }
 

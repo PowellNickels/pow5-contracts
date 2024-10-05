@@ -16,8 +16,11 @@ const AccessControlContract = AccessControlMixin(BaseContract);
 const DeFiManagerContractBase = DeFiManagerMixin(AccessControlContract);
 
 class DeFiManagerContract extends DeFiManagerContractBase {
-  constructor(signer: ethers.Signer, contractAddress: string) {
-    super(signer, contractAddress);
+  constructor(
+    contractRunner: ethers.Provider | ethers.Signer,
+    contractAddress: string,
+  ) {
+    super(contractRunner, contractAddress);
   }
 }
 
