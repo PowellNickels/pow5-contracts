@@ -293,7 +293,7 @@ contract UniV3Swapper is
     assetToken.safeIncreaseAllowance(address(uniswapV3Pool), assetTokenAmount);
 
     //
-    // Swap thed asset token for the game token
+    // Swap the asset token for the game token
     //
     // A note about amount0 and amount1:
     //
