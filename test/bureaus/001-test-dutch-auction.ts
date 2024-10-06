@@ -65,7 +65,7 @@ const AUCTION_WETH_AMOUNT: bigint =
   ethers.parseEther("1000") / BigInt(ETH_PRICE); // $1,000 in ETH
 
 // Amount of LPPOW1 minted in the first auction
-const AUCTION_LPPOW1_AMOUNT: bigint = 38_970_275_607_839_876_377n; // 38.970 LPPOW1
+const AUCTION_LPPOW1_AMOUNT: bigint = 38_952_518_683_082_427_819n; // 38.953 LPPOW1
 
 // Token ID of the first LP-NFT/LP-SFT sold at auction
 const AUCTION_LPNFT_TOKEN_ID: bigint = 2n;
@@ -638,7 +638,7 @@ describe("Bureau 1: Dutch Auction", () => {
     await dutchAuctionContract.setAuction(
       0n, // slot
       ethers.parseUnits("1", 18), // targetPrice = 1 bips scaled by 1e18
-      ethers.parseUnits("0.5", 18), // priceDecayConstant = 50% scaled by 1e18
+      ethers.parseUnits("0.5", 18), // priceDecayRate = 50% scaled by 1e18
       MAX_LOSS_AMOUNT, // maxLossWei
     );
   });
@@ -699,22 +699,36 @@ describe("Bureau 1: Dutch Auction", () => {
     );
   });
 
-  it("should check first POW1 LP-SFT price", async function (): Promise<void> {
+  it("should get auction info", async function (): Promise<void> {
     const { dutchAuctionContract } = deployerContracts;
 
-    // Get the price of the first LP-SFT
-    const price: bigint = await dutchAuctionContract.getPrice(
-      0n, // slot
-    );
-    console.log(
-      `    First LP-SFT tip: ${ethers
-        .formatUnits(price, 18)
-        .toLocaleString()} bips (${ethers
-        .formatUnits(price, 20)
-        .toLocaleString()}%)`,
-    );
+    // Get auction info
+    const auctionInfo: Array<{
+      lpNftTokenId: bigint;
+      auctionStartTime: bigint;
+      targetPrice: bigint;
+      priceDecayRate: bigint;
+      sold: bigint;
+      timeSinceStart: bigint;
+      currentPrice: bigint;
+      targetSaleTime: bigint;
+    }> = await dutchAuctionContract.getAuctions();
 
-    chai.expect(price).to.equal(ethers.parseUnits("1", 18));
+    chai.expect(auctionInfo.length).to.equal(1);
+    chai.expect(auctionInfo[0].lpNftTokenId).to.equal(2n);
+    chai.expect(auctionInfo[0].auctionStartTime).to.be.a("bigint");
+    chai
+      .expect(auctionInfo[0].targetPrice)
+      .to.equal(ethers.parseUnits("1", 18));
+    chai
+      .expect(auctionInfo[0].priceDecayRate)
+      .to.equal(ethers.parseUnits("0.5", 18));
+    chai.expect(auctionInfo[0].sold).to.equal(0n);
+    chai.expect(auctionInfo[0].timeSinceStart).to.equal(0n);
+    chai
+      .expect(auctionInfo[0].currentPrice)
+      .to.equal(ethers.parseUnits("1", 18));
+    chai.expect(auctionInfo[0].targetSaleTime).to.be.a("bigint");
   });
 
   it("should check auction LPPOW1 LP-NFT properties", async function (): Promise<void> {
@@ -804,7 +818,7 @@ describe("Bureau 1: Dutch Auction", () => {
 
     // Purchase LP-SFT
     await dutchAuctionContract.purchase(
-      0n, // slot
+      2n, // lpNftTokenId
       0n, // gameTokenAmount
       AUCTION_WETH_AMOUNT, // assetTokenAmount
       beneficiaryAddress, // receiver
@@ -815,18 +829,19 @@ describe("Bureau 1: Dutch Auction", () => {
     const { dutchAuctionContract } = beneficiaryContracts;
 
     // Get the price of the first LP-SFT
-    const price: bigint = await dutchAuctionContract.getPrice(
-      0n, // slot
-    );
-    console.log(
-      `    New LP-SFT tip: ${ethers
-        .formatUnits(price, 18)
-        .toLocaleString()} bips (${ethers
-        .formatUnits(price, 20)
-        .toLocaleString()}%)`,
-    );
+    const auctions: Array<{
+      lpNftTokenId: bigint;
+      auctionStartTime: bigint;
+      targetPrice: bigint;
+      priceDecayRate: bigint;
+      sold: bigint;
+      timeSinceStart: bigint;
+      currentPrice: bigint;
+      targetSaleTime: bigint;
+    }> = await dutchAuctionContract.getAuctions();
 
-    chai.expect(price).to.equal(ethers.parseUnits("1", 18));
+    chai.expect(auctions.length).to.equal(1);
+    chai.expect(auctions[0].targetPrice).to.equal(ethers.parseUnits("1", 18));
   });
 
   //////////////////////////////////////////////////////////////////////////////

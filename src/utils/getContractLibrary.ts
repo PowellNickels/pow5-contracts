@@ -12,7 +12,7 @@
 import { ethers } from "ethers";
 
 import { AddressBook } from "../interfaces/addressBook";
-import { DutchAuctionContract } from "../interfaces/bureaus/dutchAuctionContract";
+import { DutchAuctionContract } from "../interfaces/bureaus/dutchAuction/dutchAuctionContract";
 import { LiquidityForgeContract } from "../interfaces/bureaus/liquidityForgeContract";
 import { ReverseRepoContract } from "../interfaces/bureaus/reverseRepoContract";
 import { YieldHarvestContract } from "../interfaces/bureaus/yieldHarvestContract";

@@ -54,8 +54,8 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       addressBook.pow1Token!, // gameToken
       addressBook.wrappedNativeToken!, // assetToken
       addressBook.lpSft!, // lpSft
-      addressBook.pow1Pooler!, // uniV3Pooler
       addressBook.pow1Swapper!, // uniV3Swapper
+      addressBook.pow1Pooler!, // uniV3Pooler
       addressBook.pow1LpNftStakeFarm!, // lpNftStakeFarm
       addressBook.uniswapV3NftManager!, // uniswapV3NftManager
       addressBook.pow1Pool!, // uniswapV3Pool

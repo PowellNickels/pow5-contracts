@@ -10,7 +10,6 @@
  */
 
 // Contract ABIs and artifacts (sort by path)
-import dutchAuctionAbi from "../../abi/contracts/src/bureaus/DutchAuction.sol/DutchAuction.json";
 import liquidityForgeAbi from "../../abi/contracts/src/bureaus/LiquidityForge.sol/LiquidityForge.json";
 import reverseRepoAbi from "../../abi/contracts/src/bureaus/ReverseRepo.sol/ReverseRepo.json";
 import yieldHarvestAbi from "../../abi/contracts/src/bureaus/YieldHarvest.sol/YieldHarvest.json";
@@ -19,6 +18,7 @@ import erc20InterestFarmAbi from "../../abi/contracts/src/defi/ERC20InterestFarm
 import lpNftStakeFarmAbi from "../../abi/contracts/src/defi/LPNFTStakeFarm.sol/LPNFTStakeFarm.json";
 import lpSftLendFarmAbi from "../../abi/contracts/src/defi/LPSFTLendFarm.sol/LPSFTLendFarm.json";
 import uniV3StakeFarmAbi from "../../abi/contracts/src/defi/UniV3StakeFarm.sol/UniV3StakeFarm.json";
+import dutchAuctionAbi from "../../abi/contracts/src/interfaces/bureaus/dutchAuction/IDutchAuction.sol/IDutchAuction.json";
 import lpPow1TokenAbi from "../../abi/contracts/src/token/ERC20/LPPOW1.sol/LPPOW1.json";
 import lpPow5TokenAbi from "../../abi/contracts/src/token/ERC20/LPPOW5.sol/LPPOW5.json";
 import noPow5TokenAbi from "../../abi/contracts/src/token/ERC20/NOPOW5.sol/NOPOW5.json";
