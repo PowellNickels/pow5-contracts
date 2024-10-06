@@ -8,14 +8,16 @@
 
 import { ethers } from "ethers";
 
-import { IDutchAuction } from "../../types/contracts/src/interfaces/bureaucracy/IDutchAuction";
-import { IDutchAuction__factory } from "../../types/factories/contracts/src/interfaces/bureaucracy/IDutchAuction__factory";
-import { BaseMixin } from "../baseMixin";
+import { IDutchAuctionAdminActions } from "../../../types/contracts/src/interfaces/bureaucracy/dutchAuction/IDutchAuctionAdminActions";
+import { IDutchAuctionAdminActions__factory } from "../../../types/factories/contracts/src/interfaces/bureaucracy/dutchAuction/IDutchAuctionAdminActions__factory";
+import { BaseMixin } from "../../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
-function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
+function DutchAuctionAdminActionsMixin<T extends new (...args: any[]) => {}>(
+  Base: T,
+) {
   return class extends BaseMixin(Base) {
-    private dutchAuction: IDutchAuction;
+    private dutchAuctionAdminActions: IDutchAuctionAdminActions;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
@@ -26,10 +28,11 @@ function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
         `0x${string}`,
       ];
 
-      this.dutchAuction = IDutchAuction__factory.connect(
-        contractAddress,
-        contractRunner,
-      );
+      this.dutchAuctionAdminActions =
+        IDutchAuctionAdminActions__factory.connect(
+          contractAddress,
+          contractRunner,
+        );
     }
 
     async initialize(
@@ -39,7 +42,7 @@ function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.dutchAuction.initialize(
+          await this.dutchAuctionAdminActions.initialize(
             pow1Amount,
             marketTokenAmount,
             receiver,
@@ -50,7 +53,7 @@ function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
     }
 
     async isInitialized(): Promise<boolean> {
-      return await this.dutchAuction.isInitialized();
+      return await this.dutchAuctionAdminActions.isInitialized();
     }
 
     async setAuction(
@@ -61,7 +64,7 @@ function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.dutchAuction.setAuction(
+          await this.dutchAuctionAdminActions.setAuction(
             slot,
             targetPrice,
             priceDecayConstant,
@@ -77,39 +80,7 @@ function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.dutchAuction.removeAuction(slot);
-
-        return (await tx.wait()) as ethers.ContractTransactionReceipt;
-      });
-    }
-
-    async getPrice(slot: bigint): Promise<bigint> {
-      return await this.dutchAuction.getPrice(slot);
-    }
-
-    async purchase(
-      slot: bigint,
-      pow1Amount: bigint,
-      marketTokenAmount: bigint,
-      receiver: `0x${string}`,
-    ): Promise<ethers.ContractTransactionReceipt> {
-      return this.withSigner(async () => {
-        const tx: ethers.ContractTransactionResponse =
-          await this.dutchAuction.purchase(
-            slot,
-            pow1Amount,
-            marketTokenAmount,
-            receiver,
-          );
-
-        return (await tx.wait()) as ethers.ContractTransactionReceipt;
-      });
-    }
-
-    async exit(tokenId: bigint): Promise<ethers.ContractTransactionReceipt> {
-      return this.withSigner(async () => {
-        const tx: ethers.ContractTransactionResponse =
-          await this.dutchAuction.exit(tokenId);
+          await this.dutchAuctionAdminActions.removeAuction(slot);
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
@@ -117,4 +88,4 @@ function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
   };
 }
 
-export { DutchAuctionMixin };
+export { DutchAuctionAdminActionsMixin };

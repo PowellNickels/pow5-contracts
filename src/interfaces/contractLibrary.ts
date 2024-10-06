@@ -9,7 +9,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { DutchAuctionContract } from "./bureaucracy/dutchAuctionContract";
+import { DutchAuctionContract } from "./bureaucracy/dutchAuction/dutchAuctionContract";
 import { LiquidityForgeContract } from "./bureaucracy/liquidityForgeContract";
 import { ReverseRepoContract } from "./bureaucracy/reverseRepoContract";
 import { TheReserveContract } from "./bureaucracy/theReserve/theReserveContract";

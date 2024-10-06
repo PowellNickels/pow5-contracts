@@ -10,7 +10,7 @@
  */
 
 // Contract ABIs and artifacts (sort by path)
-import dutchAuctionAbi from "../../abi/contracts/src/interfaces/bureaucracy/IDutchAuction.sol/IDutchAuction.json";
+import dutchAuctionAbi from "../../abi/contracts/src/interfaces/bureaucracy/dutchAuction/IDutchAuction.sol/IDutchAuction.json";
 import liquidityForgeAbi from "../../abi/contracts/src/interfaces/bureaucracy/ILiquidityForge.sol/ILiquidityForge.json";
 import reverseRepoAbi from "../../abi/contracts/src/interfaces/bureaucracy/IReverseRepo.sol/IReverseRepo.json";
 import yieldHarvestAbi from "../../abi/contracts/src/interfaces/bureaucracy/IYieldHarvest.sol/IYieldHarvest.json";

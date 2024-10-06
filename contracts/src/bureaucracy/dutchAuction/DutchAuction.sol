@@ -1,0 +1,64 @@
+/*
+ * Copyright (C) 2024 Powell Nickels
+ * https://github.com/PowellNickels/pow5-contracts
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * See the file LICENSE.txt for more information.
+ */
+
+pragma solidity 0.8.27;
+
+import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {Context} from "@openzeppelin/contracts/utils/Context.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+
+import {IDutchAuction} from "../../interfaces/bureaucracy/dutchAuction/IDutchAuction.sol";
+import {ITheReserveRoutes} from "../../interfaces/bureaucracy/theReserve/ITheReserveRoutes.sol";
+
+import {DutchAuctionActions} from "./DutchAuctionActions.sol";
+import {DutchAuctionAdminActions} from "./DutchAuctionAdminActions.sol";
+import {DutchAuctionRoutes} from "./DutchAuctionRoutes.sol";
+
+/**
+ * @title Bureau of the Dutch Auction
+ */
+contract DutchAuction is DutchAuctionAdminActions, DutchAuctionActions {
+  //////////////////////////////////////////////////////////////////////////////
+  // Initialization
+  //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @dev Initializes the Dutch Auction contract
+   *
+   * @param owner_ The owner of the Dutch Auction
+   * @param theReserve_ The Reserve smart contract
+   */
+  constructor(
+    address owner_,
+    address theReserve_
+  )
+    DutchAuctionAdminActions(owner_)
+    DutchAuctionRoutes(ITheReserveRoutes(theReserve_).getRoutes())
+  {}
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Implementation of {IERC165} via {IDutchAuction}, {DutchAuctionAdminActions}
+  // and {DutchAuctionActions}
+  //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @dev See {IERC165-supportsInterface}
+   */
+  function supportsInterface(
+    bytes4 interfaceId
+  )
+    public
+    view
+    virtual
+    override(DutchAuctionAdminActions, DutchAuctionActions)
+    returns (bool)
+  {
+    return super.supportsInterface(interfaceId);
+  }
+}
