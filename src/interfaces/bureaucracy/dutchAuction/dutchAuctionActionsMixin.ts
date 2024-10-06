@@ -1,0 +1,67 @@
+/*
+ * Copyright (C) 2024 Powell Nickels
+ * https://github.com/PowellNickels/pow5-contracts
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * See the file LICENSE.txt for more information.
+ */
+
+import { ethers } from "ethers";
+
+import { IDutchAuctionActions } from "../../../types/contracts/src/interfaces/bureaucracy/dutchAuction/IDutchAuctionActions";
+import { IDutchAuctionActions__factory } from "../../../types/factories/contracts/src/interfaces/bureaucracy/dutchAuction/IDutchAuctionActions__factory";
+import { BaseMixin } from "../../baseMixin";
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
+function DutchAuctionActionsMixin<T extends new (...args: any[]) => {}>(
+  Base: T,
+) {
+  return class extends BaseMixin(Base) {
+    private dutchAuctionActions: IDutchAuctionActions;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    constructor(...args: any[]) {
+      super(...args);
+
+      const [contractRunner, contractAddress] = args as [
+        ethers.Provider | ethers.Signer,
+        `0x${string}`,
+      ];
+
+      this.dutchAuctionActions = IDutchAuctionActions__factory.connect(
+        contractAddress,
+        contractRunner,
+      );
+    }
+
+    async purchase(
+      slot: bigint,
+      pow1Amount: bigint,
+      marketTokenAmount: bigint,
+      receiver: `0x${string}`,
+    ): Promise<ethers.ContractTransactionReceipt> {
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.dutchAuctionActions.purchase(
+            slot,
+            pow1Amount,
+            marketTokenAmount,
+            receiver,
+          );
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
+    }
+
+    async exit(tokenId: bigint): Promise<ethers.ContractTransactionReceipt> {
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.dutchAuctionActions.exit(tokenId);
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
+    }
+  };
+}
+
+export { DutchAuctionActionsMixin };

@@ -133,6 +133,67 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   //////////////////////////////////////////////////////////////////////////////
+  // Spec: Test routes
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should test routes", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const {
+      dutchAuctionContract,
+      lpSftContract,
+      pow1Contract,
+      pow1LpNftStakeFarmContract,
+      pow1MarketPoolContract,
+      pow1MarketPoolerContract,
+      pow1MarketSwapperContract,
+      pow5Contract,
+      pow5StableSwapperContract,
+      usdcContract,
+      wrappedNativeContract,
+      wrappedNativeUsdcSwapperContract,
+    } = deployerContracts;
+
+    // Test routes
+    chai
+      .expect(await dutchAuctionContract.pow1Token())
+      .to.equal(pow1Contract.address);
+    chai
+      .expect(await dutchAuctionContract.pow5Token())
+      .to.equal(pow5Contract.address);
+    chai
+      .expect(await dutchAuctionContract.marketToken())
+      .to.equal(wrappedNativeContract.address);
+    chai
+      .expect(await dutchAuctionContract.stableToken())
+      .to.equal(usdcContract.address);
+    chai
+      .expect(await dutchAuctionContract.lpSft())
+      .to.equal(lpSftContract.address);
+    chai
+      .expect(await dutchAuctionContract.pow1MarketPool())
+      .to.equal(pow1MarketPoolContract.address);
+    chai
+      .expect(await dutchAuctionContract.pow1MarketSwapper())
+      .to.equal(pow1MarketSwapperContract.address);
+    chai
+      .expect(await dutchAuctionContract.pow5StableSwapper())
+      .to.equal(pow5StableSwapperContract.address);
+    chai
+      .expect(await dutchAuctionContract.marketStableSwapper())
+      .to.equal(wrappedNativeUsdcSwapperContract.address);
+    chai
+      .expect(await dutchAuctionContract.pow1MarketPooler())
+      .to.equal(pow1MarketPoolerContract.address);
+    chai
+      .expect(await dutchAuctionContract.pow1LpNftStakeFarm())
+      .to.equal(pow1LpNftStakeFarmContract.address);
+    chai
+      .expect(await dutchAuctionContract.uniswapV3NftManager())
+      .to.equal(addressBook.uniswapV3NftManager!);
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
   // Spec: Obtain W-ETH to initialize DutchAuction
   //////////////////////////////////////////////////////////////////////////////
 
