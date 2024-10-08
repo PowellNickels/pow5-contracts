@@ -23,7 +23,7 @@ function LPNFTHolderMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.lpNftTHolder = ILPNFTHolder__factory.connect(
@@ -32,20 +32,26 @@ function LPNFTHolderMixin<T extends new (...args: any[]) => {}>(Base: T) {
       );
     }
 
-    async addressToTokenId(tokenAddress: string): Promise<bigint> {
+    async addressToTokenId(tokenAddress: `0x${string}`): Promise<bigint> {
       return await this.lpNftTHolder.addressToTokenId(tokenAddress);
     }
 
-    async addressesToTokenIds(tokenAddresses: string[]): Promise<bigint[]> {
+    async addressesToTokenIds(
+      tokenAddresses: `0x${string}`[],
+    ): Promise<bigint[]> {
       return await this.lpNftTHolder.addressesToTokenIds(tokenAddresses);
     }
 
-    async tokenIdToAddress(tokenId: bigint): Promise<string> {
-      return await this.lpNftTHolder.tokenIdToAddress(tokenId);
+    async tokenIdToAddress(tokenId: bigint): Promise<`0x${string}`> {
+      return (await this.lpNftTHolder.tokenIdToAddress(
+        tokenId,
+      )) as `0x${string}`;
     }
 
-    async tokenIdsToAddresses(tokenIds: bigint[]): Promise<string[]> {
-      return await this.lpNftTHolder.tokenIdsToAddresses(tokenIds);
+    async tokenIdsToAddresses(tokenIds: bigint[]): Promise<`0x${string}`[]> {
+      return (await this.lpNftTHolder.tokenIdsToAddresses(
+        tokenIds,
+      )) as `0x${string}`[];
     }
   };
 }

@@ -16,7 +16,7 @@ const FarmContract = FarmMixin(BaseContract);
 class POW1LpNftStakeFarmContract extends FarmContract {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
-    contractAddress: string,
+    contractAddress: `0x${string}`,
   ) {
     super(contractRunner, contractAddress);
   }

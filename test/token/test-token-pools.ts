@@ -100,7 +100,7 @@ describe("Token Pools", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   let deployer: SignerWithAddress;
-  let beneficiaryAddress: string;
+  let beneficiaryAddress: `0x${string}`;
   let contracts: ContractLibraryEthers;
   let pow1IsToken0: boolean;
   let pow5IsToken0: boolean;
@@ -118,7 +118,8 @@ describe("Token Pools", () => {
     deployer = signers[0];
 
     // Get the wallet addresses
-    const accounts: string[] = await hardhat.getUnnamedAccounts();
+    const accounts: `0x${string}`[] =
+      (await hardhat.getUnnamedAccounts()) as `0x${string}`[];
     beneficiaryAddress = accounts[1];
 
     // A single fixture is used for the test suite
@@ -987,7 +988,9 @@ describe("Token Pools", () => {
     chai.expect(totalSupply).to.equal(1n);
 
     // Test ownerOf()
-    const owner: string = await lpSftContract.ownerOf(POW1_LPNFT_TOKEN_ID);
+    const owner: `0x${string}` = (await lpSftContract.ownerOf(
+      POW1_LPNFT_TOKEN_ID,
+    )) as `0x${string}`;
     chai.expect(owner).to.equal(beneficiaryAddress);
 
     // Test getTokenIds()
@@ -1284,7 +1287,9 @@ describe("Token Pools", () => {
     chai.expect(totalSupply).to.equal(2n);
 
     // Test ownerOf()
-    const owner: string = await lpSftContract.ownerOf(POW5_LPNFT_TOKEN_ID);
+    const owner: `0x${string}` = (await lpSftContract.ownerOf(
+      POW5_LPNFT_TOKEN_ID,
+    )) as `0x${string}`;
     chai.expect(owner).to.equal(beneficiaryAddress);
 
     // Test getTokenIds()

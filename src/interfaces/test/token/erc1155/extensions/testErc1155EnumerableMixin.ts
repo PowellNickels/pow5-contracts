@@ -25,7 +25,7 @@ function TestERC1155EnumerableMixin<T extends new (...args: any[]) => {}>(
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.testErc1155Enumerable = TestERC1155Enumerable__factory.connect(
@@ -35,7 +35,7 @@ function TestERC1155EnumerableMixin<T extends new (...args: any[]) => {}>(
     }
 
     async mintNFT(
-      account: string,
+      account: `0x${string}`,
       nftTokenId: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
@@ -47,7 +47,7 @@ function TestERC1155EnumerableMixin<T extends new (...args: any[]) => {}>(
     }
 
     async batchMintNFT(
-      account: string,
+      account: `0x${string}`,
       nftTokenIds: bigint[],
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
@@ -59,7 +59,7 @@ function TestERC1155EnumerableMixin<T extends new (...args: any[]) => {}>(
     }
 
     async burnNFT(
-      account: string,
+      account: `0x${string}`,
       nftTokenId: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
@@ -71,7 +71,7 @@ function TestERC1155EnumerableMixin<T extends new (...args: any[]) => {}>(
     }
 
     async batchBurnNFT(
-      account: string,
+      account: `0x${string}`,
       nftTokenIds: bigint[],
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {

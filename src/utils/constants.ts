@@ -176,7 +176,8 @@ const LPPOW5_POOL_FEE: UNI_V3_FEE_AMOUNT = UNI_V3_FEE_AMOUNT.HIGH;
 /**
  * @description The zero or absent address
  */
-const ZERO_ADDRESS: string = "0x0000000000000000000000000000000000000000";
+const ZERO_ADDRESS: `0x${string}` =
+  "0x0000000000000000000000000000000000000000";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Exports

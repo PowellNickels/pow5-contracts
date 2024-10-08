@@ -16,7 +16,7 @@ const UniswapV3FactoryContractBase = UniswapV3FactoryMixin(BaseContract);
 class UniswapV3FactoryContract extends UniswapV3FactoryContractBase {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
-    contractAddress: string,
+    contractAddress: `0x${string}`,
   ) {
     super(contractRunner, contractAddress);
   }

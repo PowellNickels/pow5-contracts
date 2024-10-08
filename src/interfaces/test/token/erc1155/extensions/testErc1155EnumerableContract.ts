@@ -24,7 +24,7 @@ const TestERC1155EnumerableContractBase = TestERC1155EnumerableMixin(
 class TestERC1155EnumerableContract extends TestERC1155EnumerableContractBase {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
-    contractAddress: string,
+    contractAddress: `0x${string}`,
   ) {
     super(contractRunner, contractAddress);
   }

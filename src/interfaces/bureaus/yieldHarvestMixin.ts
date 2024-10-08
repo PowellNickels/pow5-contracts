@@ -23,7 +23,7 @@ function YieldHarvestMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.yieldHarvest = IYieldHarvest__factory.connect(

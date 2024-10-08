@@ -63,7 +63,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
         deployer, // owner
       ],
     });
-    addressBook.pow1Token = tx.address;
+    addressBook.pow1Token = tx.address as `0x${string}`;
   }
 
   //
@@ -80,7 +80,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
         deployer, // owner
       ],
     });
-    addressBook.pow5Token = tx.address;
+    addressBook.pow5Token = tx.address as `0x${string}`;
   }
 
   //
@@ -97,7 +97,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
         deployer, // owner
       ],
     });
-    addressBook.lpPow1Token = tx.address;
+    addressBook.lpPow1Token = tx.address as `0x${string}`;
   }
 
   //
@@ -114,7 +114,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
         deployer, // owner
       ],
     });
-    addressBook.lpPow5Token = tx.address;
+    addressBook.lpPow5Token = tx.address as `0x${string}`;
   }
 
   //
@@ -131,7 +131,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
         deployer, // owner
       ],
     });
-    addressBook.noPow5Token = tx.address;
+    addressBook.noPow5Token = tx.address as `0x${string}`;
   }
 
   //
@@ -153,7 +153,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
         addressBook.uniswapV3NftManager!, // uniswapV3NftManager
       ],
     });
-    addressBook.lpNft = tx.address;
+    addressBook.lpNft = tx.address as `0x${string}`;
   }
 
   //
@@ -176,7 +176,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
         addressBook.uniswapV3NftManager!, // uniswapV3NftManager
       ],
     });
-    addressBook.lpSft = tx.address;
+    addressBook.lpSft = tx.address as `0x${string}`;
   }
 
   //
@@ -194,7 +194,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
         addressBook.lpSft!, // lpSft
       ],
     });
-    addressBook.noLpSft = tx.address;
+    addressBook.noLpSft = tx.address as `0x${string}`;
   }
 };
 

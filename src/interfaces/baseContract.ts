@@ -16,7 +16,7 @@ class BaseContract {
   /**
    * @description The address of the contract
    */
-  public address: string;
+  public address: `0x${string}`;
 
   /**
    * @description The signer used to interact with the blockchain
@@ -32,7 +32,7 @@ class BaseContract {
    */
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
-    contractAddress: string,
+    contractAddress: `0x${string}`,
   ) {
     this.contractRunner = contractRunner;
     this.address = contractAddress;

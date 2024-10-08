@@ -26,7 +26,7 @@ const LPSFTIssuableContract = LPSFTIssuableMixin(AccessControlContract);
 class NOLPSFTContract extends LPSFTIssuableContract {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
-    contractAddress: string,
+    contractAddress: `0x${string}`,
   ) {
     super(contractRunner, contractAddress);
   }

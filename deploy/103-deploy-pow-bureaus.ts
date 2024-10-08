@@ -61,7 +61,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       addressBook.pow1Pool!, // uniswapV3Pool
     ],
   });
-  addressBook.dutchAuction = dutchAuctionTx.address;
+  addressBook.dutchAuction = dutchAuctionTx.address as `0x${string}`;
 
   //
   // Deploy YieldHarvest
@@ -77,7 +77,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       addressBook.defiManager!, // defiManager
     ],
   });
-  addressBook.yieldHarvest = yieldHarvestTx.address;
+  addressBook.yieldHarvest = yieldHarvestTx.address as `0x${string}`;
 
   //
   // Deploy LiquidityForge
@@ -95,7 +95,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       addressBook.pow5InterestFarm!, // erc20InterestFarm
     ],
   });
-  addressBook.liquidityForge = liquidityForgeTx.address;
+  addressBook.liquidityForge = liquidityForgeTx.address as `0x${string}`;
 
   //
   // Deploy ReverseRepo
@@ -116,7 +116,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       addressBook.pow5Pool!, // uniswapV3Pool
     ],
   });
-  addressBook.reverseRepo = reverseRepoTx.address;
+  addressBook.reverseRepo = reverseRepoTx.address as `0x${string}`;
 };
 
 export default func;

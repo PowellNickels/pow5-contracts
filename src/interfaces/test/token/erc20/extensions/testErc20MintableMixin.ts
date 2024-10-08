@@ -23,7 +23,7 @@ function TestERC20MintableMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.testErc1155Enumerable = TestERC20Mintable__factory.connect(
@@ -33,7 +33,7 @@ function TestERC20MintableMixin<T extends new (...args: any[]) => {}>(Base: T) {
     }
 
     async mint(
-      account: string,
+      account: `0x${string}`,
       amount: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {

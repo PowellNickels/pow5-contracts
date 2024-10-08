@@ -25,7 +25,7 @@ function UniswapV3PoolActionsMixin<T extends new (...args: any[]) => {}>(
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.uniswapV3PoolActions = IUniswapV3PoolActions__factory.connect(
@@ -46,11 +46,11 @@ function UniswapV3PoolActionsMixin<T extends new (...args: any[]) => {}>(
     }
 
     async mint(
-      recipient: string,
+      recipient: `0x${string}`,
       tickLower: number,
       tickUpper: number,
       amount: bigint,
-      data: string,
+      data: Uint8Array,
     ): Promise<{ amount0: bigint; amount1: bigint }> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
@@ -75,7 +75,7 @@ function UniswapV3PoolActionsMixin<T extends new (...args: any[]) => {}>(
     }
 
     async collect(
-      recipient: string,
+      recipient: `0x${string}`,
       tickLower: number,
       tickUpper: number,
       amount0Requested: bigint,
@@ -125,11 +125,11 @@ function UniswapV3PoolActionsMixin<T extends new (...args: any[]) => {}>(
     }
 
     async swap(
-      recipient: string,
+      recipient: `0x${string}`,
       zeroForOne: boolean,
       amountSpecified: bigint,
       sqrtPriceLimitX96: bigint,
-      data: string,
+      data: Uint8Array,
     ): Promise<{ amount0: bigint; amount1: bigint }> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
@@ -154,10 +154,10 @@ function UniswapV3PoolActionsMixin<T extends new (...args: any[]) => {}>(
     }
 
     async flash(
-      recipient: string,
+      recipient: `0x${string}`,
       amount0: bigint,
       amount1: bigint,
-      data: string,
+      data: Uint8Array,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =

@@ -25,7 +25,7 @@ function UniswapV3PoolImmutablesMixin<T extends new (...args: any[]) => {}>(
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.uniswapV3PoolImmutables = IUniswapV3PoolImmutables__factory.connect(
@@ -34,24 +34,24 @@ function UniswapV3PoolImmutablesMixin<T extends new (...args: any[]) => {}>(
       );
     }
 
-    async factory(): Promise<string> {
-      return await this.uniswapV3PoolImmutables.factory();
+    async factory(): Promise<`0x${string}`> {
+      return (await this.uniswapV3PoolImmutables.factory()) as `0x${string}`;
     }
 
-    async token0(): Promise<string> {
-      return await this.uniswapV3PoolImmutables.token0();
+    async token0(): Promise<`0x${string}`> {
+      return (await this.uniswapV3PoolImmutables.token0()) as `0x${string}`;
     }
 
-    async token1(): Promise<string> {
-      return await this.uniswapV3PoolImmutables.token1();
+    async token1(): Promise<`0x${string}`> {
+      return (await this.uniswapV3PoolImmutables.token1()) as `0x${string}`;
     }
 
-    async fee(): Promise<bigint> {
-      return await this.uniswapV3PoolImmutables.fee();
+    async fee(): Promise<number> {
+      return Number(await this.uniswapV3PoolImmutables.fee());
     }
 
-    async tickSpacing(): Promise<bigint> {
-      return await this.uniswapV3PoolImmutables.tickSpacing();
+    async tickSpacing(): Promise<number> {
+      return Number(await this.uniswapV3PoolImmutables.tickSpacing());
     }
 
     async maxLiquidityPerTick(): Promise<bigint> {

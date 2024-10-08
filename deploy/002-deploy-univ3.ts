@@ -37,7 +37,8 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Get the deployer signer
   const signers: SignerWithAddress[] = await getUnnamedSigners(hardhat_re);
   const deployer: SignerWithAddress = signers[0];
-  const deployerAddress: string = await deployer.getAddress();
+  const deployerAddress: `0x${string}` =
+    (await deployer.getAddress()) as `0x${string}`;
 
   const opts: DeployOptions = {
     deterministicDeployment: true,
@@ -82,7 +83,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       ...opts,
       args: [deployerAddress],
     });
-    addressBook.uniswapV3Factory = tx.address;
+    addressBook.uniswapV3Factory = tx.address as `0x${string}`;
   }
 
   //
@@ -109,7 +110,8 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       opts,
     );
     const nftDescriptor = await NFTDescriptor.deploy();
-    const nftDescriptorAddress = await nftDescriptor.getAddress();
+    const nftDescriptorAddress =
+      (await nftDescriptor.getAddress()) as `0x${string}`;
 
     // Deploy NonfungibleTokenPositionDescriptor
     console.log(`Deploying ${UNISWAP_V3_NFT_DESCRIPTOR_CONTRACT}`);
@@ -127,7 +129,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       ethers.encodeBytes32String(wrappedNativeTokenSymbol), // nativeCurrencyLabelBytes
     );
     addressBook.uniswapV3NftDescriptor =
-      await uniswapV3NftDescriptor.getAddress();
+      (await uniswapV3NftDescriptor.getAddress()) as `0x${string}`;
   }
 
   // Mine the next block to commit contractfactory deployment
@@ -154,7 +156,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
         addressBook.uniswapV3NftDescriptor,
       ],
     });
-    addressBook.uniswapV3NftManager = tx.address;
+    addressBook.uniswapV3NftManager = tx.address as `0x${string}`;
   }
 
   //
@@ -176,7 +178,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
         ethers.MaxUint256, // maxIncentiveDuration
       ],
     });
-    addressBook.uniswapV3Staker = tx.address;
+    addressBook.uniswapV3Staker = tx.address as `0x${string}`;
   }
 
   //////////////////////////////////////////////////////////////////////////////

@@ -86,7 +86,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       addressBook.lpSft!, // lpSft
     ],
   });
-  addressBook.defiManager = defiManagerTx.address;
+  addressBook.defiManager = defiManagerTx.address as `0x${string}`;
 
   //////////////////////////////////////////////////////////////////////////////
   // Deploy POW1 DeFi farms
@@ -113,7 +113,8 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       ],
     },
   );
-  addressBook.pow1LpNftStakeFarm = pow1LpNftStakeFarmTx.address;
+  addressBook.pow1LpNftStakeFarm =
+    pow1LpNftStakeFarmTx.address as `0x${string}`;
 
   //
   // Deploy POW1SftLendFarm
@@ -134,7 +135,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       ],
     },
   );
-  addressBook.pow1LpSftLendFarm = pow1LpSftLendFarmTx.address;
+  addressBook.pow1LpSftLendFarm = pow1LpSftLendFarmTx.address as `0x${string}`;
 
   //////////////////////////////////////////////////////////////////////////////
   // Deploy POW5 DeFi farms
@@ -160,7 +161,8 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       ],
     },
   );
-  addressBook.pow5LpNftStakeFarm = pow5LpNftStakeFarmTx.address;
+  addressBook.pow5LpNftStakeFarm =
+    pow5LpNftStakeFarmTx.address as `0x${string}`;
 
   //
   // Deploy POW5SftLendFarm
@@ -181,7 +183,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       ],
     },
   );
-  addressBook.pow5LpSftLendFarm = pow5LpSftLendFarmTx.address;
+  addressBook.pow5LpSftLendFarm = pow5LpSftLendFarmTx.address as `0x${string}`;
 
   //
   // Deploy POW5InterestFarm
@@ -200,7 +202,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       ],
     },
   );
-  addressBook.pow5InterestFarm = pow5InterestFarmTx.address;
+  addressBook.pow5InterestFarm = pow5InterestFarmTx.address as `0x${string}`;
 };
 
 export default func;

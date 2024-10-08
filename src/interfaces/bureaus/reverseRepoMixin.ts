@@ -23,7 +23,7 @@ function ReverseRepoMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.reverseRepo = IReverseRepo__factory.connect(
@@ -35,7 +35,7 @@ function ReverseRepoMixin<T extends new (...args: any[]) => {}>(Base: T) {
     async initialize(
       gameTokenAmount: bigint,
       assetTokenAmount: bigint,
-      receiver: string,
+      receiver: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
@@ -52,7 +52,7 @@ function ReverseRepoMixin<T extends new (...args: any[]) => {}>(Base: T) {
     async purchase(
       gameTokenAmount: bigint,
       assetTokenAmount: bigint,
-      receiver: string,
+      receiver: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =

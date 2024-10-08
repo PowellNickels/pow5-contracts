@@ -22,7 +22,7 @@ const ERC20IssuableContract = ERC20IssuableMixin(AccessControlContract);
 class POW1Contract extends ERC20IssuableContract {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
-    contractAddress: string,
+    contractAddress: `0x${string}`,
   ) {
     super(contractRunner, contractAddress);
   }

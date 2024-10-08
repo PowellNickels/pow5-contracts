@@ -75,7 +75,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       ],
     },
   );
-  addressBook.pow1PoolFactory = pow1PoolFactoryTx.address;
+  addressBook.pow1PoolFactory = pow1PoolFactoryTx.address as `0x${string}`;
 
   //
   // Read Uniswap V3 pool address for POW1
@@ -100,7 +100,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       addressBook.wrappedNativeToken!, // assetToken
     ],
   });
-  addressBook.pow1Swapper = pow1SwapperTx.address;
+  addressBook.pow1Swapper = pow1SwapperTx.address as `0x${string}`;
 
   //
   // Deploy UniV3Pooler for POW1
@@ -115,7 +115,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       addressBook.uniswapV3NftManager!, // uniswapV3NftManager
     ],
   });
-  addressBook.pow1Pooler = pow1PoolerTx.address;
+  addressBook.pow1Pooler = pow1PoolerTx.address as `0x${string}`;
 
   //
   // Deploy UniV3Staker for POW1
@@ -133,7 +133,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       addressBook.pow1Token!, // rewardToken
     ],
   });
-  addressBook.pow1Staker = pow1StakerTx.address;
+  addressBook.pow1Staker = pow1StakerTx.address as `0x${string}`;
 
   //////////////////////////////////////////////////////////////////////////////
   // Deploy POW5 contracts
@@ -157,7 +157,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       ],
     },
   );
-  addressBook.pow5PoolFactory = pow5PoolFactoryTx.address;
+  addressBook.pow5PoolFactory = pow5PoolFactoryTx.address as `0x${string}`;
 
   //
   // Read Uniswap V3 pool address for POW5
@@ -182,7 +182,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       addressBook.usdcToken!, // assetToken
     ],
   });
-  addressBook.pow5Swapper = pow5SwapperTx.address;
+  addressBook.pow5Swapper = pow5SwapperTx.address as `0x${string}`;
 
   //
   // Deploy UniV3Pooler for POW5
@@ -197,7 +197,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       addressBook.uniswapV3NftManager!, // uniswapV3NftManager
     ],
   });
-  addressBook.pow5Pooler = pow5PoolerTx.address;
+  addressBook.pow5Pooler = pow5PoolerTx.address as `0x${string}`;
 
   //
   // Deploy UniV3Staker for POW5
@@ -215,7 +215,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       addressBook.pow1Token!, // rewardToken
     ],
   });
-  addressBook.pow5Staker = pow5StakerTx.address;
+  addressBook.pow5Staker = pow5StakerTx.address as `0x${string}`;
 
   //////////////////////////////////////////////////////////////////////////////
   // Record addresses

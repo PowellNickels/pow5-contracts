@@ -74,7 +74,9 @@ describe("Bureau 3: Liquidity Forge", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   let deployer: SignerWithAddress;
+  let deployerAddress: `0x${string}`;
   let beneficiary: SignerWithAddress;
+  let beneficiaryAddress: `0x${string}`;
   let addressBook: AddressBook;
   let deployerContracts: ContractLibrary;
   let beneficiaryContracts: ContractLibrary;
@@ -89,7 +91,9 @@ describe("Bureau 3: Liquidity Forge", () => {
     // Use ethers to get the accounts
     const signers: SignerWithAddress[] = await hardhat.ethers.getSigners();
     deployer = signers[0];
+    deployerAddress = (await deployer.getAddress()) as `0x${string}`;
     beneficiary = signers[1];
+    beneficiaryAddress = (await beneficiary.getAddress()) as `0x${string}`;
 
     // A single fixture is used for the test suite
     await setupTest();
@@ -140,16 +144,16 @@ describe("Bureau 3: Liquidity Forge", () => {
 
     // Get pool token order
     let pow1IsToken0: boolean;
-    const token0: string = (await pow1PoolContract.token0()).toLowerCase();
-    const token1: string = (await pow1PoolContract.token1()).toLowerCase();
+    const token0: `0x${string}` = await pow1PoolContract.token0();
+    const token1: `0x${string}` = await pow1PoolContract.token1();
     if (
-      token0 === pow1Contract.address.toLowerCase() &&
-      token1 === wrappedNativeContract.address.toLowerCase()
+      token0.toLowerCase() === pow1Contract.address.toLowerCase() &&
+      token1.toLowerCase() === wrappedNativeContract.address.toLowerCase()
     ) {
       pow1IsToken0 = true;
     } else if (
-      token0 === wrappedNativeContract.address.toLowerCase() &&
-      token1 === pow1Contract.address.toLowerCase()
+      token0.toLowerCase() === wrappedNativeContract.address.toLowerCase() &&
+      token1.toLowerCase() === pow1Contract.address.toLowerCase()
     ) {
       pow1IsToken0 = false;
     } else {
@@ -169,7 +173,7 @@ describe("Bureau 3: Liquidity Forge", () => {
     await dutchAuctionContract.initialize(
       INITIAL_POW1_SUPPLY, // gameTokenAmount
       INITIAL_WETH_AMOUNT, // assetTokenAmount
-      await beneficiary.getAddress(), // receiver
+      beneficiaryAddress, // receiver
     );
   });
 
@@ -193,10 +197,7 @@ describe("Bureau 3: Liquidity Forge", () => {
       LPSFT_FARM_OPERATOR_ROLE,
       addressBook.yieldHarvest!,
     );
-    await pow1Contract.grantRole(
-      ERC20_ISSUER_ROLE,
-      await deployer.getAddress(),
-    );
+    await pow1Contract.grantRole(ERC20_ISSUER_ROLE, deployerAddress);
 
     // Mint POW1 to the POW1 LP-SFT lend farm
     await pow1Contract.mint(
@@ -206,7 +207,7 @@ describe("Bureau 3: Liquidity Forge", () => {
 
     // Lend LP-SFT to YieldHarvest
     await lpSftContract.safeTransferFrom(
-      await beneficiary.getAddress(),
+      beneficiaryAddress,
       addressBook.yieldHarvest!,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
@@ -286,7 +287,7 @@ describe("Bureau 3: Liquidity Forge", () => {
       await liquidityForgeContract.borrowPow5(
         LPPOW1_LPNFT_TOKEN_ID, // tokenId
         INITIAL_POW5_AMOUNT + 1n, // amount
-        await beneficiary.getAddress(), // receiver
+        beneficiaryAddress, // receiver
       );
       chai.assert.fail("Expected an error");
     } catch (error: unknown) {
@@ -333,7 +334,7 @@ describe("Bureau 3: Liquidity Forge", () => {
     await liquidityForgeContract.borrowPow5(
       LPPOW1_LPNFT_TOKEN_ID, // tokenId
       INITIAL_POW5_AMOUNT, // amount
-      await beneficiary.getAddress(), // receiver
+      beneficiaryAddress, // receiver
     );
   });
 
@@ -344,9 +345,7 @@ describe("Bureau 3: Liquidity Forge", () => {
   it("should check LP-SFT balances after borrowing POW5", async function (): Promise<void> {
     const { defiManagerContract, pow5Contract } = beneficiaryContracts;
 
-    const pow5Amount: bigint = await pow5Contract.balanceOf(
-      await beneficiary.getAddress(),
-    );
+    const pow5Amount: bigint = await pow5Contract.balanceOf(beneficiaryAddress);
     chai.expect(pow5Amount).to.equal(INITIAL_POW5_AMOUNT);
 
     const noPow5Amount: bigint = await defiManagerContract.noPow5Balance(
@@ -367,7 +366,7 @@ describe("Bureau 3: Liquidity Forge", () => {
     // Attempt to withdraw LP-SFT before POW5 loan is repaid
     try {
       await noLpSftContract.safeTransferFrom(
-        await beneficiary.getAddress(),
+        beneficiaryAddress,
         addressBook.yieldHarvest!,
         LPPOW1_LPNFT_TOKEN_ID,
         1n,
@@ -417,9 +416,7 @@ describe("Bureau 3: Liquidity Forge", () => {
   it("should check LP-SFT balances after repaying POW5", async function (): Promise<void> {
     const { defiManagerContract, pow5Contract } = beneficiaryContracts;
 
-    const pow5Amount: bigint = await pow5Contract.balanceOf(
-      await deployer.getAddress(),
-    );
+    const pow5Amount: bigint = await pow5Contract.balanceOf(deployerAddress);
     chai.expect(pow5Amount).to.equal(0n);
 
     const noPow5Amount: bigint = await defiManagerContract.noPow5Balance(
@@ -439,7 +436,7 @@ describe("Bureau 3: Liquidity Forge", () => {
 
     // Withdraw LP-SFT from YieldHarvest
     await noLpSftContract.safeTransferFrom(
-      await beneficiary.getAddress(),
+      beneficiaryAddress,
       addressBook.yieldHarvest!,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,

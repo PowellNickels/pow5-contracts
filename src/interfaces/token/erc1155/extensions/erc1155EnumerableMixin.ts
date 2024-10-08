@@ -23,7 +23,7 @@ function ERC1155EnumerableMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.erc1155Enumerable = IERC1155Enumerable__factory.connect(
@@ -36,11 +36,11 @@ function ERC1155EnumerableMixin<T extends new (...args: any[]) => {}>(Base: T) {
       return await this.erc1155Enumerable.totalSupply();
     }
 
-    async ownerOf(tokenId: bigint): Promise<string> {
-      return await this.erc1155Enumerable.ownerOf(tokenId);
+    async ownerOf(tokenId: bigint): Promise<`0x${string}`> {
+      return (await this.erc1155Enumerable.ownerOf(tokenId)) as `0x${string}`;
     }
 
-    async getTokenIds(account: string): Promise<bigint[]> {
+    async getTokenIds(account: `0x${string}`): Promise<bigint[]> {
       return await this.erc1155Enumerable.getTokenIds(account);
     }
   };

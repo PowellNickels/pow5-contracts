@@ -23,22 +23,25 @@ function ERC1155Mixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.erc1155 = IERC1155__factory.connect(contractAddress, contractRunner);
     }
 
-    async balanceOf(account: string, id: bigint): Promise<bigint> {
+    async balanceOf(account: `0x${string}`, id: bigint): Promise<bigint> {
       return await this.erc1155.balanceOf(account, id);
     }
 
-    async balanceOfBatch(accounts: string[], ids: bigint[]): Promise<bigint[]> {
+    async balanceOfBatch(
+      accounts: `0x${string}`[],
+      ids: bigint[],
+    ): Promise<bigint[]> {
       return await this.erc1155.balanceOfBatch(accounts, ids);
     }
 
     async setApprovalForAll(
-      operator: string,
+      operator: `0x${string}`,
       approved: boolean,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
@@ -50,15 +53,15 @@ function ERC1155Mixin<T extends new (...args: any[]) => {}>(Base: T) {
     }
 
     async isApprovedForAll(
-      account: string,
-      operator: string,
+      account: `0x${string}`,
+      operator: `0x${string}`,
     ): Promise<boolean> {
       return await this.erc1155.isApprovedForAll(account, operator);
     }
 
     async safeTransferFrom(
-      from: string,
-      to: string,
+      from: `0x${string}`,
+      to: `0x${string}`,
       id: bigint,
       value: bigint,
       data: Uint8Array,
@@ -72,8 +75,8 @@ function ERC1155Mixin<T extends new (...args: any[]) => {}>(Base: T) {
     }
 
     async safeBatchTransferFrom(
-      from: string,
-      to: string,
+      from: `0x${string}`,
+      to: `0x${string}`,
       ids: bigint[],
       values: bigint[],
       data: Uint8Array,

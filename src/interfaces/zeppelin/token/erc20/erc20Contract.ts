@@ -16,7 +16,7 @@ const ERC20ContractBase = ERC20Mixin(BaseContract);
 class ERC20Contract extends ERC20ContractBase {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
-    contractAddress: string,
+    contractAddress: `0x${string}`,
   ) {
     super(contractRunner, contractAddress);
   }

@@ -23,7 +23,7 @@ function AccessControlMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.accessControl = IAccessControl__factory.connect(
@@ -32,7 +32,7 @@ function AccessControlMixin<T extends new (...args: any[]) => {}>(Base: T) {
       );
     }
 
-    async hasRole(role: string, account: string): Promise<boolean> {
+    async hasRole(role: string, account: `0x${string}`): Promise<boolean> {
       return await this.accessControl.hasRole(role, account);
     }
 
@@ -42,7 +42,7 @@ function AccessControlMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
     async grantRole(
       role: string,
-      account: string,
+      account: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
@@ -54,7 +54,7 @@ function AccessControlMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
     async revokeRole(
       role: string,
-      account: string,
+      account: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =

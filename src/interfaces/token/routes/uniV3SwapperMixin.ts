@@ -23,7 +23,7 @@ function UniV3SwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.uniV3Swapper = IUniV3Swapper__factory.connect(
@@ -34,7 +34,7 @@ function UniV3SwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
     async buyGameToken(
       assetTokenAmount: bigint,
-      recipient: string,
+      recipient: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
@@ -46,7 +46,7 @@ function UniV3SwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
     async sellGameToken(
       gameTokenAmount: bigint,
-      recipient: string,
+      recipient: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =

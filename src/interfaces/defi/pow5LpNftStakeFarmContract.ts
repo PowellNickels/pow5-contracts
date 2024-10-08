@@ -18,7 +18,7 @@ const UniV3StakeFarmContract = UniV3StakeFarmMixin(AccessControlContract);
 class POW5LpNftStakeFarmContract extends UniV3StakeFarmContract {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
-    contractAddress: string,
+    contractAddress: `0x${string}`,
   ) {
     super(contractRunner, contractAddress);
   }

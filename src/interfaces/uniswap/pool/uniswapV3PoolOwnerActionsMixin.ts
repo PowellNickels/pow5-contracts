@@ -25,7 +25,7 @@ function UniswapV3PoolOwnerActionsMixin<T extends new (...args: any[]) => {}>(
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.uniswapV3PoolOwnerActions =
@@ -53,7 +53,7 @@ function UniswapV3PoolOwnerActionsMixin<T extends new (...args: any[]) => {}>(
     }
 
     async collectProtocol(
-      recipient: string,
+      recipient: `0x${string}`,
       amount0Requested: bigint,
       amount1Requested: bigint,
     ): Promise<{ amount0: bigint; amount1: bigint }> {

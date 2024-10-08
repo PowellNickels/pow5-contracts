@@ -83,10 +83,10 @@ describe("Bureau integration test", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   let deployer: SignerWithAddress;
+  let deployerAddress: `0x${string}`;
   let beneficiary: SignerWithAddress;
-
+  let beneficiaryAddress: `0x${string}`;
   let addressBook: AddressBook;
-
   let deployerContracts: ContractLibrary;
   let beneficiaryContracts: ContractLibrary;
 
@@ -100,7 +100,9 @@ describe("Bureau integration test", () => {
     // Use ethers to get the accounts
     const signers: SignerWithAddress[] = await hardhat.ethers.getSigners();
     deployer = signers[0];
+    deployerAddress = (await deployer.getAddress()) as `0x${string}`;
     beneficiary = signers[1];
+    beneficiaryAddress = (await beneficiary.getAddress()) as `0x${string}`;
 
     // A single fixture is used for the test suite
     await setupTest();
@@ -143,13 +145,13 @@ describe("Bureau integration test", () => {
     // Declarative structure for roles with contract and address pairs
     const roleAssignments: Record<
       string,
-      Array<{ contract: AccessControlContract; address: string }>
+      Array<{ contract: AccessControlContract; address: `0x${string}` }>
     > = {
       // ERC20_ISSUER_ROLE
       [ERC20_ISSUER_ROLE]: [
         {
           contract: pow1Contract,
-          address: await deployer.getAddress(),
+          address: deployerAddress,
         },
         {
           contract: pow5Contract,
@@ -234,13 +236,10 @@ describe("Bureau integration test", () => {
       pow1LpSftLendFarmContract.address,
       LPPOW1_REWARD_AMOUNT,
     );
-    await pow1Contract.mint(await deployer.getAddress(), LPPOW5_REWARD_AMOUNT);
+    await pow1Contract.mint(deployerAddress, LPPOW5_REWARD_AMOUNT);
 
     // Mint USDC
-    await testErc20MintableContract.mint(
-      await deployer.getAddress(),
-      INITIAL_USDC_AMOUNT,
-    );
+    await testErc20MintableContract.mint(deployerAddress, INITIAL_USDC_AMOUNT);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -308,16 +307,17 @@ describe("Bureau integration test", () => {
 
     // Get POW1 pool token order
     let pow1IsToken0: boolean;
-    const pow1Token0: string = (await pow1PoolContract.token0()).toLowerCase();
-    const pow1Token1: string = (await pow1PoolContract.token1()).toLowerCase();
+    const pow1Token0: `0x${string}` = await pow1PoolContract.token0();
+    const pow1Token1: `0x${string}` = await pow1PoolContract.token1();
     if (
-      pow1Token0 === pow1Contract.address.toLowerCase() &&
-      pow1Token1 === wrappedNativeContract.address.toLowerCase()
+      pow1Token0.toLowerCase() === pow1Contract.address.toLowerCase() &&
+      pow1Token1.toLowerCase() === wrappedNativeContract.address.toLowerCase()
     ) {
       pow1IsToken0 = true;
     } else if (
-      pow1Token0 === wrappedNativeContract.address.toLowerCase() &&
-      pow1Token1 === pow1Contract.address.toLowerCase()
+      pow1Token0.toLowerCase() ===
+        wrappedNativeContract.address.toLowerCase() &&
+      pow1Token1.toLowerCase() === pow1Contract.address.toLowerCase()
     ) {
       pow1IsToken0 = false;
     } else {
@@ -334,16 +334,16 @@ describe("Bureau integration test", () => {
 
     // Get POW5 pool token order
     let pow5IsToken0: boolean;
-    const pow5Token0: string = (await pow5PoolContract.token0()).toLowerCase();
-    const pow5Token1: string = (await pow5PoolContract.token1()).toLowerCase();
+    const pow5Token0: `0x${string}` = await pow5PoolContract.token0();
+    const pow5Token1: `0x${string}` = await pow5PoolContract.token1();
     if (
-      pow5Token0 === pow5Contract.address.toLowerCase() &&
-      pow5Token1 === usdcContract.address.toLowerCase()
+      pow5Token0.toLowerCase() === pow5Contract.address.toLowerCase() &&
+      pow5Token1.toLowerCase() === usdcContract.address.toLowerCase()
     ) {
       pow5IsToken0 = true;
     } else if (
-      pow5Token0 === usdcContract.address.toLowerCase() &&
-      pow5Token1 === pow5Contract.address.toLowerCase()
+      pow5Token0.toLowerCase() === usdcContract.address.toLowerCase() &&
+      pow5Token1.toLowerCase() === pow5Contract.address.toLowerCase()
     ) {
       pow5IsToken0 = false;
     } else {
@@ -385,7 +385,7 @@ describe("Bureau integration test", () => {
     await dutchAuctionContract.initialize(
       INITIAL_POW1_SUPPLY, // gameTokenAmount
       INITIAL_WETH_AMOUNT, // assetTokenAmount
-      await beneficiary.getAddress(), // receiver
+      beneficiaryAddress, // receiver
     );
   });
 
@@ -400,7 +400,7 @@ describe("Bureau integration test", () => {
 
     // Lend LP-SFT to YieldHarvest
     await lpSftContract.safeTransferFrom(
-      await beneficiary.getAddress(),
+      beneficiaryAddress,
       yieldHarvestContract.address,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
@@ -422,14 +422,11 @@ describe("Bureau integration test", () => {
     await liquidityForgeContract.borrowPow5(
       LPPOW1_LPNFT_TOKEN_ID, // tokenId
       INITIAL_POW5_AMOUNT, // amount
-      await beneficiary.getAddress(), // receiver
+      beneficiaryAddress, // receiver
     );
 
     // Transfer POW5 to deployer
-    await pow5Contract.transfer(
-      await deployer.getAddress(),
-      INITIAL_POW5_DEPOSIT,
-    );
+    await pow5Contract.transfer(deployerAddress, INITIAL_POW5_DEPOSIT);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -445,7 +442,7 @@ describe("Bureau integration test", () => {
     reverseRepoContract.initialize(
       INITIAL_POW5_DEPOSIT, // gameTokenAmount
       INITIAL_USDC_AMOUNT, // assetTokenAmount
-      await beneficiary.getAddress(), // receiver
+      beneficiaryAddress, // receiver
     );
   });
 });

@@ -23,7 +23,7 @@ function UniswapV3FactoryMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.uniswapV3Factory = IUniswapV3Factory__factory.connect(
@@ -36,8 +36,8 @@ function UniswapV3FactoryMixin<T extends new (...args: any[]) => {}>(Base: T) {
       return await this.uniswapV3Factory.poolCodeHash();
     }
 
-    async owner(): Promise<string> {
-      return await this.uniswapV3Factory.owner();
+    async owner(): Promise<`0x${string}`> {
+      return (await this.uniswapV3Factory.owner()) as `0x${string}`;
     }
 
     async feeAmountTickSpacing(fee: number): Promise<number> {
@@ -45,16 +45,20 @@ function UniswapV3FactoryMixin<T extends new (...args: any[]) => {}>(Base: T) {
     }
 
     async getPool(
-      tokenA: string,
-      tokenB: string,
+      tokenA: `0x${string}`,
+      tokenB: `0x${string}`,
       fee: number,
-    ): Promise<string> {
-      return await this.uniswapV3Factory.getPool(tokenA, tokenB, fee);
+    ): Promise<`0x${string}`> {
+      return (await this.uniswapV3Factory.getPool(
+        tokenA,
+        tokenB,
+        fee,
+      )) as `0x${string}`;
     }
 
     async createPool(
-      tokenA: string,
-      tokenB: string,
+      tokenA: `0x${string}`,
+      tokenB: `0x${string}`,
       fee: number,
     ): Promise<{ pool: `0x${string}` }> {
       if (!this.isSigner()) {
@@ -69,7 +73,7 @@ function UniswapV3FactoryMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       return this.getValues(receipt, "PoolCreated", (result: ethers.Result) => {
         return {
-          pool: result.getValue("amount0") as `0x${string}`,
+          pool: result.getValue("pool") as `0x${string}`,
         };
       });
     }

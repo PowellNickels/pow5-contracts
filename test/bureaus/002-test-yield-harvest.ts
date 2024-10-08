@@ -62,7 +62,9 @@ describe("Bureau 2: Yield Harvest", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   let deployer: SignerWithAddress;
+  let deployerAddress: `0x${string}`;
   let beneficiary: SignerWithAddress;
+  let beneficiaryAddress: `0x${string}`;
   let addressBook: AddressBook;
   let deployerContracts: ContractLibrary;
   let beneficiaryContracts: ContractLibrary;
@@ -77,7 +79,9 @@ describe("Bureau 2: Yield Harvest", () => {
     // Use ethers to get the accounts
     const signers: SignerWithAddress[] = await hardhat.ethers.getSigners();
     deployer = signers[0];
+    deployerAddress = (await deployer.getAddress()) as `0x${string}`;
     beneficiary = signers[1];
+    beneficiaryAddress = (await beneficiary.getAddress()) as `0x${string}`;
 
     // A single fixture is used for the test suite
     await setupTest();
@@ -132,16 +136,16 @@ describe("Bureau 2: Yield Harvest", () => {
 
     // Initialize the Uniswap V3 pool
     let pow1IsToken0: boolean;
-    const token0: string = (await pow1PoolContract.token0()).toLowerCase();
-    const token1: string = (await pow1PoolContract.token1()).toLowerCase();
+    const token0: `0x${string}` = await pow1PoolContract.token0();
+    const token1: `0x${string}` = await pow1PoolContract.token1();
     if (
-      token0 === pow1Contract.address.toLowerCase() &&
-      token1 === wrappedNativeContract.address.toLowerCase()
+      token0.toLowerCase() === pow1Contract.address.toLowerCase() &&
+      token1.toLowerCase() === wrappedNativeContract.address.toLowerCase()
     ) {
       pow1IsToken0 = true;
     } else if (
-      token0 === wrappedNativeContract.address.toLowerCase() &&
-      token1 === pow1Contract.address.toLowerCase()
+      token0.toLowerCase() === wrappedNativeContract.address.toLowerCase() &&
+      token1.toLowerCase() === pow1Contract.address.toLowerCase()
     ) {
       pow1IsToken0 = false;
     } else {
@@ -159,7 +163,7 @@ describe("Bureau 2: Yield Harvest", () => {
     await dutchAuctionContract.initialize(
       INITIAL_POW1_SUPPLY, // gameTokenAmount
       INITIAL_WETH_AMOUNT, // assetTokenAmount
-      await beneficiary.getAddress(), // receiver
+      beneficiaryAddress, // receiver
     );
   });
 
@@ -206,10 +210,7 @@ describe("Bureau 2: Yield Harvest", () => {
     const { pow1Contract, pow1LpSftLendFarmContract } = deployerContracts;
 
     // Grant issuer role to deployer
-    await pow1Contract.grantRole(
-      ERC20_ISSUER_ROLE,
-      await deployer.getAddress(),
-    );
+    await pow1Contract.grantRole(ERC20_ISSUER_ROLE, deployerAddress);
 
     // Mint POW1 to the POW1 LP-SFT lend farm
     await pow1Contract.mint(
@@ -229,7 +230,7 @@ describe("Bureau 2: Yield Harvest", () => {
 
     chai
       .expect(await lpSftContract.ownerOf(LPPOW1_LPNFT_TOKEN_ID))
-      .to.equal(await beneficiary.getAddress());
+      .to.equal(beneficiaryAddress);
     chai
       .expect(await noLpSftContract.ownerOf(LPPOW1_LPNFT_TOKEN_ID))
       .to.equal(ZERO_ADDRESS);
@@ -242,7 +243,7 @@ describe("Bureau 2: Yield Harvest", () => {
 
     // Lend LP-SFT to YieldHarvest
     await lpSftContract.safeTransferFrom(
-      await beneficiary.getAddress(),
+      beneficiaryAddress,
       yieldHarvestContract.address,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
@@ -261,7 +262,7 @@ describe("Bureau 2: Yield Harvest", () => {
       .to.equal(yieldHarvestContract.address);
     chai
       .expect(await noLpSftContract.ownerOf(LPPOW1_LPNFT_TOKEN_ID))
-      .to.equal(await beneficiary.getAddress());
+      .to.equal(beneficiaryAddress);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -275,7 +276,7 @@ describe("Bureau 2: Yield Harvest", () => {
 
     // Withdraw LP-SFT from YieldHarvest
     await noLpSftContract.safeTransferFrom(
-      await beneficiary.getAddress(),
+      beneficiaryAddress,
       yieldHarvestContract.address,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
@@ -290,7 +291,7 @@ describe("Bureau 2: Yield Harvest", () => {
 
     chai
       .expect(await lpSftContract.ownerOf(LPPOW1_LPNFT_TOKEN_ID))
-      .to.equal(await beneficiary.getAddress());
+      .to.equal(beneficiaryAddress);
     chai
       .expect(await noLpSftContract.ownerOf(LPPOW1_LPNFT_TOKEN_ID))
       .to.equal(ZERO_ADDRESS);

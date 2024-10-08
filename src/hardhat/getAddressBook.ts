@@ -70,8 +70,8 @@ import { AddressBook } from "../interfaces/addressBook";
 //
 
 const addressBook: { [networkName: string]: AddressBook } = {
-  base: baseAddresses,
-  mainnet: mainnetAddresses,
+  base: baseAddresses as AddressBook,
+  mainnet: mainnetAddresses as AddressBook,
 };
 
 //
@@ -278,7 +278,7 @@ async function getAddressBook(networkName: string): Promise<AddressBook> {
 function loadDeployment(
   networkName: string,
   contractName: string,
-): string | undefined {
+): `0x${string}` | undefined {
   try {
     const deployment = JSON.parse(
       fs
@@ -288,7 +288,7 @@ function loadDeployment(
         .toString(),
     );
     if (deployment.address) {
-      return deployment.address;
+      return deployment.address as `0x${string}`;
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {}
@@ -301,7 +301,7 @@ const getContractAddress = async (
   contractSymbol: string,
   contractName: string,
   networkName: string,
-): Promise<string | undefined> => {
+): Promise<`0x${string}` | undefined> => {
   // Look up address in address book
   if (
     addressBook[networkName] &&
@@ -321,8 +321,8 @@ const getContractAddress = async (
       const contractDeployment = await hardhat.deployments.get(contractName);
       if (contractDeployment && contractDeployment.address) {
         addressBook[networkName][contractName as keyof AddressBook] =
-          contractDeployment.address;
-        return contractDeployment.address;
+          contractDeployment.address as `0x${string}`;
+        return contractDeployment.address as `0x${string}`;
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {}
@@ -343,7 +343,7 @@ const getContractAddress = async (
 function writeAddress(
   networkName: string,
   contractName: string,
-  address: string,
+  address: `0x${string}`,
   abi: { [key: string]: any },
 ): void {
   console.log(`Deployed ${contractName} to ${address}`);

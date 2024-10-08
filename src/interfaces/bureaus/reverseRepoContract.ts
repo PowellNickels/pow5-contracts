@@ -16,7 +16,7 @@ const ReverseRepoContractBase = ReverseRepoMixin(BaseContract);
 class ReverseRepoContract extends ReverseRepoContractBase {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
-    contractAddress: string,
+    contractAddress: `0x${string}`,
   ) {
     super(contractRunner, contractAddress);
   }

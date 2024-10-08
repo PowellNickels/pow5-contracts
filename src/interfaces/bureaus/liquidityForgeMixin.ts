@@ -23,7 +23,7 @@ function LiquidityForgeMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.liquidityForge = ILiquidityForge__factory.connect(
@@ -35,7 +35,7 @@ function LiquidityForgeMixin<T extends new (...args: any[]) => {}>(Base: T) {
     async borrowPow5(
       tokenId: bigint,
       amount: bigint,
-      receiver: string,
+      receiver: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =

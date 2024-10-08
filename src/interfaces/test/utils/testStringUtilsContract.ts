@@ -16,7 +16,7 @@ const TestStringUtilsContractBase = TestStringUtilsMixin(BaseContract);
 class TestStringUtilsContract extends TestStringUtilsContractBase {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
-    contractAddress: string,
+    contractAddress: `0x${string}`,
   ) {
     super(contractRunner, contractAddress);
   }

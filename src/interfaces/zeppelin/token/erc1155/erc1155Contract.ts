@@ -18,7 +18,7 @@ const ERC1155ContractBase = ERC1155Mixin(ERC1155MetadataURIContract);
 class ERC1155Contract extends ERC1155ContractBase {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
-    contractAddress: string,
+    contractAddress: `0x${string}`,
   ) {
     super(contractRunner, contractAddress);
   }

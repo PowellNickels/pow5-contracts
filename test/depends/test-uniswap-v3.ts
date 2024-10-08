@@ -70,7 +70,7 @@ describe("Uniswap V3", () => {
   // Fixture state
   //////////////////////////////////////////////////////////////////////////////
 
-  let beneficiaryAddress: string;
+  let beneficiaryAddress: `0x${string}`;
   let contracts: ContractLibraryEthers;
   let wethIsToken0: boolean;
 
@@ -82,7 +82,8 @@ describe("Uniswap V3", () => {
     this.timeout(60 * 1000);
 
     // Get the wallet addresses
-    const accounts: string[] = await hardhat.getUnnamedAccounts();
+    const accounts: `0x${string}`[] =
+      (await hardhat.getUnnamedAccounts()) as `0x${string}`[];
     beneficiaryAddress = accounts[1];
 
     // A single fixture is used for the test suite
@@ -109,8 +110,8 @@ describe("Uniswap V3", () => {
       usdcTokenContract,
     } = contracts;
 
-    const token0: string = await wrappedNativeUsdcPoolContract.token0();
-    const token1: string = await wrappedNativeUsdcPoolContract.token1();
+    const token0: `0x${string}` = await wrappedNativeUsdcPoolContract.token0();
+    const token1: `0x${string}` = await wrappedNativeUsdcPoolContract.token1();
     chai.expect(token0).to.not.equal(token1);
 
     // Get pool token order

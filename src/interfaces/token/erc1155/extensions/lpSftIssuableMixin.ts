@@ -23,7 +23,7 @@ function LPSFTIssuableMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.lpSftIssuable = ILPSFTIssuable__factory.connect(
@@ -33,7 +33,7 @@ function LPSFTIssuableMixin<T extends new (...args: any[]) => {}>(Base: T) {
     }
 
     async mint(
-      to: string,
+      to: `0x${string}`,
       sftTokenId: bigint,
       data: Uint8Array,
     ): Promise<ethers.ContractTransactionReceipt> {
@@ -46,7 +46,7 @@ function LPSFTIssuableMixin<T extends new (...args: any[]) => {}>(Base: T) {
     }
 
     async mintBatch(
-      to: string,
+      to: `0x${string}`,
       sftTokenIds: bigint[],
       data: Uint8Array,
     ): Promise<ethers.ContractTransactionReceipt> {
@@ -59,7 +59,7 @@ function LPSFTIssuableMixin<T extends new (...args: any[]) => {}>(Base: T) {
     }
 
     async burn(
-      from: string,
+      from: `0x${string}`,
       sftTokenId: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
@@ -71,7 +71,7 @@ function LPSFTIssuableMixin<T extends new (...args: any[]) => {}>(Base: T) {
     }
 
     async burnBatch(
-      from: string,
+      from: `0x${string}`,
       sftTokenIds: bigint[],
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {

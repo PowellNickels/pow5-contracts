@@ -23,7 +23,7 @@ function UniV3StakeFarmMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.uniV3StakeFarm = IUniV3StakeFarm__factory.connect(

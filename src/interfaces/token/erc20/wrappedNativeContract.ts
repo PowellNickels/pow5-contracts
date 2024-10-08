@@ -18,7 +18,7 @@ const WrappedNativeContractBase = WrappedNativeMixin(ERC20Contract);
 class WrappedNativeContract extends WrappedNativeContractBase {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
-    contractAddress: string,
+    contractAddress: `0x${string}`,
   ) {
     super(contractRunner, contractAddress);
   }

@@ -16,7 +16,7 @@ const UniV3SwapperContractBase = UniV3SwapperMixin(BaseContract);
 class UniV3SwapperContract extends UniV3SwapperContractBase {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
-    contractAddress: string,
+    contractAddress: `0x${string}`,
   ) {
     super(contractRunner, contractAddress);
   }

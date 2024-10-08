@@ -18,7 +18,7 @@ const ERC20MetadataContractBase = ERC20MetadataMixin(ERC20Contract);
 class ERC20MetadataContract extends ERC20MetadataContractBase {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
-    contractAddress: string,
+    contractAddress: `0x${string}`,
   ) {
     super(contractRunner, contractAddress);
   }

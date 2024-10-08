@@ -25,7 +25,7 @@ function UniswapV3PoolStateMixin<T extends new (...args: any[]) => {}>(
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.uniswapV3PoolState = IUniswapV3PoolState__factory.connect(

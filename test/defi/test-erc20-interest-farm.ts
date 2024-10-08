@@ -59,7 +59,9 @@ describe("ERC20 Interest Farm", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   let deployer: SignerWithAddress;
+  let deployerAddress: `0x${string}`;
   let beneficiary: SignerWithAddress;
+  let beneficiaryAddress: `0x${string}`;
   let addressBook: AddressBook;
   let deployerContracts: ContractLibrary;
   let beneficiaryContracts: ContractLibrary;
@@ -75,7 +77,9 @@ describe("ERC20 Interest Farm", () => {
     // deploy the contracts
     const signers: SignerWithAddress[] = await hardhat.ethers.getSigners();
     deployer = signers[0];
+    deployerAddress = (await deployer.getAddress()) as `0x${string}`;
     beneficiary = signers[1];
+    beneficiaryAddress = (await beneficiary.getAddress()) as `0x${string}`;
 
     // A single fixture is used for the test suite
     await setupTest();
@@ -101,10 +105,7 @@ describe("ERC20 Interest Farm", () => {
     const { pow1Contract } = deployerContracts;
 
     // Grant issuer role to deployer
-    await pow1Contract.grantRole(
-      ERC20_ISSUER_ROLE,
-      await deployer.getAddress(),
-    );
+    await pow1Contract.grantRole(ERC20_ISSUER_ROLE, deployerAddress);
   });
 
   it("should grant POW5 issuer role to deployer", async function (): Promise<void> {
@@ -113,10 +114,7 @@ describe("ERC20 Interest Farm", () => {
     const { pow5Contract } = deployerContracts;
 
     // Grant issuer role to deployer
-    await pow5Contract.grantRole(
-      ERC20_ISSUER_ROLE,
-      await deployer.getAddress(),
-    );
+    await pow5Contract.grantRole(ERC20_ISSUER_ROLE, deployerAddress);
   });
 
   it("should mint POW1 reward to POW5 interest farm", async function (): Promise<void> {
@@ -134,7 +132,7 @@ describe("ERC20 Interest Farm", () => {
     const { pow5Contract } = deployerContracts;
 
     // Mint POW5
-    await pow5Contract.mint(await beneficiary.getAddress(), POW5_LOAN_AMOUNT);
+    await pow5Contract.mint(beneficiaryAddress, POW5_LOAN_AMOUNT);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -149,7 +147,7 @@ describe("ERC20 Interest Farm", () => {
     // Approve POW1Staker spending POW1
     await pow5InterestFarmContract.grantRole(
       ERC20_FARM_OPERATOR_ROLE,
-      await deployer.getAddress(),
+      deployerAddress,
     );
   });
 
@@ -184,7 +182,7 @@ describe("ERC20 Interest Farm", () => {
     const { pow5InterestFarmContract } = deployerContracts;
 
     await pow5InterestFarmContract.recordLoan(
-      await beneficiary.getAddress(),
+      beneficiaryAddress,
       POW5_LOAN_AMOUNT,
     );
   });
@@ -192,9 +190,8 @@ describe("ERC20 Interest Farm", () => {
   it("should check balance", async function (): Promise<void> {
     const { pow5InterestFarmContract } = beneficiaryContracts;
 
-    const balanceAmount: bigint = await pow5InterestFarmContract.balanceOf(
-      await beneficiary.getAddress(),
-    );
+    const balanceAmount: bigint =
+      await pow5InterestFarmContract.balanceOf(beneficiaryAddress);
     chai.expect(balanceAmount).to.equal(POW5_LOAN_AMOUNT);
   });
 
@@ -213,9 +210,8 @@ describe("ERC20 Interest Farm", () => {
   it("should check for no staking reward", async function (): Promise<void> {
     const { pow5InterestFarmContract } = beneficiaryContracts;
 
-    const rewardAmount: bigint = await pow5InterestFarmContract.earned(
-      await beneficiary.getAddress(),
-    );
+    const rewardAmount: bigint =
+      await pow5InterestFarmContract.earned(beneficiaryAddress);
     chai.expect(rewardAmount).to.equal(0n);
   });
 
@@ -236,9 +232,8 @@ describe("ERC20 Interest Farm", () => {
   it("should check staking reward", async function (): Promise<void> {
     const { pow5InterestFarmContract } = beneficiaryContracts;
 
-    const rewardAmount: bigint = await pow5InterestFarmContract.earned(
-      await beneficiary.getAddress(),
-    );
+    const rewardAmount: bigint =
+      await pow5InterestFarmContract.earned(beneficiaryAddress);
 
     try {
       chai.expect(rewardAmount).to.equal(POW1_YIELD_AMOUNT);
@@ -268,15 +263,14 @@ describe("ERC20 Interest Farm", () => {
 
     const { pow5InterestFarmContract } = deployerContracts;
 
-    await pow5InterestFarmContract.claimReward(await beneficiary.getAddress());
+    await pow5InterestFarmContract.claimReward(beneficiaryAddress);
   });
 
   it("should check POW1 balances", async function () {
     const { pow1Contract } = beneficiaryContracts;
 
-    const beneficiaryBalance: bigint = await pow1Contract.balanceOf(
-      await beneficiary.getAddress(),
-    );
+    const beneficiaryBalance: bigint =
+      await pow1Contract.balanceOf(beneficiaryAddress);
 
     try {
       // Add 1 second of POW1

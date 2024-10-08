@@ -118,7 +118,9 @@ describe("Bureau 4: Reverse Repo", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   let deployer: SignerWithAddress;
+  let deployerAddress: `0x${string}`;
   let beneficiary: SignerWithAddress;
+  let beneficiaryAddress: `0x${string}`;
   let addressBook: AddressBook;
   let deployerContracts: ContractLibrary;
   let beneficiaryContracts: ContractLibrary;
@@ -134,7 +136,9 @@ describe("Bureau 4: Reverse Repo", () => {
     // Use ethers to get the accounts
     const signers: SignerWithAddress[] = await hardhat.ethers.getSigners();
     deployer = signers[0];
+    deployerAddress = (await deployer.getAddress()) as `0x${string}`;
     beneficiary = signers[1];
+    beneficiaryAddress = (await beneficiary.getAddress()) as `0x${string}`;
 
     // A single fixture is used for the test suite
     await setupTest();
@@ -179,16 +183,16 @@ describe("Bureau 4: Reverse Repo", () => {
 
     // Get pool token order
     let pow1IsToken0: boolean;
-    const token0: string = (await pow1PoolContract.token0()).toLowerCase();
-    const token1: string = (await pow1PoolContract.token1()).toLowerCase();
+    const token0: `0x${string}` = await pow1PoolContract.token0();
+    const token1: `0x${string}` = await pow1PoolContract.token1();
     if (
-      token0 === pow1Contract.address.toLowerCase() &&
-      token1 === wrappedNativeContract.address.toLowerCase()
+      token0.toLowerCase() === pow1Contract.address.toLowerCase() &&
+      token1.toLowerCase() === wrappedNativeContract.address.toLowerCase()
     ) {
       pow1IsToken0 = true;
     } else if (
-      token0 === wrappedNativeContract.address.toLowerCase() &&
-      token1 === pow1Contract.address.toLowerCase()
+      token0.toLowerCase() === wrappedNativeContract.address.toLowerCase() &&
+      token1.toLowerCase() === pow1Contract.address.toLowerCase()
     ) {
       pow1IsToken0 = false;
     } else {
@@ -218,7 +222,7 @@ describe("Bureau 4: Reverse Repo", () => {
     await dutchAuctionContract.initialize(
       INITIAL_POW1_SUPPLY, // gameTokenAmount
       INITIAL_WETH_AMOUNT, // assetTokenAmount
-      await beneficiary.getAddress(), // receiver
+      beneficiaryAddress, // receiver
     );
   });
 
@@ -246,10 +250,7 @@ describe("Bureau 4: Reverse Repo", () => {
       LPSFT_FARM_OPERATOR_ROLE,
       yieldHarvestContract.address,
     );
-    await pow1Contract.grantRole(
-      ERC20_ISSUER_ROLE,
-      await deployer.getAddress(),
-    );
+    await pow1Contract.grantRole(ERC20_ISSUER_ROLE, deployerAddress);
 
     // Mint POW1 to the POW1 LP-SFT lend farm
     await pow1Contract.mint(
@@ -259,7 +260,7 @@ describe("Bureau 4: Reverse Repo", () => {
 
     // Lend LP-SFT to YieldHarvest
     await lpSftContract.safeTransferFrom(
-      await beneficiary.getAddress(),
+      beneficiaryAddress,
       yieldHarvestContract.address,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
@@ -304,7 +305,7 @@ describe("Bureau 4: Reverse Repo", () => {
     await liquidityForgeContract.borrowPow5(
       LPPOW1_LPNFT_TOKEN_ID, // tokenId
       INITIAL_POW5_AMOUNT, // amount
-      await beneficiary.getAddress(), // receiver
+      beneficiaryAddress, // receiver
     );
   });
 
@@ -316,16 +317,16 @@ describe("Bureau 4: Reverse Repo", () => {
     const { pow5Contract, pow5PoolContract, usdcContract } = deployerContracts;
 
     // Get pool token order
-    const token0: string = (await pow5PoolContract.token0()).toLowerCase();
-    const token1: string = (await pow5PoolContract.token1()).toLowerCase();
+    const token0: `0x${string}` = await pow5PoolContract.token0();
+    const token1: `0x${string}` = await pow5PoolContract.token1();
     if (
-      token0 === pow5Contract.address.toLowerCase() &&
-      token1 === usdcContract.address.toLowerCase()
+      token0.toLowerCase() === pow5Contract.address.toLowerCase() &&
+      token1.toLowerCase() === usdcContract.address.toLowerCase()
     ) {
       pow5IsToken0 = true;
     } else if (
-      token0 === usdcContract.address.toLowerCase() &&
-      token1 === pow5Contract.address.toLowerCase()
+      token0.toLowerCase() === usdcContract.address.toLowerCase() &&
+      token1.toLowerCase() === pow5Contract.address.toLowerCase()
     ) {
       pow5IsToken0 = false;
     } else {
@@ -348,10 +349,7 @@ describe("Bureau 4: Reverse Repo", () => {
     const { pow5Contract } = beneficiaryContracts;
 
     // Transfer POW5 to deployer
-    await pow5Contract.transfer(
-      await deployer.getAddress(),
-      INITIAL_POW5_DEPOSIT,
-    );
+    await pow5Contract.transfer(deployerAddress, INITIAL_POW5_DEPOSIT);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -365,10 +363,7 @@ describe("Bureau 4: Reverse Repo", () => {
       new TestERC20MintableContract(deployer, addressBook.usdcToken!);
 
     // Mint USDC to deployer
-    await usdcTokenContract.mint(
-      await deployer.getAddress(),
-      INITIAL_USDC_AMOUNT,
-    );
+    await usdcTokenContract.mint(deployerAddress, INITIAL_USDC_AMOUNT);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -429,7 +424,7 @@ describe("Bureau 4: Reverse Repo", () => {
     const { pow1Contract } = deployerContracts;
 
     // Mint POW1 for LPPOW5 incentive reward
-    await pow1Contract.mint(await deployer.getAddress(), LPPOW5_REWARD_AMOUNT);
+    await pow1Contract.mint(deployerAddress, LPPOW5_REWARD_AMOUNT);
   });
 
   it("should approve POW5LpNftStakeFarm spending POW1", async function (): Promise<void> {
@@ -534,7 +529,7 @@ describe("Bureau 4: Reverse Repo", () => {
     reverseRepoContract.initialize(
       INITIAL_POW5_DEPOSIT, // gameTokenAmount
       INITIAL_USDC_AMOUNT, // assetTokenAmount
-      await beneficiary.getAddress(), // receiver
+      beneficiaryAddress, // receiver
     );
   });
 
@@ -546,9 +541,8 @@ describe("Bureau 4: Reverse Repo", () => {
     const { pow5Contract } = beneficiaryContracts;
 
     // Check beneficiary POW5 balance
-    const pow5Balance: bigint = await pow5Contract.balanceOf(
-      await beneficiary.getAddress(),
-    );
+    const pow5Balance: bigint =
+      await pow5Contract.balanceOf(beneficiaryAddress);
     const pow5Dust: bigint =
       pow5Balance + INITIAL_POW5_DEPOSIT - INITIAL_POW5_AMOUNT;
 
@@ -590,9 +584,8 @@ describe("Bureau 4: Reverse Repo", () => {
     );
 
     // Check USDC balance
-    const usdcBalance: bigint = await usdcTokenContract.balanceOf(
-      await beneficiary.getAddress(),
-    );
+    const usdcBalance: bigint =
+      await usdcTokenContract.balanceOf(beneficiaryAddress);
 
     // Calculate USDC value
     const usdcValue: string = ethers.formatUnits(
@@ -676,8 +669,10 @@ describe("Bureau 4: Reverse Repo", () => {
     const { lpSftContract } = beneficiaryContracts;
 
     // Get owner
-    const owner: string = await lpSftContract.ownerOf(LPPOW5_LPNFT_TOKEN_ID);
-    chai.expect(owner).to.equal(await beneficiary.getAddress());
+    const owner: `0x${string}` = await lpSftContract.ownerOf(
+      LPPOW5_LPNFT_TOKEN_ID,
+    );
+    chai.expect(owner).to.equal(beneficiaryAddress);
   });
 
   it("should check POW5 LP-SFT properties", async function (): Promise<void> {
@@ -690,13 +685,14 @@ describe("Bureau 4: Reverse Repo", () => {
     chai.expect(totalSupply).to.equal(2n);
 
     // Test ownerOf()
-    const owner: string = await lpSftContract.ownerOf(LPPOW5_LPNFT_TOKEN_ID);
-    chai.expect(owner).to.equal(await beneficiary.getAddress());
+    const owner: `0x${string}` = await lpSftContract.ownerOf(
+      LPPOW5_LPNFT_TOKEN_ID,
+    );
+    chai.expect(owner).to.equal(beneficiaryAddress);
 
     // Test getTokenIds()
-    const beneficiaryTokenIds: bigint[] = await lpSftContract.getTokenIds(
-      await beneficiary.getAddress(),
-    );
+    const beneficiaryTokenIds: bigint[] =
+      await lpSftContract.getTokenIds(beneficiaryAddress);
     chai.expect(beneficiaryTokenIds.length).to.equal(1);
     chai.expect(beneficiaryTokenIds[0]).to.equal(LPPOW5_LPNFT_TOKEN_ID);
 
@@ -731,10 +727,7 @@ describe("Bureau 4: Reverse Repo", () => {
       new TestERC20MintableContract(deployer, addressBook.usdcToken!);
 
     // Mint USDC to beneficiary
-    await usdcTokenContract.mint(
-      await beneficiary.getAddress(),
-      PURCHASE_USDC_AMOUNT,
-    );
+    await usdcTokenContract.mint(beneficiaryAddress, PURCHASE_USDC_AMOUNT);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -784,7 +777,7 @@ describe("Bureau 4: Reverse Repo", () => {
     await reverseRepoContract.purchase(
       0n, // gameTokenAmount
       PURCHASE_USDC_AMOUNT, // assetTokenAmount
-      await beneficiary.getAddress(), // receiver
+      beneficiaryAddress, // receiver
     );
   });
 
@@ -796,9 +789,8 @@ describe("Bureau 4: Reverse Repo", () => {
     const { pow5Contract } = beneficiaryContracts;
 
     // Check POW5 balance
-    const pow5Balance: bigint = await pow5Contract.balanceOf(
-      await beneficiary.getAddress(),
-    );
+    const pow5Balance: bigint =
+      await pow5Contract.balanceOf(beneficiaryAddress);
 
     // Calculate DeFi metrics
     const pow5Value: string = ethers.formatUnits(
@@ -829,9 +821,8 @@ describe("Bureau 4: Reverse Repo", () => {
     );
 
     // Check USDC balance
-    const usdcBalance: bigint = await usdcTokenContract.balanceOf(
-      await beneficiary.getAddress(),
-    );
+    const usdcBalance: bigint =
+      await usdcTokenContract.balanceOf(beneficiaryAddress);
     chai.expect(usdcBalance).to.equal(0n);
   });
 
@@ -920,9 +911,8 @@ describe("Bureau 4: Reverse Repo", () => {
     const { pow1Contract } = beneficiaryContracts;
 
     // Check POW1 balance
-    const pow1Balance: bigint = await pow1Contract.balanceOf(
-      await beneficiary.getAddress(),
-    );
+    const pow1Balance: bigint =
+      await pow1Contract.balanceOf(beneficiaryAddress);
     chai.expect(pow1Balance).to.equal(0n);
   });
 
@@ -956,15 +946,12 @@ describe("Bureau 4: Reverse Repo", () => {
     );
 
     // Check balances
-    const pow1Balance: bigint = await pow1Contract.balanceOf(
-      await beneficiary.getAddress(),
-    );
-    const pow5Balance: bigint = await pow5Contract.balanceOf(
-      await beneficiary.getAddress(),
-    );
-    const usdcBalance: bigint = await usdcTokenContract.balanceOf(
-      await beneficiary.getAddress(),
-    );
+    const pow1Balance: bigint =
+      await pow1Contract.balanceOf(beneficiaryAddress);
+    const pow5Balance: bigint =
+      await pow5Contract.balanceOf(beneficiaryAddress);
+    const usdcBalance: bigint =
+      await usdcTokenContract.balanceOf(beneficiaryAddress);
 
     // Calculate token metrics
     const pow1Returned: bigint = pow1Balance;
@@ -1032,15 +1019,12 @@ describe("Bureau 4: Reverse Repo", () => {
     );
 
     // Check balances
-    const pow1Balance: bigint = await pow1Contract.balanceOf(
-      await beneficiary.getAddress(),
-    );
-    const pow5Balance: bigint = await pow5Contract.balanceOf(
-      await beneficiary.getAddress(),
-    );
-    const usdcBalance: bigint = await usdcTokenContract.balanceOf(
-      await beneficiary.getAddress(),
-    );
+    const pow1Balance: bigint =
+      await pow1Contract.balanceOf(beneficiaryAddress);
+    const pow5Balance: bigint =
+      await pow5Contract.balanceOf(beneficiaryAddress);
+    const usdcBalance: bigint =
+      await usdcTokenContract.balanceOf(beneficiaryAddress);
 
     // Calculate DeFi metrics
     const pow1Value: string = ethers.formatUnits(
@@ -1103,17 +1087,19 @@ describe("Bureau 4: Reverse Repo", () => {
     );
 
     // Check LP-NFT owner
-    const owner: string = await uniswapV3NftManagerContract.ownerOf(
+    const owner: `0x${string}` = (await uniswapV3NftManagerContract.ownerOf(
       PURCHASED_LPNFT_TOKEN_ID,
-    );
-    chai.expect(owner).to.equal(await beneficiary.getAddress());
+    )) as `0x${string}`;
+    chai.expect(owner).to.equal(beneficiaryAddress);
   });
 
   it("should check POW5 LP-SFT owner after liquidation", async function (): Promise<void> {
     const { lpSftContract } = deployerContracts;
 
     // Check LP-SFT owner
-    const owner: string = await lpSftContract.ownerOf(PURCHASED_LPNFT_TOKEN_ID);
+    const owner: `0x${string}` = await lpSftContract.ownerOf(
+      PURCHASED_LPNFT_TOKEN_ID,
+    );
     chai.expect(owner).to.equal(ZERO_ADDRESS);
   });
 
@@ -1148,9 +1134,8 @@ describe("Bureau 4: Reverse Repo", () => {
     const { defiManagerContract, pow5Contract } = beneficiaryContracts;
 
     // Check POW5 and NOPOW5 balances
-    const pow5Balance: bigint = await pow5Contract.balanceOf(
-      await beneficiary.getAddress(),
-    );
+    const pow5Balance: bigint =
+      await pow5Contract.balanceOf(beneficiaryAddress);
     const noPow5Balance: bigint = await defiManagerContract.noPow5Balance(
       LPPOW1_LPNFT_TOKEN_ID,
     );
@@ -1177,19 +1162,15 @@ describe("Bureau 4: Reverse Repo", () => {
     const { pow5Contract } = deployerContracts;
 
     // Grant ERC20_ISSUER_ROLE to deployer
-    await pow5Contract.grantRole(
-      ERC20_ISSUER_ROLE,
-      await deployer.getAddress(),
-    );
+    await pow5Contract.grantRole(ERC20_ISSUER_ROLE, deployerAddress);
   });
 
   it("should mint missing POW5 deficit", async function (): Promise<void> {
     const { defiManagerContract, pow5Contract } = deployerContracts;
 
     // Check POW5 and NOPOW5 balances
-    const pow5Balance: bigint = await pow5Contract.balanceOf(
-      await beneficiary.getAddress(),
-    );
+    const pow5Balance: bigint =
+      await pow5Contract.balanceOf(beneficiaryAddress);
     const noPow5Balance: bigint = await defiManagerContract.noPow5Balance(
       LPPOW1_LPNFT_TOKEN_ID,
     );
@@ -1198,16 +1179,15 @@ describe("Bureau 4: Reverse Repo", () => {
     const deficit: bigint = noPow5Balance - pow5Balance;
 
     // Mint missing POW5 deficit
-    await pow5Contract.mint(await beneficiary.getAddress(), deficit);
+    await pow5Contract.mint(beneficiaryAddress, deficit);
   });
 
   it("should log new POW5 balance after minting POW5", async function (): Promise<void> {
     const { pow5Contract } = beneficiaryContracts;
 
     // Check POW5 balance
-    const pow5Balance: bigint = await pow5Contract.balanceOf(
-      await beneficiary.getAddress(),
-    );
+    const pow5Balance: bigint =
+      await pow5Contract.balanceOf(beneficiaryAddress);
 
     // Calculate DeFi metrics
     const pow5Value: string = ethers.formatUnits(
@@ -1263,7 +1243,7 @@ describe("Bureau 4: Reverse Repo", () => {
 
     // Withdraw LP-SFT from YieldHarvest
     await noLpSftContract.safeTransferFrom(
-      await beneficiary.getAddress(),
+      beneficiaryAddress,
       yieldHarvestContract.address,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,

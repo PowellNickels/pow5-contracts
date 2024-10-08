@@ -25,7 +25,7 @@ function ERC1155MetadataURIMixin<T extends new (...args: any[]) => {}>(
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.erc1155MetadataUri = IERC1155MetadataURI__factory.connect(

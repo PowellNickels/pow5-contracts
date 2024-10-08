@@ -33,7 +33,7 @@ const UniswapV3PoolOwnerActionsContract = UniswapV3PoolOwnerActionsMixin(
 class UniswapV3PoolContract extends UniswapV3PoolOwnerActionsContract {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
-    contractAddress: string,
+    contractAddress: `0x${string}`,
   ) {
     super(contractRunner, contractAddress);
   }

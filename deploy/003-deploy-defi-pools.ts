@@ -47,7 +47,8 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Get the deployer signer
   const signers: SignerWithAddress[] = await getUnnamedSigners(hardhat_re);
   const deployer: SignerWithAddress = signers[0];
-  const deployerAddress: string = await deployer.getAddress();
+  const deployerAddress: `0x${string}` =
+    (await deployer.getAddress()) as `0x${string}`;
 
   const opts: DeployOptions = {
     deterministicDeployment: true,
@@ -83,7 +84,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   );
 
   addressBook.wrappedNativeUsdcPoolFactory =
-    wrappedNativeUsdcPoolFactoryReceipt.address;
+    wrappedNativeUsdcPoolFactoryReceipt.address as `0x${string}`;
 
   // Read Uniswap V3 pool address
   const wrappedNativeUsdcPoolFactoryContract = new ethers.Contract(
@@ -91,7 +92,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
     uniV3PoolFactoryAbi,
     deployer,
   );
-  const wrappedNativeUsdcPoolAddress: string =
+  const wrappedNativeUsdcPoolAddress: `0x${string}` =
     await wrappedNativeUsdcPoolFactoryContract.uniswapV3Pool();
   addressBook.wrappedNativeUsdcPool = wrappedNativeUsdcPoolAddress;
 
@@ -101,8 +102,10 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
     uniswapV3PoolAbi,
     deployer,
   );
-  const token0: string = await wrappedNativeUsdcPoolContract.token0();
-  const token1: string = await wrappedNativeUsdcPoolContract.token1();
+  const token0: `0x${string}` =
+    (await wrappedNativeUsdcPoolContract.token0()) as `0x${string}`;
+  const token1: `0x${string}` =
+    (await wrappedNativeUsdcPoolContract.token1()) as `0x${string}`;
 
   if (addressBook.wrappedNativeToken === token0) {
     console.log(`WETH is token0 (${addressBook.wrappedNativeToken})`);

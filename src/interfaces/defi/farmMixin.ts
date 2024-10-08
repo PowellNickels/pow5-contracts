@@ -23,7 +23,7 @@ function FarmMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.farm = IFarm__factory.connect(contractAddress, contractRunner);
@@ -33,11 +33,11 @@ function FarmMixin<T extends new (...args: any[]) => {}>(Base: T) {
       return this.farm.rewardPerToken();
     }
 
-    async earned(account: string): Promise<bigint> {
+    async earned(account: `0x${string}`): Promise<bigint> {
       return this.farm.earned(account);
     }
 
-    async balanceOf(account: string): Promise<bigint> {
+    async balanceOf(account: `0x${string}`): Promise<bigint> {
       return this.farm.balanceOf(account);
     }
 

@@ -23,7 +23,7 @@ function ERC20Mixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.erc20 = IERC20__factory.connect(contractAddress, contractRunner);
@@ -33,12 +33,12 @@ function ERC20Mixin<T extends new (...args: any[]) => {}>(Base: T) {
       return await this.erc20.totalSupply();
     }
 
-    async balanceOf(account: string): Promise<bigint> {
+    async balanceOf(account: `0x${string}`): Promise<bigint> {
       return await this.erc20.balanceOf(account);
     }
 
     async transfer(
-      to: string,
+      to: `0x${string}`,
       value: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
@@ -49,12 +49,15 @@ function ERC20Mixin<T extends new (...args: any[]) => {}>(Base: T) {
       });
     }
 
-    async allowance(owner: string, spender: string): Promise<bigint> {
+    async allowance(
+      owner: `0x${string}`,
+      spender: `0x${string}`,
+    ): Promise<bigint> {
       return await this.erc20.allowance(owner, spender);
     }
 
     async approve(
-      spender: string,
+      spender: `0x${string}`,
       value: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
@@ -68,8 +71,8 @@ function ERC20Mixin<T extends new (...args: any[]) => {}>(Base: T) {
     }
 
     async transferFrom(
-      from: string,
-      to: string,
+      from: `0x${string}`,
+      to: `0x${string}`,
       value: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {

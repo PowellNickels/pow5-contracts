@@ -23,7 +23,7 @@ function DeFiManagerMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.defiManager = IDeFiManager__factory.connect(
@@ -75,7 +75,7 @@ function DeFiManagerMixin<T extends new (...args: any[]) => {}>(Base: T) {
     async issuePow5(
       tokenId: bigint,
       amount: bigint,
-      recipient: string,
+      recipient: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =

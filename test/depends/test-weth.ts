@@ -36,6 +36,7 @@ const DEPOSIT_AMOUNT: bigint = ethers.parseEther("1");
 
 describe("W-ETH", () => {
   let deployer: SignerWithAddress;
+  let deployerAddress: `0x${string}`;
   let addressBook: AddressBook;
   let contracts: ContractLibrary;
 
@@ -48,7 +49,8 @@ describe("W-ETH", () => {
 
     // Use ethers to get the account
     const signers: SignerWithAddress[] = await hardhat.ethers.getSigners();
-    deployer = signers[1];
+    deployer = signers[0];
+    deployerAddress = (await deployer.getAddress()) as `0x${string}`;
 
     // A single fixture is used for the test suite
     await setupTest();
@@ -85,7 +87,7 @@ describe("W-ETH", () => {
     chai.expect(log.address).to.equal(addressBook.wrappedNativeToken!);
     chai.expect(log.fragment.name).to.equal("Deposit");
     chai.expect(log.args.length).to.equal(2);
-    chai.expect(log.args[0]).to.equal(await deployer.getAddress());
+    chai.expect(log.args[0]).to.equal(deployerAddress);
     chai.expect(log.args[1]).to.equal(DEPOSIT_AMOUNT);
   });
 
@@ -93,9 +95,8 @@ describe("W-ETH", () => {
     const { wrappedNativeContract } = contracts;
 
     // Check balance
-    const balance: bigint = await wrappedNativeContract.balanceOf(
-      await deployer.getAddress(),
-    );
+    const balance: bigint =
+      await wrappedNativeContract.balanceOf(deployerAddress);
     chai.expect(balance).to.equal(DEPOSIT_AMOUNT);
   });
 
@@ -121,7 +122,7 @@ describe("W-ETH", () => {
     chai.expect(log.address).to.equal(addressBook.wrappedNativeToken!);
     chai.expect(log.fragment.name).to.equal("Withdrawal");
     chai.expect(log.args.length).to.equal(2);
-    chai.expect(log.args[0]).to.equal(await deployer.getAddress());
+    chai.expect(log.args[0]).to.equal(deployerAddress);
     chai.expect(log.args[1]).to.equal(DEPOSIT_AMOUNT);
   });
 
@@ -129,9 +130,8 @@ describe("W-ETH", () => {
     const { wrappedNativeContract } = contracts;
 
     // Check balance
-    const balance: bigint = await wrappedNativeContract.balanceOf(
-      await deployer.getAddress(),
-    );
+    const balance: bigint =
+      await wrappedNativeContract.balanceOf(deployerAddress);
     chai.expect(balance).to.equal(0n);
   });
 });

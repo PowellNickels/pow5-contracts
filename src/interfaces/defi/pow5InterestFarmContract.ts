@@ -20,7 +20,7 @@ const ERC20InterestFarmContract = ERC20InterestFarmMixin(FarmContract);
 class POW5InterestFarmContract extends ERC20InterestFarmContract {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
-    contractAddress: string,
+    contractAddress: `0x${string}`,
   ) {
     super(contractRunner, contractAddress);
   }

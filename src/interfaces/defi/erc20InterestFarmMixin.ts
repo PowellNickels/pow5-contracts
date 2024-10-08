@@ -23,7 +23,7 @@ function ERC20InterestFarmMixin<T extends new (...args: any[]) => {}>(Base: T) {
 
       const [contractRunner, contractAddress] = args as [
         ethers.Provider | ethers.Signer,
-        string,
+        `0x${string}`,
       ];
 
       this.interestFarm = IERC20InterestFarm__factory.connect(
@@ -33,7 +33,7 @@ function ERC20InterestFarmMixin<T extends new (...args: any[]) => {}>(Base: T) {
     }
 
     async recordLoan(
-      lpSftAddress: string,
+      lpSftAddress: `0x${string}`,
       amount: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
@@ -45,7 +45,7 @@ function ERC20InterestFarmMixin<T extends new (...args: any[]) => {}>(Base: T) {
     }
 
     async recordRepayment(
-      lpSftAddress: string,
+      lpSftAddress: `0x${string}`,
       amount: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
@@ -57,7 +57,7 @@ function ERC20InterestFarmMixin<T extends new (...args: any[]) => {}>(Base: T) {
     }
 
     async claimReward(
-      lpSftAddress: string,
+      lpSftAddress: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =

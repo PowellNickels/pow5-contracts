@@ -51,7 +51,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   } else {
     console.log(`Deploying ${WRAPPED_NATIVE_TOKEN_CONTRACT}`);
     const tx = await deployments.deploy(WRAPPED_NATIVE_TOKEN_CONTRACT, opts);
-    addressBook.wrappedNativeToken = tx.address;
+    addressBook.wrappedNativeToken = tx.address as `0x${string}`;
   }
 
   // Deploy USDC token
@@ -60,7 +60,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   } else {
     console.log(`Deploying ${USDC_CONTRACT}`);
     const tx = await deployments.deploy(USDC_CONTRACT, opts);
-    addressBook.usdcToken = tx.address;
+    addressBook.usdcToken = tx.address as `0x${string}`;
   }
 };
 
