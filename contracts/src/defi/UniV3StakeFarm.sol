@@ -147,8 +147,7 @@ contract UniV3StakeFarm is
     returns (bool)
   {
     return
-      AccessControl.supportsInterface(interfaceId) ||
-      ERC1155Holder.supportsInterface(interfaceId) ||
+      super.supportsInterface(interfaceId) ||
       interfaceId == type(IUniV3StakeFarm).interfaceId;
   }
 

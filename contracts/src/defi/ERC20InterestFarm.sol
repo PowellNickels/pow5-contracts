@@ -134,7 +134,7 @@ contract ERC20InterestFarm is
     bytes4 interfaceId
   ) public view override(AccessControl, IERC165) returns (bool) {
     return
-      AccessControl.supportsInterface(interfaceId) ||
+      super.supportsInterface(interfaceId) ||
       interfaceId == type(IERC20InterestFarm).interfaceId;
   }
 

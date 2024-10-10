@@ -43,7 +43,7 @@ abstract contract ERC20Issuable is AccessControl, ERC20, IERC20Issuable {
     bytes4 interfaceId
   ) public view virtual override(AccessControl, IERC165) returns (bool) {
     return
-      AccessControl.supportsInterface(interfaceId) ||
+      super.supportsInterface(interfaceId) ||
       interfaceId == type(IERC20).interfaceId ||
       interfaceId == type(IERC20Metadata).interfaceId ||
       interfaceId == type(IERC20Issuable).interfaceId;

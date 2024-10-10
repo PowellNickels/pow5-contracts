@@ -83,7 +83,7 @@ abstract contract LPNFTHolder is
     bytes4 interfaceId
   ) public view virtual override(ERC1155, IERC165) returns (bool) {
     return
-      ERC1155.supportsInterface(interfaceId) ||
+      super.supportsInterface(interfaceId) ||
       interfaceId == type(ILPNFTHolder).interfaceId;
   }
 

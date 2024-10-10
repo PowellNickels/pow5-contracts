@@ -135,7 +135,7 @@ contract DeFiManager is ReentrancyGuard, AccessControl, IDeFiManager {
     bytes4 interfaceId
   ) public view virtual override(AccessControl, IERC165) returns (bool) {
     return
-      AccessControl.supportsInterface(interfaceId) ||
+      super.supportsInterface(interfaceId) ||
       type(IDeFiManager).interfaceId == interfaceId;
   }
 
