@@ -151,10 +151,7 @@ contract LPSFT is
     returns (bool)
   {
     return
-      AccessControl.supportsInterface(interfaceId) ||
-      ERC1155Enumerable.supportsInterface(interfaceId) ||
-      LPSFTIssuable.supportsInterface(interfaceId) ||
-      LPNFTHolder.supportsInterface(interfaceId) ||
+      super.supportsInterface(interfaceId) ||
       interfaceId == type(ILPSFT).interfaceId;
   }
 

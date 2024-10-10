@@ -57,8 +57,7 @@ abstract contract LPSFTIssuable is
     returns (bool)
   {
     return
-      AccessControl.supportsInterface(interfaceId) ||
-      ERC1155.supportsInterface(interfaceId) ||
+      super.supportsInterface(interfaceId) ||
       interfaceId == type(ILPSFTIssuable).interfaceId;
   }
 

@@ -13,6 +13,7 @@ import {IERC721Errors} from "@openzeppelin/contracts/interfaces/draft-IERC6093.s
 import {ERC1155Holder} from "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import {Arrays} from "@openzeppelin/contracts/utils/Arrays.sol";
 import {Context} from "@openzeppelin/contracts/utils/Context.sol";
@@ -147,8 +148,8 @@ contract UniV3StakeFarm is
     returns (bool)
   {
     return
-      AccessControl.supportsInterface(interfaceId) ||
-      ERC1155Holder.supportsInterface(interfaceId) ||
+      super.supportsInterface(interfaceId) ||
+      interfaceId == type(IERC721Receiver).interfaceId ||
       interfaceId == type(IUniV3StakeFarm).interfaceId;
   }
 

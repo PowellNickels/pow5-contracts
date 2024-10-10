@@ -176,8 +176,7 @@ contract DutchAuction is
     returns (bool)
   {
     return
-      AccessControl.supportsInterface(interfaceId) ||
-      ERC1155Holder.supportsInterface(interfaceId) ||
+      super.supportsInterface(interfaceId) ||
       interfaceId == type(IERC721Receiver).interfaceId ||
       interfaceId == type(IDutchAuction).interfaceId;
   }

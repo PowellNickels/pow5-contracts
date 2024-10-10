@@ -70,9 +70,7 @@ contract NOLPSFT is ERC1155Enumerable, LPSFTIssuable {
     override(ERC1155Enumerable, LPSFTIssuable)
     returns (bool)
   {
-    return
-      ERC1155Enumerable.supportsInterface(interfaceId) ||
-      LPSFTIssuable.supportsInterface(interfaceId);
+    return super.supportsInterface(interfaceId);
   }
 
   //////////////////////////////////////////////////////////////////////////////
