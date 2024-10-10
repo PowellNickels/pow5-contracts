@@ -13,20 +13,16 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction, DeployOptions } from "hardhat-deploy/types";
 
 import {
-  POW1_POOL_CONTRACT,
-  POW1_POOL_FACTORY_CONTRACT,
-  POW1_POOLER_CONTRACT,
-  POW1_STAKER_CONTRACT,
-  POW1_SWAPPER_CONTRACT,
-  POW5_POOL_CONTRACT,
-  POW5_POOL_FACTORY_CONTRACT,
-  POW5_POOLER_CONTRACT,
-  POW5_STAKER_CONTRACT,
+  DEX_TOKEN_SWAPPER_CONTRACT,
+  POW1_MARKET_POOL_CONTRACT,
+  POW1_MARKET_POOL_FACTORY_CONTRACT,
+  POW1_MARKET_POOLER_CONTRACT,
+  POW1_MARKET_SWAPPER_CONTRACT,
+  POW5_STABLE_POOL_CONTRACT,
+  POW5_STABLE_POOL_FACTORY_CONTRACT,
+  POW5_STABLE_POOLER_CONTRACT,
   POW5_SWAPPER_CONTRACT,
   UNI_V3_POOL_FACTORY_CONTRACT,
-  UNI_V3_POOLER_CONTRACT,
-  UNI_V3_STAKER_CONTRACT,
-  UNI_V3_SWAPPER_CONTRACT,
 } from "../src/hardhat/contracts/dapp";
 import { uniswapV3PoolAbi } from "../src/hardhat/contracts/depends";
 import { getAddressBook, writeAddress } from "../src/hardhat/getAddressBook";
@@ -61,9 +57,9 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Deploy Uniswap V3 pool factory for POW1
   //
 
-  console.log(`Deploying ${POW1_POOL_FACTORY_CONTRACT}`);
-  const pow1PoolFactoryTx = await deployments.deploy(
-    POW1_POOL_FACTORY_CONTRACT,
+  console.log(`Deploying ${POW1_MARKET_POOL_FACTORY_CONTRACT}`);
+  const pow1MarketPoolFactoryTx = await deployments.deploy(
+    POW1_MARKET_POOL_FACTORY_CONTRACT,
     {
       ...opts,
       contract: UNI_V3_POOL_FACTORY_CONTRACT,
@@ -75,65 +71,54 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       ],
     },
   );
-  addressBook.pow1PoolFactory = pow1PoolFactoryTx.address as `0x${string}`;
+  addressBook.pow1MarketPoolFactory =
+    pow1MarketPoolFactoryTx.address as `0x${string}`;
 
   //
   // Read Uniswap V3 pool address for POW1
   //
 
-  addressBook.pow1Pool = await deployments.read(
-    POW1_POOL_FACTORY_CONTRACT,
+  addressBook.pow1MarketPool = await deployments.read(
+    POW1_MARKET_POOL_FACTORY_CONTRACT,
     "uniswapV3Pool",
   );
 
   //
-  // Deploy UniV3Swapper for POW1
+  // Deploy POW1MarketSwapper
   //
 
-  console.log(`Deploying ${POW1_SWAPPER_CONTRACT}`);
-  const pow1SwapperTx = await deployments.deploy(POW1_SWAPPER_CONTRACT, {
-    ...opts,
-    contract: UNI_V3_SWAPPER_CONTRACT,
-    args: [
-      addressBook.pow1Pool!, // uniswapV3Pool
-      addressBook.pow1Token!, // gameToken
-      addressBook.wrappedNativeToken!, // assetToken
-    ],
-  });
-  addressBook.pow1Swapper = pow1SwapperTx.address as `0x${string}`;
+  console.log(`Deploying ${POW1_MARKET_SWAPPER_CONTRACT}`);
+  const pow1MarketSwapperTx = await deployments.deploy(
+    POW1_MARKET_SWAPPER_CONTRACT,
+    {
+      ...opts,
+      args: [
+        addressBook.pow1Token!, // gameToken
+        addressBook.wrappedNativeToken!, // assetToken
+        addressBook.pow1MarketPool!, // uniswapV3Pool
+      ],
+    },
+  );
+  addressBook.pow1MarketSwapper = pow1MarketSwapperTx.address as `0x${string}`;
 
   //
-  // Deploy UniV3Pooler for POW1
+  // Deploy POW1MarketPooler
   //
 
-  console.log(`Deploying ${POW1_POOLER_CONTRACT}`);
-  const pow1PoolerTx = await deployments.deploy(POW1_POOLER_CONTRACT, {
-    ...opts,
-    contract: UNI_V3_POOLER_CONTRACT,
-    args: [
-      addressBook.pow1Swapper!, // uniV3Swapper
-      addressBook.uniswapV3NftManager!, // uniswapV3NftManager
-    ],
-  });
-  addressBook.pow1Pooler = pow1PoolerTx.address as `0x${string}`;
-
-  //
-  // Deploy UniV3Staker for POW1
-  //
-
-  console.log(`Deploying ${POW1_STAKER_CONTRACT}`);
-  const pow1StakerTx = await deployments.deploy(POW1_STAKER_CONTRACT, {
-    ...opts,
-    contract: UNI_V3_STAKER_CONTRACT,
-    args: [
-      deployer, // owner
-      addressBook.pow1Pooler!, // uniV3Pooler
-      addressBook.uniswapV3Staker!, // uniswapV3Staker
-      addressBook.lpSft!, // lpSft
-      addressBook.pow1Token!, // rewardToken
-    ],
-  });
-  addressBook.pow1Staker = pow1StakerTx.address as `0x${string}`;
+  console.log(`Deploying ${POW1_MARKET_POOLER_CONTRACT}`);
+  const pow1MarketPoolerTx = await deployments.deploy(
+    POW1_MARKET_POOLER_CONTRACT,
+    {
+      ...opts,
+      args: [
+        addressBook.pow1Token!, // gameToken
+        addressBook.wrappedNativeToken!, // assetToken
+        addressBook.pow1MarketPool!, // uniswapV3Pool
+        addressBook.uniswapV3NftManager!, // uniswapV3NftManager
+      ],
+    },
+  );
+  addressBook.pow1MarketPooler = pow1MarketPoolerTx.address as `0x${string}`;
 
   //////////////////////////////////////////////////////////////////////////////
   // Deploy POW5 contracts
@@ -143,9 +128,9 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Deploy Uniswap V3 pool factory for POW5
   //
 
-  console.log(`Deploying ${POW5_POOL_FACTORY_CONTRACT}`);
-  const pow5PoolFactoryTx = await deployments.deploy(
-    POW5_POOL_FACTORY_CONTRACT,
+  console.log(`Deploying ${POW5_STABLE_POOL_FACTORY_CONTRACT}`);
+  const pow5StablePoolFactoryTx = await deployments.deploy(
+    POW5_STABLE_POOL_FACTORY_CONTRACT,
     {
       ...opts,
       contract: UNI_V3_POOL_FACTORY_CONTRACT,
@@ -157,65 +142,74 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
       ],
     },
   );
-  addressBook.pow5PoolFactory = pow5PoolFactoryTx.address as `0x${string}`;
+  addressBook.pow5StablePoolFactory =
+    pow5StablePoolFactoryTx.address as `0x${string}`;
 
   //
   // Read Uniswap V3 pool address for POW5
   //
 
-  addressBook.pow5Pool = await deployments.read(
-    POW5_POOL_FACTORY_CONTRACT,
+  addressBook.pow5StablePool = await deployments.read(
+    POW5_STABLE_POOL_FACTORY_CONTRACT,
     "uniswapV3Pool",
   );
 
   //
-  // Deploy UniV3Swapper for POW5
+  // Deploy POW5StableSwapper
   //
 
   console.log(`Deploying ${POW5_SWAPPER_CONTRACT}`);
-  const pow5SwapperTx = await deployments.deploy(POW5_SWAPPER_CONTRACT, {
+  const pow5StableSwapperTx = await deployments.deploy(POW5_SWAPPER_CONTRACT, {
     ...opts,
-    contract: UNI_V3_SWAPPER_CONTRACT,
     args: [
-      addressBook.pow5Pool!, // uniswapV3Pool
       addressBook.pow5Token!, // gameToken
       addressBook.usdcToken!, // assetToken
+      addressBook.pow5StablePool!, // uniswapV3Pool
     ],
   });
-  addressBook.pow5Swapper = pow5SwapperTx.address as `0x${string}`;
+  addressBook.pow5StableSwapper = pow5StableSwapperTx.address as `0x${string}`;
 
   //
-  // Deploy UniV3Pooler for POW5
+  // Deploy POW5StablePooler
   //
 
-  console.log(`Deploying ${POW5_POOLER_CONTRACT}`);
-  const pow5PoolerTx = await deployments.deploy(POW5_POOLER_CONTRACT, {
-    ...opts,
-    contract: UNI_V3_POOLER_CONTRACT,
-    args: [
-      addressBook.pow5Swapper!, // uniV3Swapper
-      addressBook.uniswapV3NftManager!, // uniswapV3NftManager
-    ],
-  });
-  addressBook.pow5Pooler = pow5PoolerTx.address as `0x${string}`;
+  console.log(`Deploying ${POW5_STABLE_POOLER_CONTRACT}`);
+  const pow5StablePoolerTx = await deployments.deploy(
+    POW5_STABLE_POOLER_CONTRACT,
+    {
+      ...opts,
+      args: [
+        addressBook.pow5Token!, // gameToken
+        addressBook.usdcToken!, // assetToken
+        addressBook.pow5StablePool!, // uniswapV3Pool
+        addressBook.uniswapV3NftManager!, // uniswapV3NftManager
+      ],
+    },
+  );
+  addressBook.pow5StablePooler = pow5StablePoolerTx.address as `0x${string}`;
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Deploy DEX contracts
+  //////////////////////////////////////////////////////////////////////////////
 
   //
-  // Deploy UniV3Staker for POW5
+  // Deploy DexTokenSwapper
   //
 
-  console.log(`Deploying ${POW5_STAKER_CONTRACT}`);
-  const pow5StakerTx = await deployments.deploy(POW5_STAKER_CONTRACT, {
-    ...opts,
-    contract: UNI_V3_STAKER_CONTRACT,
-    args: [
-      deployer, // owner
-      addressBook.pow5Pooler!, // uniV3Pooler
-      addressBook.uniswapV3Staker!, // uniswapV3Staker
-      addressBook.lpSft!, // lpSft
-      addressBook.pow1Token!, // rewardToken
-    ],
-  });
-  addressBook.pow5Staker = pow5StakerTx.address as `0x${string}`;
+  console.log(`Deploying ${DEX_TOKEN_SWAPPER_CONTRACT}`);
+  const dexTokenSwapperTx = await deployments.deploy(
+    DEX_TOKEN_SWAPPER_CONTRACT,
+    {
+      ...opts,
+      args: [
+        addressBook.wrappedNativeToken!, // marketToken
+        addressBook.usdcToken!, // stableToken
+        addressBook.wrappedNativeUsdcPool!, // marketStablePool
+      ],
+    },
+  );
+  addressBook.wrappedNativeUsdcSwapper =
+    dexTokenSwapperTx.address as `0x${string}`;
 
   //////////////////////////////////////////////////////////////////////////////
   // Record addresses
@@ -223,14 +217,14 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
 
   writeAddress(
     networkName,
-    POW1_POOL_CONTRACT,
-    addressBook.pow1Pool!,
+    POW1_MARKET_POOL_CONTRACT,
+    addressBook.pow1MarketPool!,
     uniswapV3PoolAbi,
   );
   writeAddress(
     networkName,
-    POW5_POOL_CONTRACT,
-    addressBook.pow5Pool!,
+    POW5_STABLE_POOL_CONTRACT,
+    addressBook.pow5StablePool!,
     uniswapV3PoolAbi,
   );
 };

@@ -24,25 +24,25 @@ interface AddressBook {
   noPow5Token?: `0x${string}`;
   pow1LpNftStakeFarm?: `0x${string}`;
   pow1LpSftLendFarm?: `0x${string}`;
-  pow1Pool?: `0x${string}`;
-  pow1Pooler?: `0x${string}`;
-  pow1PoolFactory?: `0x${string}`;
-  pow1Staker?: `0x${string}`;
-  pow1Swapper?: `0x${string}`;
+  pow1MarketPool?: `0x${string}`;
+  pow1MarketPooler?: `0x${string}`;
+  pow1MarketPoolFactory?: `0x${string}`;
+  pow1MarketSwapper?: `0x${string}`;
   pow1Token?: `0x${string}`;
   pow5InterestFarm?: `0x${string}`;
   pow5LpNftStakeFarm?: `0x${string}`;
   pow5LpSftLendFarm?: `0x${string}`;
-  pow5Pool?: `0x${string}`;
-  pow5Pooler?: `0x${string}`;
-  pow5PoolFactory?: `0x${string}`;
-  pow5Staker?: `0x${string}`;
-  pow5Swapper?: `0x${string}`;
+  pow5StablePool?: `0x${string}`;
+  pow5StablePooler?: `0x${string}`;
+  pow5StablePoolFactory?: `0x${string}`;
+  pow5StableSwapper?: `0x${string}`;
   pow5Token?: `0x${string}`;
   reverseRepo?: `0x${string}`;
   testErc1155Enumerable?: `0x${string}`;
   testLiquidityMath?: `0x${string}`;
+  testPow1MarketStakerContract?: `0x${string}`;
   testPow5InterestFarm?: `0x${string}`;
+  testPow5StableStakerContract?: `0x${string}`;
   testRewardMath?: `0x${string}`;
   testStringUtils?: `0x${string}`;
   testTickMath?: `0x${string}`;
@@ -54,6 +54,7 @@ interface AddressBook {
   wrappedNativeToken?: `0x${string}`;
   wrappedNativeUsdcPool?: `0x${string}`;
   wrappedNativeUsdcPoolFactory?: `0x${string}`;
+  wrappedNativeUsdcSwapper?: `0x${string}`;
   yieldHarvest?: `0x${string}`;
 }
 

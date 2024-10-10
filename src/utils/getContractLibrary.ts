@@ -31,7 +31,10 @@ import { POW5Contract } from "../interfaces/token/erc20/pow5Contract";
 import { WrappedNativeContract } from "../interfaces/token/erc20/wrappedNativeContract";
 import { LPSFTContract } from "../interfaces/token/erc1155/lpSftContract";
 import { NOLPSFTContract } from "../interfaces/token/erc1155/noLpSftContract";
-import { UniV3SwapperContract } from "../interfaces/token/routes/uniV3SwapperContract";
+import { POW1MarketPoolerContract } from "../interfaces/token/routes/pow1MarketPoolerContract";
+import { POW1MarketSwapperContract } from "../interfaces/token/routes/pow1MarketSwapperContract";
+import { POW5StablePoolerContract } from "../interfaces/token/routes/pow5StablePoolerContract";
+import { POW5StableSwapperContract } from "../interfaces/token/routes/pow5StableSwapperContract";
 import { UniswapV3PoolContract } from "../interfaces/uniswap/pool/uniswapV3PoolContract";
 import { ERC20Contract } from "../interfaces/zeppelin/token/erc20/erc20Contract";
 
@@ -70,10 +73,17 @@ function getContractLibrary(
       signer,
       addressBook.pow1LpSftLendFarm!,
     ),
-    pow1PoolContract: new UniswapV3PoolContract(signer, addressBook.pow1Pool!),
-    pow1SwapperContract: new UniV3SwapperContract(
+    pow1MarketPoolContract: new UniswapV3PoolContract(
       signer,
-      addressBook.pow1Swapper!,
+      addressBook.pow1MarketPool!,
+    ),
+    pow1MarketPoolerContract: new POW1MarketPoolerContract(
+      signer,
+      addressBook.pow1MarketPooler!,
+    ),
+    pow1MarketSwapperContract: new POW1MarketSwapperContract(
+      signer,
+      addressBook.pow1MarketSwapper!,
     ),
     pow5Contract: new POW5Contract(signer, addressBook.pow5Token!),
     pow5InterestFarmContract: new POW5InterestFarmContract(
@@ -88,10 +98,17 @@ function getContractLibrary(
       signer,
       addressBook.pow5LpSftLendFarm!,
     ),
-    pow5PoolContract: new UniswapV3PoolContract(signer, addressBook.pow5Pool!),
-    pow5SwapperContract: new UniV3SwapperContract(
+    pow5StablePoolContract: new UniswapV3PoolContract(
       signer,
-      addressBook.pow5Swapper!,
+      addressBook.pow5StablePool!,
+    ),
+    pow5StablePoolerContract: new POW5StablePoolerContract(
+      signer,
+      addressBook.pow5StablePooler!,
+    ),
+    pow5StableSwapperContract: new POW5StableSwapperContract(
+      signer,
+      addressBook.pow5StableSwapper!,
     ),
     reverseRepoContract: new ReverseRepoContract(
       signer,

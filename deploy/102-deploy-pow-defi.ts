@@ -155,7 +155,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
         deployer, // owner
         addressBook.lpSft!, // sftToken
         addressBook.pow1Token!, // rewardToken
-        addressBook.pow5Pool!, // uniswapV3Pool
+        addressBook.pow5StablePool!, // uniswapV3Pool
         addressBook.uniswapV3NftManager!, // uniswapV3NftManager
         addressBook.uniswapV3Staker!, // uniswapV3Staker
       ],

@@ -8,12 +8,12 @@
 
 import { ethers } from "ethers";
 
-import { BaseContract } from "../../baseContract";
-import { UniV3SwapperMixin } from "./uniV3SwapperMixin";
+import { BaseContract } from "../../../baseContract";
+import { TestGameTokenStakerMixin } from "./testGameTokenStakerMixin";
 
-const UniV3SwapperContractBase = UniV3SwapperMixin(BaseContract);
+const TestGameTokenStakerContract = TestGameTokenStakerMixin(BaseContract);
 
-class UniV3SwapperContract extends UniV3SwapperContractBase {
+class TestPOW5StableStakerContract extends TestGameTokenStakerContract {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
     contractAddress: `0x${string}`,
@@ -22,4 +22,4 @@ class UniV3SwapperContract extends UniV3SwapperContractBase {
   }
 }
 
-export { UniV3SwapperContract };
+export { TestPOW5StableStakerContract };

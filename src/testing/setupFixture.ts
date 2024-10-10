@@ -18,8 +18,11 @@ import { getUnnamedSigners } from "hardhat-deploy-ethers/dist/src/helpers";
 import { ContractLibraryEthers } from "../hardhat/contractLibraryEthers";
 import {
   defiManagerAbi,
+  dexTokenSwapperAbi,
   dutchAuctionAbi,
   erc20InterestFarmAbi,
+  gameTokenPoolerAbi,
+  gameTokenSwapperAbi,
   liquidityForgeAbi,
   lpNftStakeFarmAbi,
   lpPow1TokenAbi,
@@ -31,11 +34,8 @@ import {
   pow1TokenAbi,
   pow5TokenAbi,
   reverseRepoAbi,
-  uniV3PoolerAbi,
   uniV3PoolFactoryAbi,
   uniV3StakeFarmAbi,
-  uniV3StakerAbi,
-  uniV3SwapperAbi,
   yieldHarvestAbi,
 } from "../hardhat/contracts/dapp";
 import {
@@ -129,29 +129,24 @@ async function setupFixture(
     lpSftLendFarmAbi,
     beneficiary,
   );
-  const pow1PoolContract = new ethers.Contract(
-    addressBook.pow1Pool!,
+  const pow1MarketPoolContract = new ethers.Contract(
+    addressBook.pow1MarketPool!,
     uniswapV3PoolAbi,
     beneficiary,
   );
-  const pow1PoolerContract = new ethers.Contract(
-    addressBook.pow1Pooler!,
-    uniV3PoolerAbi,
+  const pow1MarketPoolerContract = new ethers.Contract(
+    addressBook.pow1MarketPooler!,
+    gameTokenPoolerAbi,
     beneficiary,
   );
-  const pow1PoolFactoryContract = new ethers.Contract(
-    addressBook.pow1PoolFactory!,
+  const pow1MarketPoolFactoryContract = new ethers.Contract(
+    addressBook.pow1MarketPoolFactory!,
     uniV3PoolFactoryAbi,
     beneficiary,
   );
-  const pow1StakerContract = new ethers.Contract(
-    addressBook.pow1Staker!,
-    uniV3StakerAbi,
-    beneficiary,
-  );
-  const pow1SwapperContract = new ethers.Contract(
-    addressBook.pow1Swapper!,
-    uniV3SwapperAbi,
+  const pow1MarketSwapperContract = new ethers.Contract(
+    addressBook.pow1MarketSwapper!,
+    gameTokenSwapperAbi,
     beneficiary,
   );
   const pow1TokenContract = new ethers.Contract(
@@ -174,29 +169,24 @@ async function setupFixture(
     lpSftLendFarmAbi,
     beneficiary,
   );
-  const pow5PoolContract = new ethers.Contract(
-    addressBook.pow5Pool!,
+  const pow5StablePoolContract = new ethers.Contract(
+    addressBook.pow5StablePool!,
     uniswapV3PoolAbi,
     beneficiary,
   );
-  const pow5PoolerContract = new ethers.Contract(
-    addressBook.pow5Pooler!,
-    uniV3PoolerAbi,
+  const pow5StablePoolerContract = new ethers.Contract(
+    addressBook.pow5StablePooler!,
+    gameTokenPoolerAbi,
     beneficiary,
   );
-  const pow5PoolFactoryContract = new ethers.Contract(
-    addressBook.pow5PoolFactory!,
+  const pow5StablePoolFactoryContract = new ethers.Contract(
+    addressBook.pow5StablePoolFactory!,
     uniV3PoolFactoryAbi,
     beneficiary,
   );
-  const pow5StakerContract = new ethers.Contract(
-    addressBook.pow5Staker!,
-    uniV3StakerAbi,
-    beneficiary,
-  );
-  const pow5SwapperContract = new ethers.Contract(
-    addressBook.pow5Swapper!,
-    uniV3SwapperAbi,
+  const pow5StableSwapperContract = new ethers.Contract(
+    addressBook.pow5StableSwapper!,
+    gameTokenSwapperAbi,
     beneficiary,
   );
   const pow5TokenContract = new ethers.Contract(
@@ -269,6 +259,11 @@ async function setupFixture(
     uniV3PoolFactoryAbi,
     beneficiary,
   );
+  const wrappedNativeUsdcSwapperContract = new ethers.Contract(
+    addressBook.wrappedNativeUsdcSwapper!,
+    dexTokenSwapperAbi,
+    beneficiary,
+  );
   const yieldHarvestContract = new ethers.Contract(
     addressBook.yieldHarvest!,
     yieldHarvestAbi,
@@ -286,20 +281,18 @@ async function setupFixture(
     noPow5TokenContract,
     pow1LpNftStakeFarmContract,
     pow1LpSftLendFarmContract,
-    pow1PoolContract,
-    pow1PoolerContract,
-    pow1PoolFactoryContract,
-    pow1StakerContract,
-    pow1SwapperContract,
+    pow1MarketPoolContract,
+    pow1MarketPoolerContract,
+    pow1MarketPoolFactoryContract,
+    pow1MarketSwapperContract,
     pow1TokenContract,
     pow5InterestFarmContract,
     pow5LpNftStakeFarmContract,
     pow5LpSftLendFarmContract,
-    pow5PoolContract,
-    pow5PoolerContract,
-    pow5PoolFactoryContract,
-    pow5StakerContract,
-    pow5SwapperContract,
+    pow5StablePoolContract,
+    pow5StablePoolerContract,
+    pow5StablePoolFactoryContract,
+    pow5StableSwapperContract,
     pow5TokenContract,
     reverseRepoContract,
     testErc1155EnumerableContract,
@@ -314,6 +307,7 @@ async function setupFixture(
     wrappedNativeTokenContract,
     wrappedNativeUsdcPoolContract,
     wrappedNativeUsdcPoolFactoryContract,
+    wrappedNativeUsdcSwapperContract,
     yieldHarvestContract,
   };
 }

@@ -19,6 +19,8 @@ import testTickMathAbi from "../../abi/contracts/test/utils/math/TestTickMath.so
 // Contract names (sort by constant)
 const TEST_ERC1155_ENUMERABLE_CONTRACT: string = "TestERC1155Enumerable";
 const TEST_LIQUIDITY_MATH_CONTRACT: string = "TestLiquidityMath";
+const TEST_POW1_MARKET_STAKER_CONTRACT: string = "TestPOW1MarketStaker";
+const TEST_POW5_STABLE_STAKER_CONTRACT: string = "TestPOW5StableStaker";
 const TEST_REWARD_MATH_CONTRACT: string = "TestRewardMath";
 const TEST_STRING_UTILS_CONTRACT: string = "TestStringUtils";
 const TEST_TICK_MATH_CONTRACT: string = "TestTickMath";
@@ -32,6 +34,8 @@ export {
   usdcTokenAbi,
   TEST_ERC1155_ENUMERABLE_CONTRACT,
   TEST_LIQUIDITY_MATH_CONTRACT,
+  TEST_POW1_MARKET_STAKER_CONTRACT,
+  TEST_POW5_STABLE_STAKER_CONTRACT,
   TEST_REWARD_MATH_CONTRACT,
   TEST_STRING_UTILS_CONTRACT,
   TEST_TICK_MATH_CONTRACT,

@@ -29,21 +29,21 @@ interface IDutchAuction is IERC165 {
   /**
    * @dev Initialize the Dutch Auction
    *
-   * The Dutch Auction is initialized my minting the first POW1 LP-SFT. No
+   * The Dutch Auction is initialized by minting the first POW1 LP-SFT. No
    * creator tip is paid.
    *
    * It is assumed that this will be the first liquidity deposited in the pool,
-   * so both gameTokenAmount and assetTokenAmount are required to be non-zero.
+   * so both pow1Amount and marketTokenAmount are required to be non-zero.
    *
-   * @param gameTokenAmount The amount of the game token to deposit
-   * @param assetTokenAmount The amount of the asset token to deposit
+   * @param pow1Amount The amount of the game token to deposit
+   * @param marketTokenAmount The amount of the market token to deposit
    * @param receiver The receiver of the POW1 LP-SFT
    *
    * @return nftTokenId The LP-NFT/LP-SFT token ID
    */
   function initialize(
-    uint256 gameTokenAmount,
-    uint256 assetTokenAmount,
+    uint256 pow1Amount,
+    uint256 marketTokenAmount,
     address receiver
   ) external returns (uint256 nftTokenId);
 
@@ -93,23 +93,23 @@ interface IDutchAuction is IERC165 {
   /**
    * @dev Purchase and stake an LP-NFT at the current auction price
    *
-   * If either `gameTokenAmount` or `assetTokenAmount` are zero, the purchase
+   * If either `pow1Amount` or `marketTokenAmount` are zero, the purchase
    * will be done via single-sided supply; about half of one token is swapped
    * for the other before pooling. If neither are zero, the tokens will be
    * supplied to the pool with no swap, and any unconsumed tokens (due to an
    * imbalance with the current pool price) will be returned to the sender.
    *
    * @param slot The auction slot
-   * @param gameTokenAmount The amount of the game token to deposit
-   * @param assetTokenAmount The amount of the asset token to deposit
+   * @param pow1Amount The amount of the game token to deposit
+   * @param marketTokenAmount The amount of the market token to deposit
    * @param receiver The receiver of the LP-SFT
    *
    * @return nftTokenId The LP-NFT/LP-SFT token ID
    */
   function purchase(
     uint256 slot,
-    uint256 gameTokenAmount,
-    uint256 assetTokenAmount,
+    uint256 pow1Amount,
+    uint256 marketTokenAmount,
     address receiver
   ) external returns (uint256 nftTokenId);
 
@@ -117,7 +117,7 @@ interface IDutchAuction is IERC165 {
    * @dev Exit a POW1 LP-SFT position
    *
    * This function allows the LP-SFT owner to exit the pool, receiving their
-   * share of the pool's assets in the form of the asset token. The LP-SFT is
+   * share of the pool's assets in the form of the market token. The LP-SFT is
    * burned in the process. The empty LP-NFT is returned to the sender.
    *
    * @param tokenId The LP-NFT/LP-SFT token ID
