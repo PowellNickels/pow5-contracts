@@ -22,9 +22,10 @@ import {IUniswapV3Pool} from "../../interfaces/uniswap-v3-core/IUniswapV3Pool.so
 import {INonfungiblePositionManager} from "../../interfaces/uniswap-v3-periphery/INonfungiblePositionManager.sol";
 
 import {IDutchAuction} from "../interfaces/bureaus/IDutchAuction.sol";
+import {IUniV3StakeFarm} from "../interfaces/defi/IUniV3StakeFarm.sol";
 import {ILPSFT} from "../interfaces/token/ERC1155/ILPSFT.sol";
-import {IUniV3Pooler} from "../interfaces/token/routes/IUniV3Pooler.sol";
-import {IUniV3Swapper} from "../interfaces/token/routes/IUniV3Swapper.sol";
+import {IGameTokenPooler} from "../interfaces/token/routes/IGameTokenPooler.sol";
+import {IGameTokenSwapper} from "../interfaces/token/routes/IGameTokenSwapper.sol";
 import {VRGDA} from "../utils/auction/VRGDA.sol";
 import {LiquidityMath} from "../utils/math/LiquidityMath.sol";
 
@@ -47,14 +48,34 @@ contract DutchAuction is
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @dev The native game token
+   * @dev The POW1 token
    */
-  IERC20 public immutable gameToken;
+  IERC20 public immutable pow1Token;
 
   /**
-   * @dev The yielding asset token
+   * @dev The market token
    */
-  IERC20 public immutable assetToken;
+  IERC20 public immutable marketToken;
+
+  /**
+   * @dev The upstream Uniswap V3 pool for the POW1/market token pair
+   */
+  IUniswapV3Pool public immutable pow1MarketPool;
+
+  /**
+   * @dev The POW1 swapper
+   */
+  IGameTokenSwapper public immutable pow1MarketSwapper;
+
+  /**
+   * @dev The POW1 pooler
+   */
+  IGameTokenPooler public immutable pow1MarketPooler;
+
+  /**
+   * @dev The POW1 LP-NFT stake farm
+   */
+  IUniV3StakeFarm public immutable pow1LpNftStakeFarm;
 
   /**
    * @dev The LP-SFT contract
@@ -62,29 +83,9 @@ contract DutchAuction is
   ILPSFT public immutable lpSft;
 
   /**
-   * @dev The UniV3 pooler
-   */
-  IUniV3Pooler public immutable uniV3Pooler;
-
-  /**
-   * @dev The UniV3 swapper
-   */
-  IUniV3Swapper public immutable uniV3Swapper;
-
-  /**
-   * @dev The LP-NFT stake farm
-   */
-  address public immutable lpNftStakeFarm;
-
-  /**
    * @dev The upstream Uniswap V3 NFT manager
    */
   INonfungiblePositionManager public immutable uniswapV3NftManager;
-
-  /**
-   * @dev The upstream Uniswap V3 pool
-   */
-  IUniswapV3Pool public immutable uniswapV3Pool;
 
   //////////////////////////////////////////////////////////////////////////////
   // State
@@ -113,49 +114,49 @@ contract DutchAuction is
    * @dev Initializes the Dutch Auction contract
    *
    * @param owner_ The owner of the Dutch Auction
-   * @param gameToken_ The native game token
-   * @param assetToken_ The yielding asset token
+   * @param pow1Token_ The POW1 token
+   * @param marketToken_ The market token
+   * @param pow1MarketPool_ The upstream Uniswap V3 pool for the token pair
+   * @param pow1MarketSwapper_ The POW1 swapper
+   * @param pow1MarketPooler_ The POW1 pooler
+   * @param pow1LpNftStakeFarm_ The POW1 LP-NFT stake farm
    * @param lpSft_ The LP-SFT contract
-   * @param uniV3Pooler_ The UniV3 pooler
-   * @param uniV3Swapper_ The UniV3 swapper
-   * @param lpNftStakeFarm_ The LP-NFT stake farm
    * @param uniswapV3NftManager_ The upstream Uniswap V3 NFT manager
-   * @param uniswapV3Pool_ The upstream Uniswap V3 pool
    */
   constructor(
     address owner_,
-    address gameToken_,
-    address assetToken_,
+    address pow1Token_,
+    address marketToken_,
+    address pow1MarketPool_,
+    address pow1MarketSwapper_,
+    address pow1MarketPooler_,
+    address pow1LpNftStakeFarm_,
     address lpSft_,
-    address uniV3Pooler_,
-    address uniV3Swapper_,
-    address lpNftStakeFarm_,
-    address uniswapV3NftManager_,
-    address uniswapV3Pool_
+    address uniswapV3NftManager_
   ) {
     // Validate parameters
     require(owner_ != address(0), "Invalid owner");
-    require(gameToken_ != address(0), "Invalid game token");
-    require(assetToken_ != address(0), "Invalid asset token");
+    require(pow1Token_ != address(0), "Invalid POW1");
+    require(marketToken_ != address(0), "Invalid market token");
+    require(pow1MarketPool_ != address(0), "Invalid POW1 pool");
+    require(pow1MarketSwapper_ != address(0), "Invalid POW1 swapper");
+    require(pow1MarketPooler_ != address(0), "Invalid POW1 pooler");
+    require(pow1LpNftStakeFarm_ != address(0), "Invalid POW1 stake farm");
     require(lpSft_ != address(0), "Invalid LP-SFT");
-    require(uniV3Pooler_ != address(0), "Invalid pooler");
-    require(uniV3Swapper_ != address(0), "Invalid swapper");
-    require(lpNftStakeFarm_ != address(0), "Invalid farm");
-    require(uniswapV3NftManager_ != address(0), "Invalid mgr");
-    require(uniswapV3Pool_ != address(0), "Invalid pool");
+    require(uniswapV3NftManager_ != address(0), "Invalid NFT mgr");
 
     // Initialize {AccessControl}
     _grantRole(DEFAULT_ADMIN_ROLE, owner_);
 
     // Initialize routes
-    gameToken = IERC20(gameToken_);
-    assetToken = IERC20(assetToken_);
+    pow1Token = IERC20(pow1Token_);
+    marketToken = IERC20(marketToken_);
+    pow1MarketPool = IUniswapV3Pool(pow1MarketPool_);
+    pow1MarketSwapper = IGameTokenSwapper(pow1MarketSwapper_);
+    pow1MarketPooler = IGameTokenPooler(pow1MarketPooler_);
+    pow1LpNftStakeFarm = IUniV3StakeFarm(pow1LpNftStakeFarm_);
     lpSft = ILPSFT(lpSft_);
-    uniV3Pooler = IUniV3Pooler(uniV3Pooler_);
-    uniV3Swapper = IUniV3Swapper(uniV3Swapper_);
-    lpNftStakeFarm = lpNftStakeFarm_;
     uniswapV3NftManager = INonfungiblePositionManager(uniswapV3NftManager_);
-    uniswapV3Pool = IUniswapV3Pool(uniswapV3Pool_);
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -189,16 +190,16 @@ contract DutchAuction is
    * @dev See {IDutchAuction-initialize}
    */
   function initialize(
-    uint256 gameTokenAmount,
-    uint256 assetTokenAmount,
+    uint256 pow1Amount,
+    uint256 marketTokenAmount,
     address receiver
   ) external override nonReentrant returns (uint256 nftTokenId) {
     // Validate access
     _checkRole(DEFAULT_ADMIN_ROLE);
 
     // Validate parameters
-    require(gameTokenAmount > 0, "Invalid game amount");
-    require(assetTokenAmount > 0, "Invalid asset amount");
+    require(pow1Amount > 0, "Invalid POW1 amount");
+    require(marketTokenAmount > 0, "Invalid market amount");
     require(receiver != address(0), "Invalid receiver");
 
     // Validate state
@@ -208,23 +209,30 @@ contract DutchAuction is
     _initialized = true;
 
     // Call external contracts
-    gameToken.safeTransferFrom(_msgSender(), address(this), gameTokenAmount);
-    assetToken.safeTransferFrom(_msgSender(), address(this), assetTokenAmount);
+    pow1Token.safeTransferFrom(_msgSender(), address(this), pow1Amount);
+    marketToken.safeTransferFrom(
+      _msgSender(),
+      address(this),
+      marketTokenAmount
+    );
 
-    gameToken.safeIncreaseAllowance(address(uniV3Pooler), gameTokenAmount);
-    assetToken.safeIncreaseAllowance(address(uniV3Pooler), assetTokenAmount);
+    pow1Token.safeIncreaseAllowance(address(pow1MarketPooler), pow1Amount);
+    marketToken.safeIncreaseAllowance(
+      address(pow1MarketPooler),
+      marketTokenAmount
+    );
 
     // Mint an LP-NFT
-    nftTokenId = uniV3Pooler.mintNFTImbalance(
-      gameTokenAmount,
-      assetTokenAmount,
+    nftTokenId = pow1MarketPooler.mintLpNftImbalance(
+      pow1Amount,
+      marketTokenAmount,
       address(this)
     );
 
     // Stake LP-NFT in the stake farm
     uniswapV3NftManager.safeTransferFrom(
       address(this),
-      lpNftStakeFarm,
+      address(pow1LpNftStakeFarm),
       nftTokenId,
       ""
     );
@@ -233,16 +241,16 @@ contract DutchAuction is
     address lpSftAddress = lpSft.tokenIdToAddress(nftTokenId);
     require(lpSftAddress != address(0), "Invalid LP-SFT");
 
-    // Send game token dust to the LP-SFT
-    uint256 gameTokenDust = gameToken.balanceOf(address(this));
-    if (gameTokenDust > 0) {
-      gameToken.safeTransfer(lpSftAddress, gameTokenDust);
+    // Send POW1 dust to the LP-SFT
+    uint256 pow1Dust = pow1Token.balanceOf(address(this));
+    if (pow1Dust > 0) {
+      pow1Token.safeTransfer(lpSftAddress, pow1Dust);
     }
 
     // Send asset token dust to the receiver
-    uint256 assetTokenDust = assetToken.balanceOf(address(this));
-    if (assetTokenDust > 0) {
-      assetToken.safeTransfer(receiver, assetTokenDust);
+    uint256 marketTokenDust = marketToken.balanceOf(address(this));
+    if (marketTokenDust > 0) {
+      marketToken.safeTransfer(receiver, marketTokenDust);
     }
 
     // Return the LP-SFT to the receiver
@@ -282,18 +290,21 @@ contract DutchAuction is
     VRGDA auction = new VRGDA(targetPrice, priceDecayConstant);
 
     // Get token balances, as Uniswap V3 can't mint a token with zero liquidity
-    uint256 gameTokenBalance = gameToken.balanceOf(address(this));
-    uint256 assetTokenBalance = assetToken.balanceOf(address(this));
+    uint256 pow1Balance = pow1Token.balanceOf(address(this));
+    uint256 marketTokenBalance = marketToken.balanceOf(address(this));
 
     // Approve pooler to spend tokens
-    gameToken.safeIncreaseAllowance(address(uniV3Pooler), gameTokenBalance);
-    assetToken.safeIncreaseAllowance(address(uniV3Pooler), assetTokenBalance);
+    pow1Token.safeIncreaseAllowance(address(pow1MarketPooler), pow1Balance);
+    marketToken.safeIncreaseAllowance(
+      address(pow1MarketPooler),
+      marketTokenBalance
+    );
 
     // Mint an LP-NFT
     // slither-disable-next-line reentrancy-no-eth
-    uint256 nftTokenId = uniV3Pooler.mintNFTImbalance(
-      gameTokenBalance,
-      assetTokenBalance,
+    uint256 nftTokenId = pow1MarketPooler.mintLpNftImbalance(
+      pow1Balance,
+      marketTokenBalance,
       address(this)
     );
 
@@ -330,15 +341,16 @@ contract DutchAuction is
       })
     );
 
-    // Allow at most a small loss of the game token
+    // Allow at most a small loss of the POW1
     require(
-      gameToken.balanceOf(address(this)) + dustLossAmount >= gameTokenBalance,
+      pow1Token.balanceOf(address(this)) + dustLossAmount >= pow1Balance,
       "Game token loss"
     );
 
     // Allow at most a small loss of the asset token
     require(
-      assetToken.balanceOf(address(this)) + dustLossAmount >= assetTokenBalance,
+      marketToken.balanceOf(address(this)) + dustLossAmount >=
+        marketTokenBalance,
       "Asset token loss"
     );
 
@@ -390,12 +402,12 @@ contract DutchAuction is
    */
   function purchase(
     uint256 slot,
-    uint256 gameTokenAmount,
-    uint256 assetTokenAmount,
+    uint256 pow1Amount,
+    uint256 marketTokenAmount,
     address receiver
   ) external override nonReentrant returns (uint256 nftTokenId) {
     // Validate parameters
-    require(gameTokenAmount > 0 || assetTokenAmount > 0, "Invalid amounts");
+    require(pow1Amount > 0 || marketTokenAmount > 0, "Invalid amounts");
     require(receiver != address(0), "Invalid receiver");
 
     // Read state
@@ -408,101 +420,109 @@ contract DutchAuction is
     uint256 creatorTipBips = auction.getVRGDAPrice(timeSinceStart, sold) / 1e18;
 
     // Calculate the auction tip
-    uint256 gameTipAmount = (gameTokenAmount * creatorTipBips) / 1e4;
-    uint256 assetTipAmount = (assetTokenAmount * creatorTipBips) / 1e4;
+    uint256 pow1TipAmount = (pow1Amount * creatorTipBips) / 1e4;
+    uint256 marketTipAmount = (marketTokenAmount * creatorTipBips) / 1e4;
 
     // Calculate the deposited liquidity
-    uint256 gameLiquidityAmount = gameTokenAmount - gameTipAmount;
-    uint256 assetLiquidityAmount = assetTokenAmount - assetTipAmount;
+    uint256 pow1LiquidityAmount = pow1Amount - pow1TipAmount;
+    uint256 marketLiquidityAmount = marketTokenAmount - marketTipAmount;
 
     // Get the pool fee
-    uint24 poolFee = uniswapV3Pool.fee();
+    uint24 poolFee = pow1MarketPool.fee();
 
     // Validate state
-    require(gameTipAmount > 0 || assetTipAmount > 0, "Invalid tips");
+    require(pow1TipAmount > 0 || marketTipAmount > 0, "Invalid tips");
     require(
-      gameLiquidityAmount > 0 || assetLiquidityAmount > 0,
+      pow1LiquidityAmount > 0 || marketLiquidityAmount > 0,
       "Invalid liquidity"
     );
 
     // Call external contracts
-    if (gameTokenAmount > 0) {
-      gameToken.safeTransferFrom(_msgSender(), address(this), gameTokenAmount);
+    if (pow1Amount > 0) {
+      pow1Token.safeTransferFrom(_msgSender(), address(this), pow1Amount);
     }
-    if (assetTokenAmount > 0) {
-      assetToken.safeTransferFrom(
+    if (marketTokenAmount > 0) {
+      marketToken.safeTransferFrom(
         _msgSender(),
         address(this),
-        assetTokenAmount
+        marketTokenAmount
       );
     }
 
     // Perform single-sided supply swap
-    if (gameLiquidityAmount == 0) {
+    if (pow1LiquidityAmount == 0) {
       // Get asset token reserve
-      uint256 assetTokenReserve = assetToken.balanceOf(address(uniswapV3Pool));
+      uint256 marketTokenReserve = marketToken.balanceOf(
+        address(pow1MarketPool)
+      );
 
       // Calculate asset swap amount
       uint256 assetSwapAmount = LiquidityMath.computeSwapAmountV2(
-        assetTokenReserve,
-        assetLiquidityAmount,
+        marketTokenReserve,
+        marketLiquidityAmount,
         poolFee
       );
-      require(assetSwapAmount <= assetLiquidityAmount, "Bad liquidity math");
+      require(assetSwapAmount <= marketLiquidityAmount, "Bad liquidity math");
 
       // Approve swap
-      assetToken.safeIncreaseAllowance(address(uniV3Swapper), assetSwapAmount);
+      marketToken.safeIncreaseAllowance(
+        address(pow1MarketSwapper),
+        assetSwapAmount
+      );
 
       // Perform swap
-      gameLiquidityAmount = uniV3Swapper.buyGameToken(
+      pow1LiquidityAmount = pow1MarketSwapper.buyGameToken(
         assetSwapAmount,
         address(this)
       );
 
       // Update amount
-      assetLiquidityAmount -= assetSwapAmount;
-    } else if (assetLiquidityAmount == 0) {
-      // Get game token reserve
-      uint256 gameTokenReserve = gameToken.balanceOf(address(uniswapV3Pool));
+      marketLiquidityAmount -= assetSwapAmount;
+    } else if (marketLiquidityAmount == 0) {
+      // Get POW1 reserve
+      uint256 pow1Reserve = pow1Token.balanceOf(address(pow1MarketPool));
 
       // Calculate game swap amount
       uint256 gameSwapAmount = LiquidityMath.computeSwapAmountV2(
-        gameTokenReserve,
-        gameLiquidityAmount,
+        pow1Reserve,
+        pow1LiquidityAmount,
         poolFee
       );
-      require(gameSwapAmount <= gameLiquidityAmount, "Bad liquidity math");
+      require(gameSwapAmount <= pow1LiquidityAmount, "Bad liquidity math");
 
       // Approve swap
-      gameToken.safeIncreaseAllowance(address(uniV3Swapper), gameSwapAmount);
+      pow1Token.safeIncreaseAllowance(
+        address(pow1MarketSwapper),
+        gameSwapAmount
+      );
 
       // Perform swap
-      assetLiquidityAmount = uniV3Swapper.sellGameToken(
+      marketLiquidityAmount = pow1MarketSwapper.sellGameToken(
         gameSwapAmount,
         address(this)
       );
 
       // Update amount
-      gameLiquidityAmount -= gameSwapAmount;
+      pow1LiquidityAmount -= gameSwapAmount;
     }
 
     // Validate state
     require(
-      gameLiquidityAmount > 0 || assetLiquidityAmount > 0,
+      pow1LiquidityAmount > 0 || marketLiquidityAmount > 0,
       "Invalid liquidity"
     );
 
     // Call external contracts
-    if (gameLiquidityAmount > 0) {
-      gameToken.safeIncreaseAllowance(
+    if (pow1LiquidityAmount > 0) {
+      pow1Token.safeIncreaseAllowance(
         address(uniswapV3NftManager),
-        gameLiquidityAmount
+        pow1LiquidityAmount
       );
     }
-    if (assetLiquidityAmount > 0) {
-      assetToken.safeIncreaseAllowance(
+    if (marketLiquidityAmount > 0) {
+      marketToken.safeIncreaseAllowance(
         address(uniswapV3NftManager),
-        assetLiquidityAmount
+        marketLiquidityAmount
       );
     }
 
@@ -511,12 +531,12 @@ contract DutchAuction is
     uniswapV3NftManager.increaseLiquidity(
       INonfungiblePositionManager.IncreaseLiquidityParams({
         tokenId: nftTokenId,
-        amount0Desired: address(gameToken) < address(assetToken)
-          ? gameLiquidityAmount
-          : assetLiquidityAmount,
-        amount1Desired: address(gameToken) < address(assetToken)
-          ? assetLiquidityAmount
-          : gameLiquidityAmount,
+        amount0Desired: address(pow1Token) < address(marketToken)
+          ? pow1LiquidityAmount
+          : marketLiquidityAmount,
+        amount1Desired: address(pow1Token) < address(marketToken)
+          ? marketLiquidityAmount
+          : pow1LiquidityAmount,
         amount0Min: 0,
         amount1Min: 0,
         // slither-disable-next-line timestamp
@@ -527,7 +547,7 @@ contract DutchAuction is
     // Stake LP-NFT in the stake farm
     uniswapV3NftManager.safeTransferFrom(
       address(this),
-      lpNftStakeFarm,
+      address(pow1LpNftStakeFarm),
       nftTokenId,
       ""
     );
@@ -548,15 +568,21 @@ contract DutchAuction is
     // Validate state
     require(lpSft.ownerOf(tokenId) == _msgSender(), "Not LP-SFT owner");
 
-    // Record game token balance to track any recovered from the LP-SFT
-    uint256 gameTokenBalance = gameToken.balanceOf(address(this));
-    uint256 assetTokenBalance = assetToken.balanceOf(address(this));
+    // Record POW1 balance to track any recovered from the LP-SFT
+    uint256 pow1Balance = pow1Token.balanceOf(address(this));
+    uint256 marketTokenBalance = marketToken.balanceOf(address(this));
 
     // Transfer the LP-SFT to the contract
     lpSft.safeTransferFrom(_msgSender(), address(this), tokenId, 1, "");
 
     // Transfer the LP-SFT to the LP-NFT stake farm
-    lpSft.safeTransferFrom(address(this), lpNftStakeFarm, tokenId, 1, "");
+    lpSft.safeTransferFrom(
+      address(this),
+      address(pow1LpNftStakeFarm),
+      tokenId,
+      1,
+      ""
+    );
 
     // Read state
     // slither-disable-next-line unused-return
@@ -596,19 +622,16 @@ contract DutchAuction is
     );
 
     // Return tokens recovered from burning the LP-SFT
-    uint256 newGameTokenBalance = gameToken.balanceOf(address(this));
-    uint256 newAssetTokenBalance = assetToken.balanceOf(address(this));
+    uint256 newPow1Balance = pow1Token.balanceOf(address(this));
+    uint256 newMarketTokenBalance = marketToken.balanceOf(address(this));
 
-    if (newGameTokenBalance > gameTokenBalance) {
-      gameToken.safeTransfer(
-        address(this),
-        newGameTokenBalance - gameTokenBalance
-      );
+    if (newPow1Balance > pow1Balance) {
+      pow1Token.safeTransfer(address(this), newPow1Balance - pow1Balance);
     }
-    if (newAssetTokenBalance > assetTokenBalance) {
-      assetToken.safeTransfer(
+    if (newMarketTokenBalance > marketTokenBalance) {
+      marketToken.safeTransfer(
         address(this),
-        newAssetTokenBalance - assetTokenBalance
+        newMarketTokenBalance - marketTokenBalance
       );
     }
 

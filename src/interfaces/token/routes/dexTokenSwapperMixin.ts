@@ -8,14 +8,14 @@
 
 import { ethers } from "ethers";
 
-import { IReverseRepo } from "../../types/contracts/src/interfaces/bureaus/IReverseRepo";
-import { IReverseRepo__factory } from "../../types/factories/contracts/src/interfaces/bureaus/IReverseRepo__factory";
-import { BaseMixin } from "../baseMixin";
+import { IDexTokenSwapper } from "../../../types/contracts/src/interfaces/token/routes/IDexTokenSwapper";
+import { IDexTokenSwapper__factory } from "../../../types/factories/contracts/src/interfaces/token/routes/IDexTokenSwapper__factory";
+import { BaseMixin } from "../../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
-function ReverseRepoMixin<T extends new (...args: any[]) => {}>(Base: T) {
+function DexTokenSwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
   return class extends BaseMixin(Base) {
-    private reverseRepo: IReverseRepo;
+    private dexTokenSwapper: IDexTokenSwapper;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
@@ -26,50 +26,46 @@ function ReverseRepoMixin<T extends new (...args: any[]) => {}>(Base: T) {
         `0x${string}`,
       ];
 
-      this.reverseRepo = IReverseRepo__factory.connect(
+      this.dexTokenSwapper = IDexTokenSwapper__factory.connect(
         contractAddress,
         contractRunner,
       );
     }
 
-    async initialize(
-      pow5Amount: bigint,
+    async buyMarketToken(
       stableTokenAmount: bigint,
-      receiver: `0x${string}`,
+      recipient: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.reverseRepo.initialize(
-            pow5Amount,
+          await this.dexTokenSwapper.buyMarketToken(
             stableTokenAmount,
-            receiver,
+            recipient,
           );
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
     }
 
-    async purchase(
-      pow5Amount: bigint,
-      stableTokenAmount: bigint,
-      receiver: `0x${string}`,
+    async sellMarketToken(
+      marketTokenAmount: bigint,
+      recipient: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.reverseRepo.purchase(
-            pow5Amount,
-            stableTokenAmount,
-            receiver,
+          await this.dexTokenSwapper.sellMarketToken(
+            marketTokenAmount,
+            recipient,
           );
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
     }
 
-    async exit(tokenId: bigint): Promise<ethers.ContractTransactionReceipt> {
+    async exit(): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.reverseRepo.exit(tokenId);
+          await this.dexTokenSwapper.exit();
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
@@ -77,4 +73,4 @@ function ReverseRepoMixin<T extends new (...args: any[]) => {}>(Base: T) {
   };
 }
 
-export { ReverseRepoMixin };
+export { DexTokenSwapperMixin };

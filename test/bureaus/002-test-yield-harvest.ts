@@ -110,7 +110,7 @@ describe("Bureau 2: Yield Harvest", () => {
       lpSftContract,
       pow1Contract,
       pow1LpNftStakeFarmContract,
-      pow1PoolContract,
+      pow1MarketPoolContract,
       wrappedNativeContract,
     } = deployerContracts;
 
@@ -136,8 +136,8 @@ describe("Bureau 2: Yield Harvest", () => {
 
     // Initialize the Uniswap V3 pool
     let pow1IsToken0: boolean;
-    const token0: `0x${string}` = await pow1PoolContract.token0();
-    const token1: `0x${string}` = await pow1PoolContract.token1();
+    const token0: `0x${string}` = await pow1MarketPoolContract.token0();
+    const token1: `0x${string}` = await pow1MarketPoolContract.token1();
     if (
       token0.toLowerCase() === pow1Contract.address.toLowerCase() &&
       token1.toLowerCase() === wrappedNativeContract.address.toLowerCase()
@@ -152,7 +152,7 @@ describe("Bureau 2: Yield Harvest", () => {
       throw new Error("POW1 pool tokens are incorrect");
     }
     chai.expect(pow1IsToken0).to.be.a("boolean");
-    await pow1PoolContract.initialize(
+    await pow1MarketPoolContract.initialize(
       encodePriceSqrt(
         pow1IsToken0 ? INITIAL_WETH_AMOUNT : INITIAL_POW1_SUPPLY,
         pow1IsToken0 ? INITIAL_POW1_SUPPLY : INITIAL_WETH_AMOUNT,

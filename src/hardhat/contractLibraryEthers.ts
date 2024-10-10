@@ -25,20 +25,18 @@ interface ContractLibraryEthers {
   noPow5TokenContract: ethers.Contract;
   pow1LpNftStakeFarmContract: ethers.Contract;
   pow1LpSftLendFarmContract: ethers.Contract;
-  pow1PoolContract: ethers.Contract;
-  pow1PoolerContract: ethers.Contract;
-  pow1PoolFactoryContract: ethers.Contract;
-  pow1StakerContract: ethers.Contract;
-  pow1SwapperContract: ethers.Contract;
+  pow1MarketPoolContract: ethers.Contract;
+  pow1MarketPoolerContract: ethers.Contract;
+  pow1MarketPoolFactoryContract: ethers.Contract;
+  pow1MarketSwapperContract: ethers.Contract;
   pow1TokenContract: ethers.Contract;
   pow5InterestFarmContract: ethers.Contract;
   pow5LpNftStakeFarmContract: ethers.Contract;
   pow5LpSftLendFarmContract: ethers.Contract;
-  pow5PoolContract: ethers.Contract;
-  pow5PoolerContract: ethers.Contract;
-  pow5PoolFactoryContract: ethers.Contract;
-  pow5StakerContract: ethers.Contract;
-  pow5SwapperContract: ethers.Contract;
+  pow5StablePoolContract: ethers.Contract;
+  pow5StablePoolerContract: ethers.Contract;
+  pow5StablePoolFactoryContract: ethers.Contract;
+  pow5StableSwapperContract: ethers.Contract;
   pow5TokenContract: ethers.Contract;
   reverseRepoContract: ethers.Contract;
   testErc1155EnumerableContract: ethers.Contract;
@@ -53,6 +51,7 @@ interface ContractLibraryEthers {
   wrappedNativeTokenContract: ethers.Contract;
   wrappedNativeUsdcPoolContract: ethers.Contract;
   wrappedNativeUsdcPoolFactoryContract: ethers.Contract;
+  wrappedNativeUsdcSwapperContract: ethers.Contract;
   yieldHarvestContract: ethers.Contract;
 }
 

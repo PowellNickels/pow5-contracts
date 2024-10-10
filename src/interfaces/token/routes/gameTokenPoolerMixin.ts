@@ -8,14 +8,14 @@
 
 import { ethers } from "ethers";
 
-import { IDutchAuction } from "../../types/contracts/src/interfaces/bureaus/IDutchAuction";
-import { IDutchAuction__factory } from "../../types/factories/contracts/src/interfaces/bureaus/IDutchAuction__factory";
-import { BaseMixin } from "../baseMixin";
+import { IGameTokenPooler } from "../../../types/contracts/src/interfaces/token/routes/IGameTokenPooler";
+import { IGameTokenPooler__factory } from "../../../types/factories/contracts/src/interfaces/token/routes/IGameTokenPooler__factory";
+import { BaseMixin } from "../../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
-function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
+function GameTokenPoolerMixin<T extends new (...args: any[]) => {}>(Base: T) {
   return class extends BaseMixin(Base) {
-    private dutchAuction: IDutchAuction;
+    private gameTokenPooler: IGameTokenPooler;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
@@ -26,90 +26,81 @@ function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
         `0x${string}`,
       ];
 
-      this.dutchAuction = IDutchAuction__factory.connect(
+      this.gameTokenPooler = IGameTokenPooler__factory.connect(
         contractAddress,
         contractRunner,
       );
     }
 
-    async initialize(
-      pow1Amount: bigint,
-      marketTokenAmount: bigint,
-      receiver: `0x${string}`,
+    async gameIsToken0(): Promise<boolean> {
+      return this.gameTokenPooler.gameIsToken0();
+    }
+
+    async mintLpNftWithGameToken(
+      gameTokenAmount: bigint,
+      recipient: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.dutchAuction.initialize(
-            pow1Amount,
-            marketTokenAmount,
-            receiver,
+          await this.gameTokenPooler.mintLpNftWithGameToken(
+            gameTokenAmount,
+            recipient,
           );
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
     }
 
-    async isInitialized(): Promise<boolean> {
-      return await this.dutchAuction.isInitialized();
-    }
-
-    async setAuction(
-      slot: bigint,
-      targetPrice: bigint,
-      priceDecayConstant: bigint,
-      dustLossAmount: bigint,
+    async mintLpNftWithAssetToken(
+      assetTokenAmount: bigint,
+      recipient: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.dutchAuction.setAuction(
-            slot,
-            targetPrice,
-            priceDecayConstant,
-            dustLossAmount,
+          await this.gameTokenPooler.mintLpNftWithAssetToken(
+            assetTokenAmount,
+            recipient,
           );
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
     }
 
-    async removeAuction(
-      slot: bigint,
+    async mintLpNftImbalance(
+      gameTokenAmount: bigint,
+      assetTokenAmount: bigint,
+      recipient: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.dutchAuction.removeAuction(slot);
-
-        return (await tx.wait()) as ethers.ContractTransactionReceipt;
-      });
-    }
-
-    async getPrice(slot: bigint): Promise<bigint> {
-      return await this.dutchAuction.getPrice(slot);
-    }
-
-    async purchase(
-      slot: bigint,
-      pow1Amount: bigint,
-      marketTokenAmount: bigint,
-      receiver: `0x${string}`,
-    ): Promise<ethers.ContractTransactionReceipt> {
-      return this.withSigner(async () => {
-        const tx: ethers.ContractTransactionResponse =
-          await this.dutchAuction.purchase(
-            slot,
-            pow1Amount,
-            marketTokenAmount,
-            receiver,
+          await this.gameTokenPooler.mintLpNftImbalance(
+            gameTokenAmount,
+            assetTokenAmount,
+            recipient,
           );
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
     }
 
-    async exit(tokenId: bigint): Promise<ethers.ContractTransactionReceipt> {
+    async collectFromLpNft(
+      lpNftTokenId: bigint,
+      recipient: `0x${string}`,
+    ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.dutchAuction.exit(tokenId);
+          await this.gameTokenPooler.collectFromLpNft(lpNftTokenId, recipient);
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
+    }
+
+    async exit(
+      lpNftTokenId: bigint,
+    ): Promise<ethers.ContractTransactionReceipt> {
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.gameTokenPooler.exit(lpNftTokenId);
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
@@ -117,4 +108,4 @@ function DutchAuctionMixin<T extends new (...args: any[]) => {}>(Base: T) {
   };
 }
 
-export { DutchAuctionMixin };
+export { GameTokenPoolerMixin };

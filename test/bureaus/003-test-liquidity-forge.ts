@@ -121,7 +121,7 @@ describe("Bureau 3: Liquidity Forge", () => {
       lpPow1Contract,
       lpSftContract,
       pow1Contract,
-      pow1PoolContract,
+      pow1MarketPoolContract,
       wrappedNativeContract,
     } = deployerContracts;
 
@@ -144,8 +144,8 @@ describe("Bureau 3: Liquidity Forge", () => {
 
     // Get pool token order
     let pow1IsToken0: boolean;
-    const token0: `0x${string}` = await pow1PoolContract.token0();
-    const token1: `0x${string}` = await pow1PoolContract.token1();
+    const token0: `0x${string}` = await pow1MarketPoolContract.token0();
+    const token1: `0x${string}` = await pow1MarketPoolContract.token1();
     if (
       token0.toLowerCase() === pow1Contract.address.toLowerCase() &&
       token1.toLowerCase() === wrappedNativeContract.address.toLowerCase()
@@ -167,7 +167,7 @@ describe("Bureau 3: Liquidity Forge", () => {
     );
 
     // Initialize the Uniswap V3 pool
-    await pow1PoolContract.initialize(INITIAL_PRICE);
+    await pow1MarketPoolContract.initialize(INITIAL_PRICE);
 
     // Initialize DutchAuction
     await dutchAuctionContract.initialize(

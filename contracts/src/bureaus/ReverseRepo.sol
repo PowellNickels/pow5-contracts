@@ -23,8 +23,8 @@ import {INonfungiblePositionManager} from "../../interfaces/uniswap-v3-periphery
 import {IReverseRepo} from "../interfaces/bureaus/IReverseRepo.sol";
 import {IUniV3StakeFarm} from "../interfaces/defi/IUniV3StakeFarm.sol";
 import {ILPSFT} from "../interfaces/token/ERC1155/ILPSFT.sol";
-import {IUniV3Pooler} from "../interfaces/token/routes/IUniV3Pooler.sol";
-import {IUniV3Swapper} from "../interfaces/token/routes/IUniV3Swapper.sol";
+import {IGameTokenPooler} from "../interfaces/token/routes/IGameTokenPooler.sol";
+import {IGameTokenSwapper} from "../interfaces/token/routes/IGameTokenSwapper.sol";
 import {LiquidityMath} from "../utils/math/LiquidityMath.sol";
 
 /**
@@ -45,14 +45,34 @@ contract ReverseRepo is
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @dev The native game token
+   * @dev The POW5 token
    */
-  IERC20 public immutable gameToken;
+  IERC20 public immutable pow5Token;
 
   /**
-   * @dev The yielding asset token
+   * @dev The stable token
    */
-  IERC20 public immutable assetToken;
+  IERC20 public immutable stableToken;
+
+  /**
+   * @dev The upstream Uniswap V3 pool for the POW5/stable token pair
+   */
+  IUniswapV3Pool public immutable pow5StablePool;
+
+  /**
+   * @dev The token swapper
+   */
+  IGameTokenSwapper public immutable pow5StableSwapper;
+
+  /**
+   * @dev The token pooler
+   */
+  IGameTokenPooler public immutable pow5StablePooler;
+
+  /**
+   * @dev The POW5 LP-NFT stake farm
+   */
+  IUniV3StakeFarm public immutable pow5LpNftStakeFarm;
 
   /**
    * @dev The LP-SFT contract
@@ -60,29 +80,9 @@ contract ReverseRepo is
   ILPSFT public immutable lpSft;
 
   /**
-   * @dev The UniV3 pooler
-   */
-  IUniV3Pooler public immutable uniV3Pooler;
-
-  /**
-   * @dev The UniV3 swapper
-   */
-  IUniV3Swapper public immutable uniV3Swapper;
-
-  /**
-   * @dev The UniV3 stake farm
-   */
-  IUniV3StakeFarm public immutable uniV3StakeFarm;
-
-  /**
    * @dev The upstream Uniswap V3 NFT manager
    */
   INonfungiblePositionManager public immutable uniswapV3NftManager;
-
-  /**
-   * @dev The upstream Uniswap V3 pool
-   */
-  IUniswapV3Pool public immutable uniswapV3Pool;
 
   //////////////////////////////////////////////////////////////////////////////
   // Initialization
@@ -92,52 +92,52 @@ contract ReverseRepo is
    * @dev Initializes the Yield Harvest contract
    *
    * @param owner_ The owner of the Dutch Auction
-   * @param gameToken_ The native game token
-   * @param assetToken_ The yielding asset token
+   * @param pow5Token_ The POW5 token
+   * @param stableToken_ The stable token
+   * @param pow5StablePool_ The upstream Uniswap V3 pool for the token pair
+   * @param pow5StableSwapper_ The POW5 swapper
+   * @param pow5StablePooler_ The POW5 pooler
+   * @param pow5LpNftStakeFarm_ The POW5 LP-NFT stake farm
    * @param lpSft_ The LP-SFT token contract
-   * @param uniV3Pooler_ The UniV3 pooler
-   * @param uniV3Swapper_ The UniV3 swapper
-   * @param uniV3StakeFarm_ The UniV3 stake farm
    * @param uniswapV3NftManager_ The upstream Uniswap V3 NFT manager
-   * @param uniswapV3Pool_ The upstream Uniswap V3 pool
    */
   constructor(
     address owner_,
-    address gameToken_,
-    address assetToken_,
+    address pow5Token_,
+    address stableToken_,
+    address pow5StablePool_,
+    address pow5StableSwapper_,
+    address pow5StablePooler_,
+    address pow5LpNftStakeFarm_,
     address lpSft_,
-    address uniV3Pooler_,
-    address uniV3Swapper_,
-    address uniV3StakeFarm_,
-    address uniswapV3NftManager_,
-    address uniswapV3Pool_
+    address uniswapV3NftManager_
   ) {
     // Validate parameters
     require(owner_ != address(0), "Invalid owner");
-    require(gameToken_ != address(0), "Invalid game token");
-    require(assetToken_ != address(0), "Invalid asset token");
+    require(pow5Token_ != address(0), "Invalid POW5");
+    require(stableToken_ != address(0), "Invalid stable token");
+    require(pow5StablePool_ != address(0), "Invalid pool");
+    require(pow5StableSwapper_ != address(0), "Invalid swapper");
+    require(pow5StablePooler_ != address(0), "Invalid pooler");
+    require(pow5LpNftStakeFarm_ != address(0), "Invalid farm");
     require(lpSft_ != address(0), "Invalid LP-SFT");
-    require(uniV3Pooler_ != address(0), "Invalid pooler");
-    require(uniV3Swapper_ != address(0), "Invalid swapper");
-    require(uniV3StakeFarm_ != address(0), "Invalid farm");
     require(uniswapV3NftManager_ != address(0), "Invalid mgr");
-    require(uniswapV3Pool_ != address(0), "Invalid pool");
 
     // Initialize {AccessControl}
     _grantRole(DEFAULT_ADMIN_ROLE, owner_);
 
     // Initialize routes
-    gameToken = IERC20(gameToken_);
-    assetToken = IERC20(assetToken_);
+    pow5Token = IERC20(pow5Token_);
+    stableToken = IERC20(stableToken_);
+    pow5StablePool = IUniswapV3Pool(pow5StablePool_);
+    pow5StableSwapper = IGameTokenSwapper(pow5StableSwapper_);
+    pow5StablePooler = IGameTokenPooler(pow5StablePooler_);
+    pow5LpNftStakeFarm = IUniV3StakeFarm(pow5LpNftStakeFarm_);
     lpSft = ILPSFT(lpSft_);
-    uniV3Pooler = IUniV3Pooler(uniV3Pooler_);
-    uniV3StakeFarm = IUniV3StakeFarm(uniV3StakeFarm_);
-    uniV3Swapper = IUniV3Swapper(uniV3Swapper_);
     uniswapV3NftManager = INonfungiblePositionManager(uniswapV3NftManager_);
-    uniswapV3Pool = IUniswapV3Pool(uniswapV3Pool_);
 
     // Approve the stake farm to transfer our LP-NFTs
-    uniswapV3NftManager.setApprovalForAll(address(uniV3StakeFarm), true);
+    uniswapV3NftManager.setApprovalForAll(pow5LpNftStakeFarm_, true);
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -170,52 +170,59 @@ contract ReverseRepo is
    * @dev See {IReverseRepo-initialize}
    */
   function initialize(
-    uint256 gameTokenAmount,
-    uint256 assetTokenAmount,
+    uint256 pow5Amount,
+    uint256 stableTokenAmount,
     address receiver
   ) external override nonReentrant returns (uint256 tokenId) {
     // Validate access
     _checkRole(DEFAULT_ADMIN_ROLE);
 
     // Validate parameters
-    require(gameTokenAmount > 0, "Invalid game amount");
-    require(assetTokenAmount > 0, "Invalid asset amount");
+    require(pow5Amount > 0, "Invalid POW5 amount");
+    require(stableTokenAmount > 0, "Invalid stable amount");
     require(receiver != address(0), "Invalid receiver");
 
     // Call external contracts
-    gameToken.safeTransferFrom(_msgSender(), address(this), gameTokenAmount);
-    assetToken.safeTransferFrom(_msgSender(), address(this), assetTokenAmount);
+    pow5Token.safeTransferFrom(_msgSender(), address(this), pow5Amount);
+    stableToken.safeTransferFrom(
+      _msgSender(),
+      address(this),
+      stableTokenAmount
+    );
 
-    gameToken.safeIncreaseAllowance(address(uniV3Pooler), gameTokenAmount);
-    assetToken.safeIncreaseAllowance(address(uniV3Pooler), assetTokenAmount);
+    pow5Token.safeIncreaseAllowance(address(pow5StablePooler), pow5Amount);
+    stableToken.safeIncreaseAllowance(
+      address(pow5StablePooler),
+      stableTokenAmount
+    );
 
     // Approve the stake farm to transfer our LP-NFTs
-    lpSft.setApprovalForAll(address(uniV3StakeFarm), true);
+    lpSft.setApprovalForAll(address(pow5LpNftStakeFarm), true);
 
     // Mint an LP-NFT
-    tokenId = uniV3Pooler.mintNFTImbalance(
-      gameTokenAmount,
-      assetTokenAmount,
+    tokenId = pow5StablePooler.mintLpNftImbalance(
+      pow5Amount,
+      stableTokenAmount,
       address(this)
     );
 
     // Stake LP-NFT in the stake farm
-    uniV3StakeFarm.enter(tokenId);
+    pow5LpNftStakeFarm.enter(tokenId);
 
     // Get newly-minted LP-SFT address
     address lpSftAddress = lpSft.tokenIdToAddress(tokenId);
     require(lpSftAddress != address(0), "Invalid LP-SFT");
 
-    // Send game token dust to the receiver
-    uint256 gameTokenDust = gameToken.balanceOf(address(this));
-    if (gameTokenDust > 0) {
-      gameToken.safeTransfer(receiver, gameTokenDust);
+    // Send POW5 dust to the receiver
+    uint256 pow5Dust = pow5Token.balanceOf(address(this));
+    if (pow5Dust > 0) {
+      pow5Token.safeTransfer(receiver, pow5Dust);
     }
 
-    // Send asset token dust to the sender
-    uint256 assetTokenDust = assetToken.balanceOf(address(this));
-    if (assetTokenDust > 0) {
-      assetToken.safeTransfer(receiver, assetTokenDust);
+    // Send stable token dust to the receiver
+    uint256 stableDust = stableToken.balanceOf(address(this));
+    if (stableDust > 0) {
+      stableToken.safeTransfer(receiver, stableDust);
     }
 
     // Return the LP-SFT to the receiver
@@ -228,113 +235,122 @@ contract ReverseRepo is
    * @dev See {IReverseRepo-purchase}
    */
   function purchase(
-    uint256 gameTokenAmount,
-    uint256 assetTokenAmount,
+    uint256 pow5Amount,
+    uint256 stableTokenAmount,
     address receiver
   ) external override nonReentrant returns (uint256 tokenId) {
     // Validate parameters
-    require(gameTokenAmount > 0 || assetTokenAmount > 0, "Invalid amounts");
+    require(pow5Amount > 0 || stableTokenAmount > 0, "Invalid amounts");
     require(receiver != address(0), "Invalid receiver");
 
     // Get the pool fee
-    uint24 poolFee = uniswapV3Pool.fee();
+    uint24 poolFee = pow5StablePool.fee();
 
     // Call external contracts
-    if (gameTokenAmount > 0) {
-      gameToken.safeTransferFrom(_msgSender(), address(this), gameTokenAmount);
+    if (pow5Amount > 0) {
+      pow5Token.safeTransferFrom(_msgSender(), address(this), pow5Amount);
     }
-    if (assetTokenAmount > 0) {
-      assetToken.safeTransferFrom(
+    if (stableTokenAmount > 0) {
+      stableToken.safeTransferFrom(
         _msgSender(),
         address(this),
-        assetTokenAmount
+        stableTokenAmount
       );
     }
 
     // Perform single-sided supply swap
-    if (gameTokenAmount == 0) {
-      // Get asset token reserve
-      uint256 assetTokenReserve = assetToken.balanceOf(address(uniswapV3Pool));
+    if (pow5Amount == 0) {
+      // Get stable token reserve
+      uint256 stableReserve = stableToken.balanceOf(address(pow5StablePool));
 
-      // Calculate asset swap amount
-      uint256 assetSwapAmount = LiquidityMath.computeSwapAmountV2(
-        assetTokenReserve,
-        assetTokenAmount,
+      // Calculate stable swap amount
+      uint256 stableSwapAmount = LiquidityMath.computeSwapAmountV2(
+        stableReserve,
+        stableTokenAmount,
         poolFee
       );
-      require(assetSwapAmount <= assetTokenAmount, "Bad liquidity math");
+      require(stableSwapAmount <= stableTokenAmount, "Bad liquidity math");
 
       // Approve swap
-      assetToken.safeIncreaseAllowance(address(uniV3Swapper), assetSwapAmount);
+      stableToken.safeIncreaseAllowance(
+        address(pow5StableSwapper),
+        stableSwapAmount
+      );
 
       // Perform swap
-      gameTokenAmount = uniV3Swapper.buyGameToken(
-        assetSwapAmount,
+      pow5Amount = pow5StableSwapper.buyGameToken(
+        stableSwapAmount,
         address(this)
       );
 
       // Update amount
-      assetTokenAmount -= assetSwapAmount;
-    } else if (assetTokenAmount == 0) {
-      // Get game token reserve
-      uint256 gameTokenReserve = gameToken.balanceOf(address(uniswapV3Pool));
+      stableTokenAmount -= stableSwapAmount;
+    } else if (stableTokenAmount == 0) {
+      // Get POW5 reserve
+      uint256 pow5Reserve = pow5Token.balanceOf(address(pow5StablePool));
 
-      // Calculate game swap amount
-      uint256 gameSwapAmount = LiquidityMath.computeSwapAmountV2(
-        gameTokenReserve,
-        gameTokenAmount,
+      // Calculate POW5 swap amount
+      uint256 pow5SwapAmount = LiquidityMath.computeSwapAmountV2(
+        pow5Reserve,
+        pow5Amount,
         poolFee
       );
-      require(gameSwapAmount <= gameTokenAmount, "Bad liquidity math");
+      require(pow5SwapAmount <= pow5Amount, "Bad liquidity math");
 
       // Approve swap
-      gameToken.safeIncreaseAllowance(address(uniV3Swapper), gameSwapAmount);
+      pow5Token.safeIncreaseAllowance(
+        address(pow5StableSwapper),
+        pow5SwapAmount
+      );
 
       // Perform swap
-      assetTokenAmount = uniV3Swapper.sellGameToken(
-        gameSwapAmount,
+      stableTokenAmount = pow5StableSwapper.sellGameToken(
+        pow5SwapAmount,
         address(this)
       );
 
       // Update amount
-      gameTokenAmount -= gameSwapAmount;
+      pow5Amount -= pow5SwapAmount;
     }
 
     // Validate state
-    require(gameTokenAmount > 0 || assetTokenAmount > 0, "Invalid liquidity");
+    require(pow5Amount > 0 || stableTokenAmount > 0, "Invalid liquidity");
 
     // Approve tokens
-    if (gameTokenAmount > 0) {
-      gameToken.safeIncreaseAllowance(address(uniV3Pooler), gameTokenAmount);
+    if (pow5Amount > 0) {
+      pow5Token.safeIncreaseAllowance(address(pow5StablePooler), pow5Amount);
     }
-    if (assetTokenAmount > 0) {
-      assetToken.safeIncreaseAllowance(address(uniV3Pooler), assetTokenAmount);
+    if (stableTokenAmount > 0) {
+      stableToken.safeIncreaseAllowance(
+        address(pow5StablePooler),
+        stableTokenAmount
+      );
     }
 
     // Mint an LP-NFT
-    tokenId = uniV3Pooler.mintNFTImbalance(
-      gameTokenAmount,
-      assetTokenAmount,
+    tokenId = pow5StablePooler.mintLpNftImbalance(
+      pow5Amount,
+      stableTokenAmount,
       address(this)
     );
 
     // Stake LP-NFT in the stake farm
-    uniV3StakeFarm.enter(tokenId);
+    pow5LpNftStakeFarm.enter(tokenId);
 
     // Get newly-minted LP-SFT address
     address lpSftAddress = lpSft.tokenIdToAddress(tokenId);
     require(lpSftAddress != address(0), "Invalid LP-SFT");
 
-    // Send game token dust to the receiver
-    uint256 gameTokenDust = gameToken.balanceOf(address(this));
-    if (gameTokenDust > 0) {
-      gameToken.safeTransfer(receiver, gameTokenDust);
+    // Send POW5 dust to the receiver
+    uint256 pow5Dust = pow5Token.balanceOf(address(this));
+    if (pow5Dust > 0) {
+      pow5Token.safeTransfer(receiver, pow5Dust);
     }
 
-    // Send asset token dust to the receiver
-    uint256 assetTokenDust = assetToken.balanceOf(address(this));
-    if (assetTokenDust > 0) {
-      assetToken.safeTransfer(receiver, assetTokenDust);
+    // Send stable token dust to the receiver
+    uint256 stableDust = stableToken.balanceOf(address(this));
+    if (stableDust > 0) {
+      stableToken.safeTransfer(receiver, stableDust);
     }
 
     // Return the LP-SFT to the receiver
@@ -351,24 +367,24 @@ contract ReverseRepo is
     lpSft.safeTransferFrom(_msgSender(), address(this), tokenId, 1, "");
 
     // Withdraw the LP-NFT from the stake farm
-    uniV3StakeFarm.exit(tokenId);
+    pow5LpNftStakeFarm.exit(tokenId);
 
     // Read state
-    uint256 gameTokenBalance = gameToken.balanceOf(address(this));
+    uint256 pow5Balance = pow5Token.balanceOf(address(this));
 
-    // Swap any game tokens to asset tokens
-    if (gameTokenBalance > 0) {
-      gameToken.safeIncreaseAllowance(address(uniV3Swapper), gameTokenBalance);
+    // Swap any POW5 to the stable token
+    if (pow5Balance > 0) {
+      pow5Token.safeIncreaseAllowance(address(pow5StableSwapper), pow5Balance);
       // slither-disable-next-line unused-return
-      uniV3Swapper.sellGameToken(gameTokenBalance, address(this));
+      pow5StableSwapper.sellGameToken(pow5Balance, address(this));
     }
 
     // Read state
-    uint256 assetTokenBalance = assetToken.balanceOf(address(this));
+    uint256 stableTokenBalance = stableToken.balanceOf(address(this));
 
     // Return any tokens to the sender
-    if (assetTokenBalance > 0) {
-      assetToken.safeTransfer(_msgSender(), assetTokenBalance);
+    if (stableTokenBalance > 0) {
+      stableToken.safeTransfer(_msgSender(), stableTokenBalance);
     }
 
     // Return the empty LP-NFT to the sender

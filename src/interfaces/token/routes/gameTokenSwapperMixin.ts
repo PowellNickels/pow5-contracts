@@ -8,14 +8,14 @@
 
 import { ethers } from "ethers";
 
-import { IUniV3Swapper } from "../../../types/contracts/src/interfaces/token/routes/IUniV3Swapper";
-import { IUniV3Swapper__factory } from "../../../types/factories/contracts/src/interfaces/token/routes/IUniV3Swapper__factory";
+import { IGameTokenSwapper } from "../../../types/contracts/src/interfaces/token/routes/IGameTokenSwapper";
+import { IGameTokenSwapper__factory } from "../../../types/factories/contracts/src/interfaces/token/routes/IGameTokenSwapper__factory";
 import { BaseMixin } from "../../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
-function UniV3SwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
+function GameTokenSwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
   return class extends BaseMixin(Base) {
-    private uniV3Swapper: IUniV3Swapper;
+    private gameTokenSwapper: IGameTokenSwapper;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
@@ -26,10 +26,14 @@ function UniV3SwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
         `0x${string}`,
       ];
 
-      this.uniV3Swapper = IUniV3Swapper__factory.connect(
+      this.gameTokenSwapper = IGameTokenSwapper__factory.connect(
         contractAddress,
         contractRunner,
       );
+    }
+
+    async gameIsToken0(): Promise<boolean> {
+      return this.gameTokenSwapper.gameIsToken0();
     }
 
     async buyGameToken(
@@ -38,7 +42,7 @@ function UniV3SwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.uniV3Swapper.buyGameToken(assetTokenAmount, recipient);
+          await this.gameTokenSwapper.buyGameToken(assetTokenAmount, recipient);
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
@@ -50,7 +54,7 @@ function UniV3SwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.uniV3Swapper.sellGameToken(gameTokenAmount, recipient);
+          await this.gameTokenSwapper.sellGameToken(gameTokenAmount, recipient);
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
@@ -59,7 +63,7 @@ function UniV3SwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
     async exit(): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.uniV3Swapper.exit();
+          await this.gameTokenSwapper.exit();
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
@@ -67,4 +71,4 @@ function UniV3SwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
   };
 }
 
-export { UniV3SwapperMixin };
+export { GameTokenSwapperMixin };

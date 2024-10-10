@@ -298,17 +298,17 @@ describe("Bureau integration test", () => {
 
     const {
       pow1Contract,
-      pow1PoolContract,
+      pow1MarketPoolContract,
       pow5Contract,
-      pow5PoolContract,
+      pow5StablePoolContract,
       usdcContract,
       wrappedNativeContract,
     } = deployerContracts;
 
     // Get POW1 pool token order
     let pow1IsToken0: boolean;
-    const pow1Token0: `0x${string}` = await pow1PoolContract.token0();
-    const pow1Token1: `0x${string}` = await pow1PoolContract.token1();
+    const pow1Token0: `0x${string}` = await pow1MarketPoolContract.token0();
+    const pow1Token1: `0x${string}` = await pow1MarketPoolContract.token1();
     if (
       pow1Token0.toLowerCase() === pow1Contract.address.toLowerCase() &&
       pow1Token1.toLowerCase() === wrappedNativeContract.address.toLowerCase()
@@ -325,7 +325,7 @@ describe("Bureau integration test", () => {
     }
 
     // Initialize the Uniswap V3 pool for POW1
-    await pow1PoolContract.initialize(
+    await pow1MarketPoolContract.initialize(
       encodePriceSqrt(
         pow1IsToken0 ? INITIAL_WETH_AMOUNT : INITIAL_POW1_SUPPLY,
         pow1IsToken0 ? INITIAL_POW1_SUPPLY : INITIAL_WETH_AMOUNT,
@@ -334,8 +334,8 @@ describe("Bureau integration test", () => {
 
     // Get POW5 pool token order
     let pow5IsToken0: boolean;
-    const pow5Token0: `0x${string}` = await pow5PoolContract.token0();
-    const pow5Token1: `0x${string}` = await pow5PoolContract.token1();
+    const pow5Token0: `0x${string}` = await pow5StablePoolContract.token0();
+    const pow5Token1: `0x${string}` = await pow5StablePoolContract.token1();
     if (
       pow5Token0.toLowerCase() === pow5Contract.address.toLowerCase() &&
       pow5Token1.toLowerCase() === usdcContract.address.toLowerCase()
@@ -351,7 +351,7 @@ describe("Bureau integration test", () => {
     }
 
     // Initialize the Uniswap V3 pool for POW5
-    await pow5PoolContract.initialize(
+    await pow5StablePoolContract.initialize(
       encodePriceSqrt(
         pow5IsToken0 ? INITIAL_USDC_AMOUNT : INITIAL_POW5_DEPOSIT,
         pow5IsToken0 ? INITIAL_POW5_DEPOSIT : INITIAL_USDC_AMOUNT,

@@ -15,22 +15,14 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 import {IUniswapV3SwapCallback} from "../../../interfaces/uniswap-v3-core/callback/IUniswapV3SwapCallback.sol";
 import {IUniswapV3Pool} from "../../../interfaces/uniswap-v3-core/IUniswapV3Pool.sol";
 
-import {IUniV3Swapper} from "../../interfaces/token/routes/IUniV3Swapper.sol";
-
 /**
- * @dev Token router to swap between the game token and a yielding asset token
+ * @dev Token router to swap between the numerator token and a yielding denominator token
  */
-contract UniV3Swapper is
-  IUniV3Swapper,
-  IUniswapV3SwapCallback,
-  Context,
-  ReentrancyGuard
-{
+abstract contract UniV3Swapper is Context, IUniswapV3SwapCallback {
   using SafeERC20 for IERC20;
 
   //////////////////////////////////////////////////////////////////////////////
@@ -42,14 +34,14 @@ contract UniV3Swapper is
    *
    * Equivalent to getSqrtRatioAtTick(MIN_TICK).
    */
-  uint160 internal constant MIN_SQRT_RATIO = 4295128739;
+  uint160 private constant MIN_SQRT_RATIO = 4295128739;
 
   /**
    * @dev The maximum value that can be returned from {TickMath-getSqrtRatioAtTick}
    *
    * Equivalent to getSqrtRatioAtTick(MAX_TICK).
    */
-  uint160 internal constant MAX_SQRT_RATIO =
+  uint160 private constant MAX_SQRT_RATIO =
     1461446703485210103287273052203988822378723970342;
 
   //////////////////////////////////////////////////////////////////////////////
@@ -57,29 +49,29 @@ contract UniV3Swapper is
   //////////////////////////////////////////////////////////////////////////////
 
   /**
+   * @dev The numerator token
+   */
+  IERC20 internal immutable _numeratorToken;
+
+  /**
+   * @dev The denominator token
+   */
+  IERC20 internal immutable _denominatorToken;
+
+  /**
    * @dev The Uniswap V3 pool for the token pair
    */
-  IUniswapV3Pool public immutable uniswapV3Pool;
-
-  /**
-   * @dev The game token
-   */
-  IERC20 public immutable gameToken;
-
-  /**
-   * @dev The asset token
-   */
-  IERC20 public immutable assetToken;
+  IUniswapV3Pool internal immutable _uniswapV3Pool;
 
   //////////////////////////////////////////////////////////////////////////////
   // State
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @dev True if the game token is sorted first in the Uniswap V3 pool, false
-   * otherwise
+   * @dev True if the numerator token is sorted first in the Uniswap V3 pool,
+   * false otherwise
    */
-  bool public immutable gameIsToken0;
+  bool internal immutable _numeratorIsToken0;
 
   //////////////////////////////////////////////////////////////////////////////
   // Initialization
@@ -88,15 +80,19 @@ contract UniV3Swapper is
   /**
    * @dev Initializes the contract
    *
-   * @param uniswapV3Pool_ The address of the Uniswap V3 pool contract
-   * @param gameToken_ The address of the game token of the protocol
-   * @param assetToken_ The address of the asset token of the protocol
+   * @param numeratorToken_ The address of the numerator token of the pair
+   * @param denominatorToken_ The address of the denominator token of the pair
+   * @param uniswapV3Pool_ The address of the Uniswap V3 pool contract for the pair
    */
-  constructor(address uniswapV3Pool_, address gameToken_, address assetToken_) {
+  constructor(
+    address numeratorToken_,
+    address denominatorToken_,
+    address uniswapV3Pool_
+  ) {
     // Validate parameters
+    require(numeratorToken_ != address(0), "Invalid numerator");
+    require(denominatorToken_ != address(0), "Invalid denominator");
     require(uniswapV3Pool_ != address(0), "Invalid pool");
-    require(gameToken_ != address(0), "Invalid game");
-    require(assetToken_ != address(0), "Invalid asset");
 
     // Read external contracts
     address token0 = IUniswapV3Pool(uniswapV3Pool_).token0();
@@ -107,104 +103,24 @@ contract UniV3Swapper is
     require(token1 != address(0), "Invalid token1");
 
     // Determine token order
-    bool gameIsToken0_ = gameToken_ == token0;
+    bool numeratorIsToken0_ = numeratorToken_ == token0;
 
     // Validate external contracts
-    if (gameIsToken0_) {
-      require(token0 == gameToken_, "Invalid token0");
-      require(token1 == assetToken_, "Invalid token1");
+    if (numeratorIsToken0_) {
+      require(token0 == numeratorToken_, "Invalid token0 for num");
+      require(token1 == denominatorToken_, "Invalid token1 for denom");
     } else {
-      require(token0 == assetToken_, "Invalid token0");
-      require(token1 == gameToken_, "Invalid token1");
+      require(token0 == denominatorToken_, "Invalid token0 for denom");
+      require(token1 == numeratorToken_, "Invalid token1 for num");
     }
 
     // Initialize routes
-    uniswapV3Pool = IUniswapV3Pool(uniswapV3Pool_);
-    gameToken = IERC20(gameToken_);
-    assetToken = IERC20(assetToken_);
+    _numeratorToken = IERC20(numeratorToken_);
+    _denominatorToken = IERC20(denominatorToken_);
+    _uniswapV3Pool = IUniswapV3Pool(uniswapV3Pool_);
 
     // Initialize state
-    gameIsToken0 = gameIsToken0_;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {IUniV3Swapper}
-  //////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * @dev See {IUniV3Swapper-buyGameToken}
-   */
-  function buyGameToken(
-    uint256 assetTokenAmount,
-    address recipient
-  ) public override nonReentrant returns (uint256 gameTokenReturned) {
-    // Validate parameters
-    require(recipient != address(0), "Invalid recipient");
-
-    // Receive the asset token
-    _receiveAssetToken(assetTokenAmount);
-
-    // Buy the game token
-    gameTokenReturned = _buyGameToken(assetTokenAmount);
-
-    // Return the game token
-    _returnGameToken(gameTokenReturned, recipient);
-
-    // Emit event
-    // slither-disable-next-line reentrancy-events
-    emit GameTokenBought(
-      _msgSender(),
-      recipient,
-      assetTokenAmount,
-      gameTokenReturned
-    );
-
-    return gameTokenReturned;
-  }
-
-  /**
-   * @dev See {IUniV3Swapper-sellGameToken}
-   */
-  function sellGameToken(
-    uint256 gameTokenAmount,
-    address recipient
-  ) public override nonReentrant returns (uint256 assetTokenReturned) {
-    // Validate parameters
-    require(gameTokenAmount > 0, "Invalid amount");
-    require(recipient != address(0), "Invalid recipient");
-
-    // Receive the game token
-    _receiveGameToken(gameTokenAmount);
-
-    // Sell the game token
-    assetTokenReturned = _sellGameToken(gameTokenAmount);
-
-    // Return the asset token
-    _returnAssetToken(assetTokenReturned, recipient);
-
-    // Dispatch event
-    // slither-disable-next-line reentrancy-events
-    emit GameTokenSold(
-      _msgSender(),
-      recipient,
-      gameTokenAmount,
-      assetTokenReturned
-    );
-
-    return assetTokenReturned;
-  }
-
-  /**
-   * @dev See {IUniV3Swapper-exit}
-   */
-  function exit() public override returns (uint256 assetTokenReturned) {
-    // Read state
-    uint256 gameTokenAmount = gameToken.balanceOf(_msgSender());
-
-    // Swap everything
-    assetTokenReturned = sellGameToken(gameTokenAmount, _msgSender());
-
-    return assetTokenReturned;
+    _numeratorIsToken0 = numeratorIsToken0_;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -230,7 +146,7 @@ contract UniV3Swapper is
     bytes calldata
   ) public override {
     // Validate caller
-    require(_msgSender() == address(uniswapV3Pool), "Invalid caller");
+    require(_msgSender() == address(_uniswapV3Pool), "Invalid caller");
 
     // Pay fees
     if (amount0Delta > 0) {
@@ -248,146 +164,241 @@ contract UniV3Swapper is
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // Private interface
+  // Internal market interface
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @dev Procure the game token from the sender
+   * @dev Buy the numerator token, spending the denominator token
    *
-   * @param gameTokenAmount Amount of the game token to transfer
+   * @param denominatorTokenAmount Amount of the denominator token to spend
+   * @param recipient Address to receive the numerator token
+   *
+   * @return numeratorTokenReturned Amount of the numerator token received
    */
-  function _receiveGameToken(uint256 gameTokenAmount) private {
-    // Call external contracts
-    if (gameTokenAmount > 0) {
-      gameToken.safeTransferFrom(_msgSender(), address(this), gameTokenAmount);
-    }
+  function _buyNumeratorToken(
+    uint256 denominatorTokenAmount,
+    address recipient
+  ) internal returns (uint256 numeratorTokenReturned) {
+    // Validate parameters
+    require(recipient != address(0), "Invalid recipient");
+
+    // Receive the denominator token
+    _receiveDenominatorToken(denominatorTokenAmount);
+
+    // Buy the numerator token
+    numeratorTokenReturned = _swapDenominatorForNumerator(
+      denominatorTokenAmount
+    );
+
+    // Return the numerator token
+    _returnNumeratorToken(numeratorTokenReturned, recipient);
+
+    return numeratorTokenReturned;
   }
 
   /**
-   * @dev Procure the asset token from the sender
+   * @dev Sell the numerator token, receiving the denominator token
    *
-   * @param assetTokenAmount Amount of the asset token to transfer
+   * @param numeratorTokenAmount Amount of the numerator token to spend
+   * @param recipient Address to receive the denominator token
+   *
+   * @return denominatorTokenReturned Amount of the denominator token received
    */
-  function _receiveAssetToken(uint256 assetTokenAmount) private {
+  function _sellNumeratorToken(
+    uint256 numeratorTokenAmount,
+    address recipient
+  ) internal returns (uint256 denominatorTokenReturned) {
+    // Validate parameters
+    require(numeratorTokenAmount > 0, "Invalid amount");
+    require(recipient != address(0), "Invalid recipient");
+
+    // Receive the numerator token
+    _receiveNumeratorToken(numeratorTokenAmount);
+
+    // Sell the numerator token
+    denominatorTokenReturned = _swapNumeratorForDenominator(
+      numeratorTokenAmount
+    );
+
+    // Return the denominator token
+    _returnDenominatorToken(denominatorTokenReturned, recipient);
+
+    return denominatorTokenReturned;
+  }
+
+  /**
+   * @dev Exit the protocol, selling the numerator token for the denominator token
+   *
+   * @return denominatorTokenReturned Amount of the denominator token received
+   */
+  function _exitSwapper() internal returns (uint256 denominatorTokenReturned) {
+    // Read state
+    uint256 numeratorTokenAmount = _numeratorToken.balanceOf(_msgSender());
+
+    // Swap everything
+    denominatorTokenReturned = _sellNumeratorToken(
+      numeratorTokenAmount,
+      _msgSender()
+    );
+
+    return denominatorTokenReturned;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Internal swapping interface
+  //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @dev Swap the denominator token for the numerator token
+   *
+   * @param denominatorTokenAmount Amount of the denominator token to swap
+   *
+   * @return numeratorTokenReturned Amount of the numerator token received
+   */
+  function _swapDenominatorForNumerator(
+    uint256 denominatorTokenAmount
+  ) internal returns (uint256 numeratorTokenReturned) {
+    // Approve Uniswap V3 pool to spend the denominator token
+    _denominatorToken.safeIncreaseAllowance(
+      address(_uniswapV3Pool),
+      denominatorTokenAmount
+    );
+
+    //
+    // Swap the denominator token for the numerator token
+    //
+    // A note about amount0 and amount1:
+    //
+    // amount0 is the delta of the balance of token0 of the pool
+    // amount1 is the delta of the balance of token1 of the pool
+    //
+    // Amounts are exact when negative, minimum when positive.
+    //
+    bool zeroForOne = _numeratorIsToken0 ? false : true;
+    (int256 amount0, int256 amount1) = _uniswapV3Pool.swap(
+      address(this),
+      zeroForOne,
+      SafeCast.toInt256(denominatorTokenAmount),
+      _numeratorIsToken0 ? MAX_SQRT_RATIO - 1 : MIN_SQRT_RATIO + 1, // TODO
+      ""
+    );
+
+    // Calculate numerator token amount
+    numeratorTokenReturned = _numeratorIsToken0
+      ? SafeCast.toUint256(-amount0)
+      : SafeCast.toUint256(-amount1);
+
+    return numeratorTokenReturned;
+  }
+
+  /**
+   * @dev Swap the numerator token for the denominator token
+   *
+   * @param numeratorTokenAmount Amount of the numerator token to swap
+   *
+   * @return denominatorTokenReturned Amount of the denominator token received
+   */
+  function _swapNumeratorForDenominator(
+    uint256 numeratorTokenAmount
+  ) internal returns (uint256 denominatorTokenReturned) {
+    // Approve Uniswap V3 pool to spend the numerator token
+    _numeratorToken.safeIncreaseAllowance(
+      address(_uniswapV3Pool),
+      numeratorTokenAmount
+    );
+
+    //
+    // Swap the numerator token for the denominator token
+    //
+    // A note about amount0 and amount1:
+    //
+    // amount0 is the delta of the balance of token0 of the pool
+    // amount1 is the delta of the balance of token1 of the pool
+    //
+    // Amounts are exact when negative, minimum when positive.
+    //
+    bool zeroForOne = _numeratorIsToken0 ? true : false;
+    (int256 amount0, int256 amount1) = _uniswapV3Pool.swap(
+      address(this),
+      zeroForOne,
+      SafeCast.toInt256(numeratorTokenAmount),
+      _numeratorIsToken0 ? MIN_SQRT_RATIO + 1 : MAX_SQRT_RATIO - 1, // TODO
+      ""
+    );
+
+    // Calculate denominator token amount
+    denominatorTokenReturned = _numeratorIsToken0
+      ? SafeCast.toUint256(-amount1)
+      : SafeCast.toUint256(-amount0);
+
+    return denominatorTokenReturned;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Internal routing interface
+  //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @dev Procure the numerator token from the sender
+   *
+   * @param numeratorTokenAmount Amount of the numerator token to transfer
+   */
+  function _receiveNumeratorToken(uint256 numeratorTokenAmount) internal {
     // Call external contracts
-    if (assetTokenAmount > 0) {
-      assetToken.safeTransferFrom(
+    if (numeratorTokenAmount > 0) {
+      _numeratorToken.safeTransferFrom(
         _msgSender(),
         address(this),
-        assetTokenAmount
+        numeratorTokenAmount
       );
     }
   }
 
   /**
-   * @dev Buy the game token with the asset token
+   * @dev Procure the denominator token from the sender
    *
-   * @param assetTokenAmount Amount of the asset token to spend
-   *
-   * @return gameTokenReturned Amount of the game token received
+   * @param denominatorTokenAmount Amount of the denominator token to transfer
    */
-  function _buyGameToken(
-    uint256 assetTokenAmount
-  ) private returns (uint256 gameTokenReturned) {
-    // Approve Uniswap V3 pool to spend the asset token
-    assetToken.safeIncreaseAllowance(address(uniswapV3Pool), assetTokenAmount);
-
-    //
-    // Swap the asset token for the game token
-    //
-    // A note about amount0 and amount1:
-    //
-    // amount0 is the delta of the balance of token0 of the pool
-    // amount1 is the delta of the balance of token1 of the pool
-    //
-    // Amounts are exact when negative, minimum when positive.
-    //
-    bool zeroForOne = gameIsToken0 ? false : true;
-    (int256 amount0, int256 amount1) = uniswapV3Pool.swap(
-      address(this),
-      zeroForOne,
-      SafeCast.toInt256(assetTokenAmount),
-      gameIsToken0 ? MAX_SQRT_RATIO - 1 : MIN_SQRT_RATIO + 1, // TODO
-      ""
-    );
-
-    // Calculate game token amount
-    gameTokenReturned = gameIsToken0
-      ? SafeCast.toUint256(-amount0)
-      : SafeCast.toUint256(-amount1);
-
-    return gameTokenReturned;
-  }
-
-  /**
-   * @dev Sell the game token for the asset token
-   *
-   * @param gameTokenAmount Amount of the game token to spend
-   *
-   * @return assetTokenReturned Amount of the asset token received
-   */
-  function _sellGameToken(
-    uint256 gameTokenAmount
-  ) private returns (uint256 assetTokenReturned) {
-    // Approve Uniswap V3 pool to spend the game token
-    gameToken.safeIncreaseAllowance(address(uniswapV3Pool), gameTokenAmount);
-
-    //
-    // Swap the game token for the asset token
-    //
-    // A note about amount0 and amount1:
-    //
-    // amount0 is the delta of the balance of token0 of the pool
-    // amount1 is the delta of the balance of token1 of the pool
-    //
-    // Amounts are exact when negative, minimum when positive.
-    //
-    bool zeroForOne = gameIsToken0 ? true : false;
-    (int256 amount0, int256 amount1) = uniswapV3Pool.swap(
-      address(this),
-      zeroForOne,
-      SafeCast.toInt256(gameTokenAmount),
-      gameIsToken0 ? MIN_SQRT_RATIO + 1 : MAX_SQRT_RATIO - 1, // TODO
-      ""
-    );
-
-    // Calculate asset token amount
-    assetTokenReturned = gameIsToken0
-      ? SafeCast.toUint256(-amount1)
-      : SafeCast.toUint256(-amount0);
-
-    return assetTokenReturned;
-  }
-
-  /**
-   * @dev Return the game token to the recipient
-   *
-   * @param gameTokenAmount Amount of the game token to transfer
-   * @param recipient Address to transfer the game token to
-   */
-  function _returnGameToken(
-    uint256 gameTokenAmount,
-    address recipient
-  ) private {
-    // Transfer the token to the recipient
-    if (gameTokenAmount > 0) {
-      gameToken.safeTransfer(recipient, gameTokenAmount);
+  function _receiveDenominatorToken(uint256 denominatorTokenAmount) internal {
+    // Call external contracts
+    if (denominatorTokenAmount > 0) {
+      _denominatorToken.safeTransferFrom(
+        _msgSender(),
+        address(this),
+        denominatorTokenAmount
+      );
     }
   }
 
   /**
-   * @dev Return the asset token to the recipient
+   * @dev Return the numerator token to the recipient
    *
-   * @param assetTokenAmount Amount of the asset token to transfer
-   * @param recipient Address to transfer the asset token to
+   * @param numeratorTokenAmount Amount of the numerator token to transfer
+   * @param recipient Address to transfer the numerator token to
    */
-  function _returnAssetToken(
-    uint256 assetTokenAmount,
+  function _returnNumeratorToken(
+    uint256 numeratorTokenAmount,
     address recipient
-  ) private {
-    // Transfer the token to the recipient
-    if (assetTokenAmount > 0) {
-      assetToken.safeTransfer(recipient, assetTokenAmount);
+  ) internal {
+    // Call external contracts
+    if (numeratorTokenAmount > 0) {
+      _numeratorToken.safeTransfer(recipient, numeratorTokenAmount);
+    }
+  }
+
+  /**
+   * @dev Return the denominator token to the recipient
+   *
+   * @param denominatorTokenAmount Amount of the denominator token to transfer
+   * @param recipient Address to transfer the denominator token to
+   */
+  function _returnDenominatorToken(
+    uint256 denominatorTokenAmount,
+    address recipient
+  ) internal {
+    // Call external contracts
+    if (denominatorTokenAmount > 0) {
+      _denominatorToken.safeTransfer(recipient, denominatorTokenAmount);
     }
   }
 }

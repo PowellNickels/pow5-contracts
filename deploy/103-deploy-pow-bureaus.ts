@@ -51,14 +51,14 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
     ...opts,
     args: [
       deployer, // owner
-      addressBook.pow1Token!, // gameToken
-      addressBook.wrappedNativeToken!, // assetToken
+      addressBook.pow1Token!, // pow1Token
+      addressBook.wrappedNativeToken!, // marketToken
+      addressBook.pow1MarketPool!, // pow1MarketPool
+      addressBook.pow1MarketSwapper!, // pow1MarketSwapper
+      addressBook.pow1MarketPooler!, // pow1MarketPooler
+      addressBook.pow1LpNftStakeFarm!, // pow1LpNftStakeFarm
       addressBook.lpSft!, // lpSft
-      addressBook.pow1Pooler!, // uniV3Pooler
-      addressBook.pow1Swapper!, // uniV3Swapper
-      addressBook.pow1LpNftStakeFarm!, // lpNftStakeFarm
       addressBook.uniswapV3NftManager!, // uniswapV3NftManager
-      addressBook.pow1Pool!, // uniswapV3Pool
     ],
   });
   addressBook.dutchAuction = dutchAuctionTx.address as `0x${string}`;
@@ -106,14 +106,14 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
     ...opts,
     args: [
       deployer, // owner
-      addressBook.pow5Token!, // gameToken
-      addressBook.usdcToken!, // assetToken
+      addressBook.pow5Token!, // pow5Token
+      addressBook.usdcToken!, // stableToken
+      addressBook.pow5StablePool!, // pow5StablePool
+      addressBook.pow5StableSwapper!, // pow5StableSwapper
+      addressBook.pow5StablePooler!, // pow5StablePooler
+      addressBook.pow5LpNftStakeFarm!, // pow5LpNftStakeFarm
       addressBook.lpSft!, // lpSft
-      addressBook.pow5Pooler!, // uniV3Pooler
-      addressBook.pow5Swapper!, // uniV3Swapper
-      addressBook.pow5LpNftStakeFarm!, // uniV3StakeFarm
       addressBook.uniswapV3NftManager!, // uniswapV3NftManager
-      addressBook.pow5Pool!, // uniswapV3Pool
     ],
   });
   addressBook.reverseRepo = reverseRepoTx.address as `0x${string}`;

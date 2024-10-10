@@ -65,7 +65,7 @@ const AUCTION_WETH_AMOUNT: bigint =
   ethers.parseEther("1000") / BigInt(ETH_PRICE); // $1,000 in ETH
 
 // Amount of LPPOW1 minted in the first auction
-const AUCTION_LPPOW1_AMOUNT: bigint = 38_970_275_607_839_876_377n; // 38.970 LPPOW1
+const AUCTION_LPPOW1_AMOUNT: bigint = 38_970_275_607_839_900_943n; // 38.970 LPPOW1
 
 // Token ID of the first LP-NFT/LP-SFT sold at auction
 const AUCTION_LPNFT_TOKEN_ID: bigint = 2n;
@@ -197,12 +197,12 @@ describe("Bureau 1: Dutch Auction", () => {
   // Spec: Get pool token order
   //////////////////////////////////////////////////////////////////////////////
 
-  it("should get pool token order for LPPOW5", async function (): Promise<void> {
-    const { pow1Contract, pow1PoolContract, wrappedNativeContract } =
+  it("should get pool token order for LPPOW1", async function (): Promise<void> {
+    const { pow1Contract, pow1MarketPoolContract, wrappedNativeContract } =
       deployerContracts;
 
-    const token0: `0x${string}` = await pow1PoolContract.token0();
-    const token1: `0x${string}` = await pow1PoolContract.token1();
+    const token0: `0x${string}` = await pow1MarketPoolContract.token0();
+    const token1: `0x${string}` = await pow1MarketPoolContract.token1();
 
     if (
       token0.toLowerCase() === pow1Contract.address.toLowerCase() &&
@@ -232,7 +232,7 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should initialize the LPPOW1 pool", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1PoolContract } = deployerContracts;
+    const { pow1MarketPoolContract } = deployerContracts;
 
     // The initial sqrt price [sqrt(amountToken1/amountToken0)] as a Q64.96 value
     const INITIAL_PRICE: bigint = encodePriceSqrt(
@@ -241,7 +241,7 @@ describe("Bureau 1: Dutch Auction", () => {
     );
 
     // Initialize the Uniswap V3 pool
-    await pow1PoolContract.initialize(INITIAL_PRICE);
+    await pow1MarketPoolContract.initialize(INITIAL_PRICE);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -305,8 +305,8 @@ describe("Bureau 1: Dutch Auction", () => {
 
     // Initialize DutchAuction
     await dutchAuctionContract.initialize(
-      INITIAL_POW1_SUPPLY, // gameTokenAmount
-      INITIAL_WETH_AMOUNT, // assetTokenAmount
+      INITIAL_POW1_SUPPLY, // pow1Amount
+      INITIAL_WETH_AMOUNT, // marketTokenAmount
       beneficiaryAddress, // receiver
     );
   });
@@ -359,15 +359,15 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   it("should log Uniswap pool reserves", async function (): Promise<void> {
-    const { pow1Contract, pow1PoolContract, wrappedNativeContract } =
+    const { pow1Contract, pow1MarketPoolContract, wrappedNativeContract } =
       deployerContracts;
 
     // Get Uniswap pool reserves
     const pow1Balance: bigint = await pow1Contract.balanceOf(
-      pow1PoolContract.address,
+      pow1MarketPoolContract.address,
     );
     const wethBalance: bigint = await wrappedNativeContract.balanceOf(
-      pow1PoolContract.address,
+      pow1MarketPoolContract.address,
     );
 
     // Log Uniswap pool reserves
@@ -495,14 +495,15 @@ describe("Bureau 1: Dutch Auction", () => {
   // Spec: Obtain POW1 dust
   //////////////////////////////////////////////////////////////////////////////
 
-  it("should approve POW1Swapper to spend WETH", async function (): Promise<void> {
+  it("should approve POW1MarketSwapper to spend WETH", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1SwapperContract, wrappedNativeContract } = deployerContracts;
+    const { pow1MarketSwapperContract, wrappedNativeContract } =
+      deployerContracts;
 
-    // Approve POW1Swapper spending WETH
+    // Approve POW1MarketSwapper spending WETH
     await wrappedNativeContract.approve(
-      pow1SwapperContract.address,
+      pow1MarketSwapperContract.address,
       WETH_DUST_AMOUNT,
     );
   });
@@ -510,10 +511,13 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should swap WETH dust for POW1 dust", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1SwapperContract } = deployerContracts;
+    const { pow1MarketSwapperContract } = deployerContracts;
 
     // Swap WETH for POW1
-    await pow1SwapperContract.buyGameToken(WETH_DUST_AMOUNT, deployerAddress);
+    await pow1MarketSwapperContract.buyGameToken(
+      WETH_DUST_AMOUNT,
+      deployerAddress,
+    );
   });
 
   it("should check POW1 balance", async function (): Promise<void> {
@@ -537,15 +541,15 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   it("should log Uniswap pool reserves", async function (): Promise<void> {
-    const { pow1Contract, pow1PoolContract, wrappedNativeContract } =
+    const { pow1Contract, pow1MarketPoolContract, wrappedNativeContract } =
       deployerContracts;
 
     // Get Uniswap pool reserves
     const pow1Balance: bigint = await pow1Contract.balanceOf(
-      pow1PoolContract.address,
+      pow1MarketPoolContract.address,
     );
     const wethBalance: bigint = await wrappedNativeContract.balanceOf(
-      pow1PoolContract.address,
+      pow1MarketPoolContract.address,
     );
 
     // Log Uniswap pool reserves
@@ -672,15 +676,15 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   it("should log Uniswap pool reserves", async function (): Promise<void> {
-    const { pow1Contract, pow1PoolContract, wrappedNativeContract } =
+    const { pow1Contract, pow1MarketPoolContract, wrappedNativeContract } =
       deployerContracts;
 
     // Get Uniswap pool reserves
     const pow1Balance: bigint = await pow1Contract.balanceOf(
-      pow1PoolContract.address,
+      pow1MarketPoolContract.address,
     );
     const wethBalance: bigint = await wrappedNativeContract.balanceOf(
-      pow1PoolContract.address,
+      pow1MarketPoolContract.address,
     );
 
     console.log(
@@ -805,8 +809,8 @@ describe("Bureau 1: Dutch Auction", () => {
     // Purchase LP-SFT
     await dutchAuctionContract.purchase(
       0n, // slot
-      0n, // gameTokenAmount
-      AUCTION_WETH_AMOUNT, // assetTokenAmount
+      0n, // pow1Amount
+      AUCTION_WETH_AMOUNT, // marketTokenAmount
       beneficiaryAddress, // receiver
     );
   });
@@ -834,15 +838,15 @@ describe("Bureau 1: Dutch Auction", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   it("should log Uniswap pool reserves", async function (): Promise<void> {
-    const { pow1Contract, pow1PoolContract, wrappedNativeContract } =
+    const { pow1Contract, pow1MarketPoolContract, wrappedNativeContract } =
       deployerContracts;
 
     // Get Uniswap pool reserves
     const pow1Balance: bigint = await pow1Contract.balanceOf(
-      pow1PoolContract.address,
+      pow1MarketPoolContract.address,
     );
     const wethBalance: bigint = await wrappedNativeContract.balanceOf(
-      pow1PoolContract.address,
+      pow1MarketPoolContract.address,
     );
 
     console.log(

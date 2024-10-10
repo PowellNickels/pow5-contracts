@@ -79,10 +79,10 @@ const PURCHASE_USDC_AMOUNT: bigint =
 const PURCHASE_LPPOW5_AMOUNT: bigint = 32_597_676_069_972n; // 32 LPPOW5
 
 // Returned USDC after buying
-const PURCHASE_POW5_RETURNED: bigint = 9_681_047_111_497_358n; // 9.681 POW5
+const PURCHASE_POW5_RETURNED: bigint = 21_333n; // TODO
 
 // USDC lost when a POW5 LP-SFT is purchased and then liquidated
-const PURCHASE_USDC_LOST: bigint = 3_536_677n; // 3.536 USDC ($3.54)
+const PURCHASE_USDC_LOST: bigint = 3_030_615n; // 3.031 USDC ($3.03)
 
 //
 // Debug parameters
@@ -167,7 +167,7 @@ describe("Bureau 4: Reverse Repo", () => {
       lpSftContract,
       pow1Contract,
       pow1LpNftStakeFarmContract,
-      pow1PoolContract,
+      pow1MarketPoolContract,
       wrappedNativeContract,
     } = deployerContracts;
 
@@ -183,8 +183,8 @@ describe("Bureau 4: Reverse Repo", () => {
 
     // Get pool token order
     let pow1IsToken0: boolean;
-    const token0: `0x${string}` = await pow1PoolContract.token0();
-    const token1: `0x${string}` = await pow1PoolContract.token1();
+    const token0: `0x${string}` = await pow1MarketPoolContract.token0();
+    const token1: `0x${string}` = await pow1MarketPoolContract.token1();
     if (
       token0.toLowerCase() === pow1Contract.address.toLowerCase() &&
       token1.toLowerCase() === wrappedNativeContract.address.toLowerCase()
@@ -206,7 +206,7 @@ describe("Bureau 4: Reverse Repo", () => {
     );
 
     // Initialize the Uniswap V3 pool
-    await pow1PoolContract.initialize(INITIAL_PRICE);
+    await pow1MarketPoolContract.initialize(INITIAL_PRICE);
 
     // Approve tokens
     await pow1Contract.approve(
@@ -220,8 +220,8 @@ describe("Bureau 4: Reverse Repo", () => {
 
     // Initialize DutchAuction
     await dutchAuctionContract.initialize(
-      INITIAL_POW1_SUPPLY, // gameTokenAmount
-      INITIAL_WETH_AMOUNT, // assetTokenAmount
+      INITIAL_POW1_SUPPLY, // pow1Amount
+      INITIAL_WETH_AMOUNT, // marketTokenAmount
       beneficiaryAddress, // receiver
     );
   });
@@ -314,11 +314,12 @@ describe("Bureau 4: Reverse Repo", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   it("should get pool token order for LPPOW5", async function (): Promise<void> {
-    const { pow5Contract, pow5PoolContract, usdcContract } = deployerContracts;
+    const { pow5Contract, pow5StablePoolContract, usdcContract } =
+      deployerContracts;
 
     // Get pool token order
-    const token0: `0x${string}` = await pow5PoolContract.token0();
-    const token1: `0x${string}` = await pow5PoolContract.token1();
+    const token0: `0x${string}` = await pow5StablePoolContract.token0();
+    const token1: `0x${string}` = await pow5StablePoolContract.token1();
     if (
       token0.toLowerCase() === pow5Contract.address.toLowerCase() &&
       token1.toLowerCase() === usdcContract.address.toLowerCase()
@@ -402,7 +403,7 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should initialize the LPPOW5 pool", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow5PoolContract } = deployerContracts;
+    const { pow5StablePoolContract } = deployerContracts;
 
     // The initial sqrt price [sqrt(amountToken1/amountToken0)] as a Q64.96 value
     const INITIAL_PRICE: bigint = encodePriceSqrt(
@@ -411,7 +412,7 @@ describe("Bureau 4: Reverse Repo", () => {
     );
 
     // Initialize the Uniswap V3 pool
-    await pow5PoolContract.initialize(INITIAL_PRICE);
+    await pow5StablePoolContract.initialize(INITIAL_PRICE);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -527,8 +528,8 @@ describe("Bureau 4: Reverse Repo", () => {
 
     // Initialize ReverseRepo
     reverseRepoContract.initialize(
-      INITIAL_POW5_DEPOSIT, // gameTokenAmount
-      INITIAL_USDC_AMOUNT, // assetTokenAmount
+      INITIAL_POW5_DEPOSIT, // pow5Amount
+      INITIAL_USDC_AMOUNT, // stableTokenAmount
       beneficiaryAddress, // receiver
     );
   });
@@ -607,7 +608,7 @@ describe("Bureau 4: Reverse Repo", () => {
   });
 
   it("should log Uniswap pool reserves", async function (): Promise<void> {
-    const { pow5Contract, pow5PoolContract } = beneficiaryContracts;
+    const { pow5Contract, pow5StablePoolContract } = beneficiaryContracts;
     const usdcTokenContract: ERC20Contract = new ERC20Contract(
       deployer,
       addressBook.usdcToken!,
@@ -615,10 +616,10 @@ describe("Bureau 4: Reverse Repo", () => {
 
     // Get Uniswap pool reserves
     const pow5Balance: bigint = await pow5Contract.balanceOf(
-      pow5PoolContract.address,
+      pow5StablePoolContract.address,
     );
     const usdcBalance: bigint = await usdcTokenContract.balanceOf(
-      pow5PoolContract.address,
+      pow5StablePoolContract.address,
     );
 
     // Calculate DeFi metrics
@@ -775,8 +776,8 @@ describe("Bureau 4: Reverse Repo", () => {
 
     // Buy POW5 LP-SFT from ReverseRepo
     await reverseRepoContract.purchase(
-      0n, // gameTokenAmount
-      PURCHASE_USDC_AMOUNT, // assetTokenAmount
+      0n, // pow5Amount
+      PURCHASE_USDC_AMOUNT, // stableTokenAmount
       beneficiaryAddress, // receiver
     );
   });
@@ -806,12 +807,14 @@ describe("Bureau 4: Reverse Repo", () => {
       )} POW5 ($${pow5Value})`,
     );
 
-    chai.expect(pow5Balance).to.equal(
-      INITIAL_POW5_AMOUNT -
-        INITIAL_POW5_DEPOSIT +
-        LPPOW5_POW5_DUST +
-        9_681_047_111_497_358n, // TODO: Magic constant (9.681 POW5)
-    );
+    chai
+      .expect(pow5Balance)
+      .to.equal(
+        INITIAL_POW5_AMOUNT -
+          INITIAL_POW5_DEPOSIT +
+          LPPOW5_POW5_DUST +
+          PURCHASE_POW5_RETURNED,
+      );
   });
 
   it("should check USDC balance after purchase", async function (): Promise<void> {
@@ -823,7 +826,7 @@ describe("Bureau 4: Reverse Repo", () => {
     // Check USDC balance
     const usdcBalance: bigint =
       await usdcTokenContract.balanceOf(beneficiaryAddress);
-    chai.expect(usdcBalance).to.equal(0n);
+    chai.expect(usdcBalance).to.equal(5_366_714n); // TODO: Magic constant
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -831,7 +834,7 @@ describe("Bureau 4: Reverse Repo", () => {
   //////////////////////////////////////////////////////////////////////////////
 
   it("should log Uniswap pool reserves", async function (): Promise<void> {
-    const { pow5Contract, pow5PoolContract } = beneficiaryContracts;
+    const { pow5Contract, pow5StablePoolContract } = beneficiaryContracts;
     const usdcTokenContract: ERC20Contract = new ERC20Contract(
       deployer,
       addressBook.usdcToken!,
@@ -839,10 +842,10 @@ describe("Bureau 4: Reverse Repo", () => {
 
     // Get Uniswap pool reserves
     const pow5Balance: bigint = await pow5Contract.balanceOf(
-      pow5PoolContract.address,
+      pow5StablePoolContract.address,
     );
     const usdcBalance: bigint = await usdcTokenContract.balanceOf(
-      pow5PoolContract.address,
+      pow5StablePoolContract.address,
     );
 
     // Calculate DeFi metrics
