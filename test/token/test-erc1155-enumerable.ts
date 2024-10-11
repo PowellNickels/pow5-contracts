@@ -89,7 +89,7 @@ describe("ERC1155Enumerable", () => {
 
     // Mint NFT
     const receipt: ethers.ContractTransactionReceipt =
-      await testERC1155EnumerableContract.mintNFT(
+      await testERC1155EnumerableContract.mintNft(
         beneficiaryAddress,
         nftTokenId1,
       );
@@ -126,7 +126,7 @@ describe("ERC1155Enumerable", () => {
     this.timeout(60 * 1000);
 
     // Mint NFT
-    await testERC1155EnumerableContract.mintNFT(
+    await testERC1155EnumerableContract.mintNft(
       beneficiaryAddress,
       nftTokenId2,
     );
@@ -158,7 +158,7 @@ describe("ERC1155Enumerable", () => {
     this.timeout(60 * 1000);
 
     const receipt: ethers.ContractTransactionReceipt =
-      await testERC1155EnumerableContract.burnNFT(
+      await testERC1155EnumerableContract.burnNft(
         beneficiaryAddress,
         nftTokenId1,
       );
@@ -199,7 +199,7 @@ describe("ERC1155Enumerable", () => {
     this.timeout(60 * 1000);
 
     // Burn NFT
-    await testERC1155EnumerableContract.burnNFT(
+    await testERC1155EnumerableContract.burnNft(
       beneficiaryAddress,
       nftTokenId2,
     );
@@ -422,7 +422,7 @@ describe("ERC1155Enumerable", () => {
     this.timeout(60 * 1000);
 
     // Mint NFT
-    await testERC1155EnumerableContract.mintNFT(
+    await testERC1155EnumerableContract.mintNft(
       beneficiaryAddress,
       nftTokenId2,
     );

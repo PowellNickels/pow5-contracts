@@ -44,7 +44,7 @@ contract TestERC1155Enumerable is ERC1155Utils, ERC1155Enumerable {
    * @param account The account to mint an NFT to
    * @param nftTokenId The token ID of the minted NFT
    */
-  function mintNFT(address account, uint256 nftTokenId) external {
+  function mintNft(address account, uint256 nftTokenId) external {
     // Call ancestor
     _mint(account, nftTokenId, 1, "");
   }
@@ -78,7 +78,7 @@ contract TestERC1155Enumerable is ERC1155Utils, ERC1155Enumerable {
    * @param account The account to burn an NFT from
    * @param nftTokenId The token ID of the NFT to burn
    */
-  function burnNFT(address account, uint256 nftTokenId) external {
+  function burnNft(address account, uint256 nftTokenId) external {
     // Call ancestor
     _burn(account, nftTokenId, 1);
   }

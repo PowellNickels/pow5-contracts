@@ -34,13 +34,13 @@ function TestERC1155EnumerableMixin<T extends new (...args: any[]) => {}>(
       );
     }
 
-    async mintNFT(
+    async mintNft(
       account: `0x${string}`,
       nftTokenId: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.testErc1155Enumerable.mintNFT(account, nftTokenId);
+          await this.testErc1155Enumerable.mintNft(account, nftTokenId);
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
@@ -58,13 +58,13 @@ function TestERC1155EnumerableMixin<T extends new (...args: any[]) => {}>(
       });
     }
 
-    async burnNFT(
+    async burnNft(
       account: `0x${string}`,
       nftTokenId: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.testErc1155Enumerable.burnNFT(account, nftTokenId);
+          await this.testErc1155Enumerable.burnNft(account, nftTokenId);
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
