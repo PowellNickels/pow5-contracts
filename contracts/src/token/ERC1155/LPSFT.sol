@@ -17,7 +17,6 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {Arrays} from "@openzeppelin/contracts/utils/Arrays.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
-import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
 
 import {INonfungiblePositionManager} from "../../../interfaces/uniswap-v3-periphery/INonfungiblePositionManager.sol";
 
@@ -258,7 +257,7 @@ contract LPSFT is
         // Read state
         address token0;
         address token1;
-        uint128 uniV3LiquidityAmount;
+        uint128 liquidityAmount;
         // slither-disable-next-line unused-return
         (
           ,
@@ -268,25 +267,20 @@ contract LPSFT is
           ,
           ,
           ,
-          uniV3LiquidityAmount,
+          liquidityAmount,
           ,
           ,
           ,
 
         ) = uniswapV3NftManager.positions(tokenId);
 
-        // Translate state
-        uint256 liquidityAmount = SafeCast.toUint256(
-          SafeCast.toInt256(uniV3LiquidityAmount)
-        );
-
         // Increase LP token balance
         if (token0 == address(pow1Token) || token1 == address(pow1Token)) {
-          lpPow1Token.mint(tokenAddress, liquidityAmount);
+          lpPow1Token.mint(tokenAddress, uint256(liquidityAmount));
         } else if (
           token0 == address(pow5Token) || token1 == address(pow5Token)
         ) {
-          lpPow5Token.mint(tokenAddress, liquidityAmount);
+          lpPow5Token.mint(tokenAddress, uint256(liquidityAmount));
         }
       }
     }

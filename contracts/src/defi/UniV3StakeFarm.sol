@@ -284,16 +284,16 @@ contract UniV3StakeFarm is
 
     // Read state
     // slither-disable-next-line unused-return
-    (, , , , , , , uint128 uniV3LiquidityAmount, , , , ) = uniswapV3NftManager
+    (, , , , , , , uint128 liquidityAmount, , , , ) = uniswapV3NftManager
       .positions(tokenId);
 
     // Withdraw tokens from the pool
-    if (uniV3LiquidityAmount > 0) {
+    if (liquidityAmount > 0) {
       // slither-disable-next-line unused-return
       uniswapV3NftManager.decreaseLiquidity(
         INonfungiblePositionManager.DecreaseLiquidityParams({
           tokenId: tokenId,
-          liquidity: uniV3LiquidityAmount,
+          liquidity: liquidityAmount,
           amount0Min: 0,
           amount1Min: 0,
           // slither-disable-next-line timestamp

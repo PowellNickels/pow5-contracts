@@ -38,7 +38,7 @@ abstract contract IUniV3Pooler {
     uint256 nftTokenId,
     uint256 gameTokenShare,
     uint256 assetTokenShare,
-    uint256 liquidityAmount
+    uint128 liquidityAmount
   );
 
   /**
@@ -58,7 +58,7 @@ abstract contract IUniV3Pooler {
     address indexed recipient,
     address nftAddress,
     uint256 nftTokenId,
-    uint256 liquidityAmount,
+    uint128 liquidityAmount,
     uint256 gameTokenCollected,
     uint256 assetTokenCollected,
     uint256 assetTokenReturned

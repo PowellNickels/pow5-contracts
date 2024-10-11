@@ -303,7 +303,7 @@ contract DutchAuction is
 
     // Read state
     // slither-disable-next-line unused-return
-    (, , , , , , , uint128 uniV3LiquidityAmount, , , , ) = uniswapV3NftManager
+    (, , , , , , , uint128 liquidityAmount, , , , ) = uniswapV3NftManager
       .positions(nftTokenId);
 
     // Withdraw tokens from the pool
@@ -311,7 +311,7 @@ contract DutchAuction is
     uniswapV3NftManager.decreaseLiquidity(
       INonfungiblePositionManager.DecreaseLiquidityParams({
         tokenId: nftTokenId,
-        liquidity: uniV3LiquidityAmount,
+        liquidity: liquidityAmount,
         amount0Min: 0,
         amount1Min: 0,
         // slither-disable-next-line timestamp
@@ -560,7 +560,7 @@ contract DutchAuction is
 
     // Read state
     // slither-disable-next-line unused-return
-    (, , , , , , , uint128 uniV3LiquidityAmount, , , , ) = uniswapV3NftManager
+    (, , , , , , , uint128 liquidityAmount, , , , ) = uniswapV3NftManager
       .positions(tokenId);
 
     // Withdraw tokens from the pool
@@ -568,7 +568,7 @@ contract DutchAuction is
     uniswapV3NftManager.decreaseLiquidity(
       INonfungiblePositionManager.DecreaseLiquidityParams({
         tokenId: tokenId,
-        liquidity: uniV3LiquidityAmount,
+        liquidity: liquidityAmount,
         amount0Min: 0,
         amount1Min: 0,
         // slither-disable-next-line timestamp

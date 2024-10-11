@@ -263,19 +263,14 @@ contract UniV3Pooler is
 
     // Read state
     // slither-disable-next-line unused-return
-    (, , , , , , , uint128 uniV3LiquidityAmount, , , , ) = uniswapV3NftManager
+    (, , , , , , , uint128 liquidityAmount, , , , ) = uniswapV3NftManager
       .positions(nftTokenId);
-
-    // Translate state
-    uint256 liquidityAmount = SafeCast.toUint256(
-      SafeCast.toInt256(uniV3LiquidityAmount)
-    );
 
     // Collect tokens and fees from the LP NFT
     (
       uint256 gameTokenCollected,
       uint256 assetTokenCollected
-    ) = _collectTokensAndFees(nftTokenId, uniV3LiquidityAmount);
+    ) = _collectTokensAndFees(nftTokenId, liquidityAmount);
 
     // Track token amount
     uint256 assetTokenAmount = assetTokenCollected;
@@ -446,7 +441,7 @@ contract UniV3Pooler is
     uint24 poolFee = uniswapV3Pool.fee();
 
     // Mint the LP NFT
-    uint256 liquidityAmount;
+    uint128 liquidityAmount;
     uint256 amount0;
     uint256 amount1;
     (nftTokenId, liquidityAmount, amount0, amount1) = uniswapV3NftManager.mint(
