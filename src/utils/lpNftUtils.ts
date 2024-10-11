@@ -10,7 +10,7 @@
  */
 
 //
-// LP NFT utility functions
+// LP-NFT utility functions
 //
 
 /**

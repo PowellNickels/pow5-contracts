@@ -262,7 +262,7 @@ contract UniV3StakeFarm is
       address(this)
     );
 
-    // Unstake the LP NFT
+    // Unstake the LP-NFT
     uniswapV3Staker.unstakeToken(_incentiveKey, tokenId);
 
     // Read state
@@ -279,7 +279,7 @@ contract UniV3StakeFarm is
       rewardAfter - rewardBefore
     );
 
-    // Withdraw the LP NFT from the staker
+    // Withdraw the LP-NFT from the staker
     uniswapV3Staker.withdrawToken(tokenId, address(this), "");
 
     // Read state
@@ -333,7 +333,7 @@ contract UniV3StakeFarm is
       token1.safeTransfer(_msgSender(), token1Balance);
     }
 
-    // Return the empty LP NFT to the sender as a keepsake
+    // Return the empty LP-NFT to the sender as a keepsake
     uniswapV3NftManager.safeTransferFrom(address(this), _msgSender(), tokenId);
 
     /* TODO

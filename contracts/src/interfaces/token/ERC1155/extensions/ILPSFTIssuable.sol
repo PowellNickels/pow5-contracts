@@ -20,23 +20,23 @@ interface ILPSFTIssuable is IERC165, IERC1155 {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @dev Mints a new LP SFT
+   * @dev Mints a new LP-SFT
    *
-   * @param to The account receiving the minted LP SFT
-   * @param sftTokenId The token ID of the minted LP SFT
+   * @param to The account receiving the minted LP-SFT
+   * @param sftTokenId The token ID of the minted LP-SFT
    * @param data Extra data passed to the receiver contract
    */
   function mint(address to, uint256 sftTokenId, bytes memory data) external;
 
   /**
-   * @dev Mints a batch of LP SFTs
+   * @dev Mints a batch of LP-SFTs
    *
-   * @param to The account receiving the minted LP SFT
+   * @param to The account receiving the minted LP-SFT
    * @param sftTokenIds The token IDs of the minted SFTs
    * @param data Extra data passed to the receiver contract
    *
-   * Note: This function does not place a limit on the number of LP SFTs that
-   * can be minted in a single transaction. The number of LP SFTs to mint can
+   * Note: This function does not place a limit on the number of LP-SFTs that
+   * can be minted in a single transaction. The number of LP-SFTs to mint can
    * exceed the block gas limit, denying the transaction from completing.
    */
   function mintBatch(
@@ -46,21 +46,21 @@ interface ILPSFTIssuable is IERC165, IERC1155 {
   ) external;
 
   /**
-   * @dev Burns an existing LP SFT
+   * @dev Burns an existing LP-SFT
    *
-   * @param from The account to burn an LP SFT from
-   * @param sftTokenId The token ID of the LP SFT to burn
+   * @param from The account to burn an LP-SFT from
+   * @param sftTokenId The token ID of the LP-SFT to burn
    */
   function burn(address from, uint256 sftTokenId) external;
 
   /**
-   * @dev Burns a batch of existing LP SFTs
+   * @dev Burns a batch of existing LP-SFTs
    *
-   * @param from The account to burn LP SFTs from
-   * @param sftTokenIds The token IDs of the LP SFTs to burn
+   * @param from The account to burn LP-SFTs from
+   * @param sftTokenIds The token IDs of the LP-SFTs to burn
    *
-   * Note: This function does not place a limit on the number of LP SFTs that
-   * can be burned in a single transaction. The number of LP SFTs to burn can
+   * Note: This function does not place a limit on the number of LP-SFTs that
+   * can be burned in a single transaction. The number of LP-SFTs to burn can
    * exceed the block gas limit, denying the transaction from completing.
    */
   function burnBatch(address from, uint256[] memory sftTokenIds) external;
