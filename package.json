@@ -83,7 +83,7 @@
     "solmate": "^6.2.0",
     "ts-node": "^10.9.2",
     "typechain": "^8.3.2",
-    "typescript": "^5.6.2",
+    "typescript": "^5.6.3",
     "ws": "8.18.0"
   },
   "resolutions": {
