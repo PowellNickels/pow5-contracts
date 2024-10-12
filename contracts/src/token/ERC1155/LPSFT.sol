@@ -11,7 +11,6 @@
 
 pragma solidity 0.8.27;
 
-import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -25,7 +24,6 @@ import {ILPSFT} from "../../interfaces/token/ERC1155/ILPSFT.sol";
 import {IERC20Issuable} from "../../interfaces/token/ERC20/extensions/IERC20Issuable.sol";
 
 import {ERC1155Enumerable} from "./extensions/ERC1155Enumerable.sol";
-import {ERC1155NonReentrant} from "./extensions/ERC1155NonReentrant.sol";
 import {LPNFTHolder} from "./extensions/LPNFTHolder.sol";
 import {LPSFTIssuable} from "./extensions/LPSFTIssuable.sol";
 
@@ -34,14 +32,7 @@ import {LPSFTIssuable} from "./extensions/LPSFTIssuable.sol";
  *
  * @dev See https://eips.ethereum.org/EIPS/eip-1155
  */
-contract LPSFT is
-  AccessControl,
-  ERC1155NonReentrant,
-  ERC1155Enumerable,
-  LPSFTIssuable,
-  LPNFTHolder,
-  ILPSFT
-{
+contract LPSFT is ILPSFT, ERC1155Enumerable, LPSFTIssuable, LPNFTHolder {
   using Arrays for uint256[];
   using SafeERC20 for IERC20;
 
@@ -126,8 +117,8 @@ contract LPSFT is
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {IERC165} via {AccessControl}, {ERC1155NonReentrant},
-  // {ERC1155Enumerable}, {LPSFTIssuable}, {LPNFTHolder} and {ILPSFT}
+  // Implementation of {IERC165} via {ILPSFT}, {ERC1155Enumerable},
+  // {LPSFTIssuable} and {LPNFTHolder}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -139,14 +130,7 @@ contract LPSFT is
     public
     view
     virtual
-    override(
-      AccessControl,
-      ERC1155Enumerable,
-      LPSFTIssuable,
-      LPNFTHolder,
-      ERC1155,
-      IERC165
-    )
+    override(IERC165, ERC1155Enumerable, LPSFTIssuable, LPNFTHolder)
     returns (bool)
   {
     return
@@ -155,8 +139,8 @@ contract LPSFT is
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {IERC1155MetadataURI} via {ERC1155NonReentrant},
-  // {ERC1155Enumerable}, {LSFTIssuable} and {LPNFTHolder}
+  // Implementation of {IERC1155MetadataURI} via {ERC1155Enumerable},
+  // {LSFTIssuable} and {LPNFTHolder}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -183,8 +167,8 @@ contract LPSFT is
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {ERC1155} via {ERC1155NonReentrant}, {ERC1155Enumerable},
-  // {LSFTIssuable} and {LPNFTHolder}
+  // Implementation of {ERC1155} via {ERC1155Enumerable}, {LSFTIssuable} and
+  // {LPNFTHolder}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
