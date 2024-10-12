@@ -21,6 +21,7 @@ import {IUniswapV3Pool} from "../../interfaces/uniswap-v3-core/IUniswapV3Pool.so
 import {INonfungiblePositionManager} from "../../interfaces/uniswap-v3-periphery/INonfungiblePositionManager.sol";
 
 import {IReverseRepo} from "../interfaces/bureaucracy/IReverseRepo.sol";
+import {ITheReserve} from "../interfaces/bureaucracy/theReserve/ITheReserve.sol";
 import {IUniV3StakeFarm} from "../interfaces/defi/IUniV3StakeFarm.sol";
 import {ILPSFT} from "../interfaces/token/ERC1155/ILPSFT.sol";
 import {IGameTokenPooler} from "../interfaces/token/routes/IGameTokenPooler.sol";
@@ -43,6 +44,11 @@ contract ReverseRepo is
   //////////////////////////////////////////////////////////////////////////////
   // Routes
   //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @dev The Reserve smart contract
+   */
+  ITheReserve public immutable theReserve;
 
   /**
    * @dev The POW5 token
@@ -92,52 +98,40 @@ contract ReverseRepo is
    * @dev Initializes the Yield Harvest contract
    *
    * @param owner_ The owner of the Dutch Auction
-   * @param pow5Token_ The POW5 token
-   * @param stableToken_ The stable token
-   * @param pow5StablePool_ The upstream Uniswap V3 pool for the token pair
-   * @param pow5StableSwapper_ The POW5 swapper
-   * @param pow5StablePooler_ The POW5 pooler
-   * @param pow5LpNftStakeFarm_ The POW5 LP-NFT stake farm
-   * @param lpSft_ The LP-SFT token contract
-   * @param uniswapV3NftManager_ The upstream Uniswap V3 NFT manager
+   * @param theReserve_ The Reserve smart contract address
    */
-  constructor(
-    address owner_,
-    address pow5Token_,
-    address stableToken_,
-    address pow5StablePool_,
-    address pow5StableSwapper_,
-    address pow5StablePooler_,
-    address pow5LpNftStakeFarm_,
-    address lpSft_,
-    address uniswapV3NftManager_
-  ) {
+  constructor(address owner_, address theReserve_) {
     // Validate parameters
     require(owner_ != address(0), "Invalid owner");
-    require(pow5Token_ != address(0), "Invalid POW5");
-    require(stableToken_ != address(0), "Invalid stable token");
-    require(pow5StablePool_ != address(0), "Invalid pool");
-    require(pow5StableSwapper_ != address(0), "Invalid swapper");
-    require(pow5StablePooler_ != address(0), "Invalid pooler");
-    require(pow5LpNftStakeFarm_ != address(0), "Invalid farm");
-    require(lpSft_ != address(0), "Invalid LP-SFT");
-    require(uniswapV3NftManager_ != address(0), "Invalid mgr");
+    require(theReserve_ != address(0), "Invalid The Reserve");
 
     // Initialize {AccessControl}
     _grantRole(DEFAULT_ADMIN_ROLE, owner_);
 
     // Initialize routes
-    pow5Token = IERC20(pow5Token_);
-    stableToken = IERC20(stableToken_);
-    pow5StablePool = IUniswapV3Pool(pow5StablePool_);
-    pow5StableSwapper = IGameTokenSwapper(pow5StableSwapper_);
-    pow5StablePooler = IGameTokenPooler(pow5StablePooler_);
-    pow5LpNftStakeFarm = IUniV3StakeFarm(pow5LpNftStakeFarm_);
-    lpSft = ILPSFT(lpSft_);
-    uniswapV3NftManager = INonfungiblePositionManager(uniswapV3NftManager_);
+    theReserve = ITheReserve(theReserve_);
+    pow5Token = IERC20(ITheReserve(theReserve_).pow5Token());
+    stableToken = IERC20(ITheReserve(theReserve_).stableToken());
+    pow5StablePool = IUniswapV3Pool(ITheReserve(theReserve_).pow5StablePool());
+    pow5StableSwapper = IGameTokenSwapper(
+      ITheReserve(theReserve_).pow5StableSwapper()
+    );
+    pow5StablePooler = IGameTokenPooler(
+      ITheReserve(theReserve_).pow5StablePooler()
+    );
+    pow5LpNftStakeFarm = IUniV3StakeFarm(
+      ITheReserve(theReserve_).pow5LpNftStakeFarm()
+    );
+    lpSft = ILPSFT(ITheReserve(theReserve_).lpSft());
+    uniswapV3NftManager = INonfungiblePositionManager(
+      ITheReserve(theReserve_).uniswapV3NftManager()
+    );
 
     // Approve the stake farm to transfer our LP-NFTs
-    uniswapV3NftManager.setApprovalForAll(pow5LpNftStakeFarm_, true);
+    uniswapV3NftManager.setApprovalForAll(
+      address(ITheReserve(theReserve_).pow5LpNftStakeFarm()),
+      true
+    );
   }
 
   //////////////////////////////////////////////////////////////////////////////

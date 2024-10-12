@@ -22,6 +22,7 @@ import {IUniswapV3Pool} from "../../interfaces/uniswap-v3-core/IUniswapV3Pool.so
 import {INonfungiblePositionManager} from "../../interfaces/uniswap-v3-periphery/INonfungiblePositionManager.sol";
 
 import {IDutchAuction} from "../interfaces/bureaucracy/IDutchAuction.sol";
+import {ITheReserve} from "../interfaces/bureaucracy/theReserve/ITheReserve.sol";
 import {ILPNFTStakeFarm} from "../interfaces/defi/ILPNFTStakeFarm.sol";
 import {ILPSFT} from "../interfaces/token/ERC1155/ILPSFT.sol";
 import {IGameTokenPooler} from "../interfaces/token/routes/IGameTokenPooler.sol";
@@ -46,6 +47,11 @@ contract DutchAuction is
   //////////////////////////////////////////////////////////////////////////////
   // Routes
   //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @dev The Reserve smart contract
+   */
+  ITheReserve public immutable theReserve;
 
   /**
    * @dev The POW1 token
@@ -114,49 +120,26 @@ contract DutchAuction is
    * @dev Initializes the Dutch Auction contract
    *
    * @param owner_ The owner of the Dutch Auction
-   * @param pow1Token_ The POW1 token
-   * @param marketToken_ The market token
-   * @param pow1MarketPool_ The upstream Uniswap V3 pool for the token pair
-   * @param pow1MarketSwapper_ The POW1 swapper
-   * @param pow1MarketPooler_ The POW1 pooler
-   * @param pow1LpNftStakeFarm_ The POW1 LP-NFT stake farm
-   * @param lpSft_ The LP-SFT contract
-   * @param uniswapV3NftManager_ The upstream Uniswap V3 NFT manager
+   * @param theReserve_ The Reserve smart contract address
    */
-  constructor(
-    address owner_,
-    address pow1Token_,
-    address marketToken_,
-    address pow1MarketPool_,
-    address pow1MarketSwapper_,
-    address pow1MarketPooler_,
-    address pow1LpNftStakeFarm_,
-    address lpSft_,
-    address uniswapV3NftManager_
-  ) {
+  constructor(address owner_, address theReserve_) {
     // Validate parameters
     require(owner_ != address(0), "Invalid owner");
-    require(pow1Token_ != address(0), "Invalid POW1");
-    require(marketToken_ != address(0), "Invalid market token");
-    require(pow1MarketPool_ != address(0), "Invalid POW1 pool");
-    require(pow1MarketSwapper_ != address(0), "Invalid POW1 swapper");
-    require(pow1MarketPooler_ != address(0), "Invalid POW1 pooler");
-    require(pow1LpNftStakeFarm_ != address(0), "Invalid POW1 stake farm");
-    require(lpSft_ != address(0), "Invalid LP-SFT");
-    require(uniswapV3NftManager_ != address(0), "Invalid NFT mgr");
+    require(theReserve_ != address(0), "Invalid The Reserve");
 
     // Initialize {AccessControl}
     _grantRole(DEFAULT_ADMIN_ROLE, owner_);
 
     // Initialize routes
-    pow1Token = IERC20(pow1Token_);
-    marketToken = IERC20(marketToken_);
-    pow1MarketPool = IUniswapV3Pool(pow1MarketPool_);
-    pow1MarketSwapper = IGameTokenSwapper(pow1MarketSwapper_);
-    pow1MarketPooler = IGameTokenPooler(pow1MarketPooler_);
-    pow1LpNftStakeFarm = ILPNFTStakeFarm(pow1LpNftStakeFarm_);
-    lpSft = ILPSFT(lpSft_);
-    uniswapV3NftManager = INonfungiblePositionManager(uniswapV3NftManager_);
+    theReserve = ITheReserve(theReserve_);
+    pow1Token = ITheReserve(theReserve_).pow1Token();
+    marketToken = ITheReserve(theReserve_).marketToken();
+    pow1MarketPool = ITheReserve(theReserve_).pow1MarketPool();
+    pow1MarketSwapper = ITheReserve(theReserve_).pow1MarketSwapper();
+    pow1MarketPooler = ITheReserve(theReserve_).pow1MarketPooler();
+    pow1LpNftStakeFarm = ITheReserve(theReserve_).pow1LpNftStakeFarm();
+    lpSft = ITheReserve(theReserve_).lpSft();
+    uniswapV3NftManager = ITheReserve(theReserve_).uniswapV3NftManager();
   }
 
   //////////////////////////////////////////////////////////////////////////////

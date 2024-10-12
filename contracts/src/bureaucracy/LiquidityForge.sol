@@ -15,6 +15,7 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 
 import {ILiquidityForge} from "../interfaces/bureaucracy/ILiquidityForge.sol";
 import {IYieldHarvest} from "../interfaces/bureaucracy/IYieldHarvest.sol";
+import {ITheReserve} from "../interfaces/bureaucracy/theReserve/ITheReserve.sol";
 import {IDeFiManager} from "../interfaces/defi/IDeFiManager.sol";
 import {IERC20InterestFarm} from "../interfaces/defi/IERC20InterestFarm.sol";
 import {ILPSFT} from "../interfaces/token/ERC1155/ILPSFT.sol";
@@ -29,6 +30,11 @@ contract LiquidityForge is Context, ReentrancyGuard, ILiquidityForge {
   //////////////////////////////////////////////////////////////////////////////
   // Routes
   //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @dev The Reserve smart contract
+   */
+  ITheReserve public immutable theReserve;
 
   /**
    * @dev The LP-SFT token contract
@@ -67,34 +73,28 @@ contract LiquidityForge is Context, ReentrancyGuard, ILiquidityForge {
   /**
    * @dev Initializes the Liquidity Forge contract
    *
-   * @param lpSft_ The LP-SFT token contract
-   * @param noLpSft_ The LP-SFT debt contract
+   * @param theReserve_ The Reserve smart contract address
    * @param defiManager_ The LP-SFT manager contract
-   * @param pow5Token_ The POW5 token contract
    * @param yieldHarvest_ The Yield Harvest contract
    * @param erc20InterestFarm_ The ERC20 interest farm
    */
   constructor(
-    address lpSft_,
-    address noLpSft_,
+    address theReserve_,
     address defiManager_,
-    address pow5Token_,
     address yieldHarvest_,
     address erc20InterestFarm_
   ) {
     // Validate parameters
-    require(lpSft_ != address(0), "Invalid LP-SFT");
-    require(noLpSft_ != address(0), "Invalid No-LP-SFT");
     require(defiManager_ != address(0), "Invalid LP-SFT mgr");
-    require(pow5Token_ != address(0), "Invalid POW5");
     require(yieldHarvest_ != address(0), "Invalid yield harvest");
     require(erc20InterestFarm_ != address(0), "Invalid interest farm");
 
     // Initialize routes
-    lpSft = ILPSFT(lpSft_);
-    noLpSft = IERC1155Enumerable(noLpSft_);
+    theReserve = ITheReserve(theReserve_);
+    lpSft = ILPSFT(ITheReserve(theReserve_).lpSft());
+    noLpSft = IERC1155Enumerable(ITheReserve(theReserve_).noLpSft());
     defiManager = IDeFiManager(defiManager_);
-    pow5Token = IERC20(pow5Token_);
+    pow5Token = IERC20(ITheReserve(theReserve_).pow5Token());
     yieldHarvest = IYieldHarvest(yieldHarvest_);
     erc20InterestFarm = IERC20InterestFarm(erc20InterestFarm_);
   }

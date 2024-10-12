@@ -43,6 +43,7 @@ import {
   POW5_SWAPPER_CONTRACT,
   POW5_TOKEN_CONTRACT,
   REVERSE_REPO_CONTRACT,
+  THE_RESERVE_CONTRACT,
   YIELD_HARVEST_CONTRACT,
 } from "../hardhat/contracts/dapp";
 import {
@@ -226,6 +227,11 @@ async function getAddressBook(networkName: string): Promise<AddressBook> {
     testTickMath: await getContractAddress(
       "testTickMath",
       TEST_TICK_MATH_CONTRACT,
+      networkName,
+    ),
+    theReserve: await getContractAddress(
+      "theReserve",
+      THE_RESERVE_CONTRACT,
       networkName,
     ),
     uniswapV3Factory: await getContractAddress(
