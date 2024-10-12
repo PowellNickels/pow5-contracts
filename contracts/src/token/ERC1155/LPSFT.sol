@@ -140,12 +140,12 @@ contract LPSFT is
     view
     virtual
     override(
+      IERC165,
       AccessControl,
       ERC1155Enumerable,
       LPSFTIssuable,
       LPNFTHolder,
-      ERC1155,
-      IERC165
+      ERC1155
     )
     returns (bool)
   {
