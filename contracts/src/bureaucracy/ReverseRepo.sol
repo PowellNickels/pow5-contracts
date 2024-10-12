@@ -20,7 +20,7 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 import {IUniswapV3Pool} from "../../interfaces/uniswap-v3-core/IUniswapV3Pool.sol";
 import {INonfungiblePositionManager} from "../../interfaces/uniswap-v3-periphery/INonfungiblePositionManager.sol";
 
-import {IReverseRepo} from "../interfaces/bureaus/IReverseRepo.sol";
+import {IReverseRepo} from "../interfaces/bureaucracy/IReverseRepo.sol";
 import {IUniV3StakeFarm} from "../interfaces/defi/IUniV3StakeFarm.sol";
 import {ILPSFT} from "../interfaces/token/ERC1155/ILPSFT.sol";
 import {IGameTokenPooler} from "../interfaces/token/routes/IGameTokenPooler.sol";

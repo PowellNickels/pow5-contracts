@@ -12,10 +12,10 @@
 import { ethers } from "ethers";
 
 import { AddressBook } from "../interfaces/addressBook";
-import { DutchAuctionContract } from "../interfaces/bureaus/dutchAuctionContract";
-import { LiquidityForgeContract } from "../interfaces/bureaus/liquidityForgeContract";
-import { ReverseRepoContract } from "../interfaces/bureaus/reverseRepoContract";
-import { YieldHarvestContract } from "../interfaces/bureaus/yieldHarvestContract";
+import { DutchAuctionContract } from "../interfaces/bureaucracy/dutchAuctionContract";
+import { LiquidityForgeContract } from "../interfaces/bureaucracy/liquidityForgeContract";
+import { ReverseRepoContract } from "../interfaces/bureaucracy/reverseRepoContract";
+import { YieldHarvestContract } from "../interfaces/bureaucracy/yieldHarvestContract";
 import { ContractLibrary } from "../interfaces/contractLibrary";
 import { DeFiManagerContract } from "../interfaces/defi/defiManagerContract";
 import { POW1LpNftStakeFarmContract } from "../interfaces/defi/pow1LpNftStakeFarmContract";

@@ -13,7 +13,7 @@ import {IERC1155Receiver} from "@openzeppelin/contracts/token/ERC1155/IERC1155Re
 import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-import {IYieldHarvest} from "../interfaces/bureaus/IYieldHarvest.sol";
+import {IYieldHarvest} from "../interfaces/bureaucracy/IYieldHarvest.sol";
 import {IDeFiManager} from "../interfaces/defi/IDeFiManager.sol";
 import {ILPSFTLendFarm} from "../interfaces/defi/ILPSFTLendFarm.sol";
 import {ILPSFTIssuable} from "../interfaces/token/ERC1155/extensions/ILPSFTIssuable.sol";

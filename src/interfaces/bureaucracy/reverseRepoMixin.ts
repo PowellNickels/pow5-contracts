@@ -8,8 +8,8 @@
 
 import { ethers } from "ethers";
 
-import { IReverseRepo } from "../../types/contracts/src/interfaces/bureaus/IReverseRepo";
-import { IReverseRepo__factory } from "../../types/factories/contracts/src/interfaces/bureaus/IReverseRepo__factory";
+import { IReverseRepo } from "../../types/contracts/src/interfaces/bureaucracy/IReverseRepo";
+import { IReverseRepo__factory } from "../../types/factories/contracts/src/interfaces/bureaucracy/IReverseRepo__factory";
 import { BaseMixin } from "../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any

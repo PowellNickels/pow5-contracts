@@ -13,8 +13,8 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-import {ILiquidityForge} from "../interfaces/bureaus/ILiquidityForge.sol";
-import {IYieldHarvest} from "../interfaces/bureaus/IYieldHarvest.sol";
+import {ILiquidityForge} from "../interfaces/bureaucracy/ILiquidityForge.sol";
+import {IYieldHarvest} from "../interfaces/bureaucracy/IYieldHarvest.sol";
 import {IDeFiManager} from "../interfaces/defi/IDeFiManager.sol";
 import {IERC20InterestFarm} from "../interfaces/defi/IERC20InterestFarm.sol";
 import {ILPSFT} from "../interfaces/token/ERC1155/ILPSFT.sol";

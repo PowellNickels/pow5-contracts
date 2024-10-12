@@ -8,8 +8,8 @@
 
 import { ethers } from "ethers";
 
-import { IYieldHarvest } from "../../types/contracts/src/interfaces/bureaus/IYieldHarvest";
-import { IYieldHarvest__factory } from "../../types/factories/contracts/src/interfaces/bureaus/IYieldHarvest__factory";
+import { IYieldHarvest } from "../../types/contracts/src/interfaces/bureaucracy/IYieldHarvest";
+import { IYieldHarvest__factory } from "../../types/factories/contracts/src/interfaces/bureaucracy/IYieldHarvest__factory";
 import { BaseMixin } from "../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any

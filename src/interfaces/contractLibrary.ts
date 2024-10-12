@@ -9,10 +9,10 @@
  * See the file LICENSE.txt for more information.
  */
 
-import { DutchAuctionContract } from "./bureaus/dutchAuctionContract";
-import { LiquidityForgeContract } from "./bureaus/liquidityForgeContract";
-import { ReverseRepoContract } from "./bureaus/reverseRepoContract";
-import { YieldHarvestContract } from "./bureaus/yieldHarvestContract";
+import { DutchAuctionContract } from "./bureaucracy/dutchAuctionContract";
+import { LiquidityForgeContract } from "./bureaucracy/liquidityForgeContract";
+import { ReverseRepoContract } from "./bureaucracy/reverseRepoContract";
+import { YieldHarvestContract } from "./bureaucracy/yieldHarvestContract";
 import { DeFiManagerContract } from "./defi/defiManagerContract";
 import { POW1LpNftStakeFarmContract } from "./defi/pow1LpNftStakeFarmContract";
 import { POW1LpSftLendFarmContract } from "./defi/pow1LpSftLendFarmContract";

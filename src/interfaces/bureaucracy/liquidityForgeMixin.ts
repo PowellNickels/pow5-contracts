@@ -8,8 +8,8 @@
 
 import { ethers } from "ethers";
 
-import { ILiquidityForge } from "../../types/contracts/src/interfaces/bureaus/ILiquidityForge";
-import { ILiquidityForge__factory } from "../../types/factories/contracts/src/interfaces/bureaus/ILiquidityForge__factory";
+import { ILiquidityForge } from "../../types/contracts/src/interfaces/bureaucracy/ILiquidityForge";
+import { ILiquidityForge__factory } from "../../types/factories/contracts/src/interfaces/bureaucracy/ILiquidityForge__factory";
 import { BaseMixin } from "../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any

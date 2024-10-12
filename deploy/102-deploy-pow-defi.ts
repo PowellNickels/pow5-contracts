@@ -117,7 +117,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
     pow1LpNftStakeFarmTx.address as `0x${string}`;
 
   //
-  // Deploy POW1SftLendFarm
+  // Deploy POW1LpSftLendFarm
   //
 
   console.log(`Deploying ${POW1_LPSFT_LEND_FARM_CONTRACT}`);
@@ -165,7 +165,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
     pow5LpNftStakeFarmTx.address as `0x${string}`;
 
   //
-  // Deploy POW5SftLendFarm
+  // Deploy POW5LpSftLendFarm
   //
 
   console.log(`Deploying ${POW5_LPSFT_LEND_FARM_CONTRACT}`);

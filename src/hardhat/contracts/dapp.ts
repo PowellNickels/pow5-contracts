@@ -10,10 +10,10 @@
  */
 
 // Contract ABIs and artifacts (sort by path)
-import dutchAuctionAbi from "../../abi/contracts/src/bureaus/DutchAuction.sol/DutchAuction.json";
-import liquidityForgeAbi from "../../abi/contracts/src/bureaus/LiquidityForge.sol/LiquidityForge.json";
-import reverseRepoAbi from "../../abi/contracts/src/bureaus/ReverseRepo.sol/ReverseRepo.json";
-import yieldHarvestAbi from "../../abi/contracts/src/bureaus/YieldHarvest.sol/YieldHarvest.json";
+import dutchAuctionAbi from "../../abi/contracts/src/bureaucracy/DutchAuction.sol/DutchAuction.json";
+import liquidityForgeAbi from "../../abi/contracts/src/bureaucracy/LiquidityForge.sol/LiquidityForge.json";
+import reverseRepoAbi from "../../abi/contracts/src/bureaucracy/ReverseRepo.sol/ReverseRepo.json";
+import yieldHarvestAbi from "../../abi/contracts/src/bureaucracy/YieldHarvest.sol/YieldHarvest.json";
 import defiManagerAbi from "../../abi/contracts/src/defi/DeFiManager.sol/DeFiManager.json";
 import erc20InterestFarmAbi from "../../abi/contracts/src/defi/ERC20InterestFarm.sol/ERC20InterestFarm.json";
 import lpNftStakeFarmAbi from "../../abi/contracts/src/defi/LPNFTStakeFarm.sol/LPNFTStakeFarm.json";

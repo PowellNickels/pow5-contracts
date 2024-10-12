@@ -21,7 +21,7 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 import {IUniswapV3Pool} from "../../interfaces/uniswap-v3-core/IUniswapV3Pool.sol";
 import {INonfungiblePositionManager} from "../../interfaces/uniswap-v3-periphery/INonfungiblePositionManager.sol";
 
-import {IDutchAuction} from "../interfaces/bureaus/IDutchAuction.sol";
+import {IDutchAuction} from "../interfaces/bureaucracy/IDutchAuction.sol";
 import {ILPNFTStakeFarm} from "../interfaces/defi/ILPNFTStakeFarm.sol";
 import {ILPSFT} from "../interfaces/token/ERC1155/ILPSFT.sol";
 import {IGameTokenPooler} from "../interfaces/token/routes/IGameTokenPooler.sol";

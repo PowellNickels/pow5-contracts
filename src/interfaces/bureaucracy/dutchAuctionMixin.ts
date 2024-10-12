@@ -8,8 +8,8 @@
 
 import { ethers } from "ethers";
 
-import { IDutchAuction } from "../../types/contracts/src/interfaces/bureaus/IDutchAuction";
-import { IDutchAuction__factory } from "../../types/factories/contracts/src/interfaces/bureaus/IDutchAuction__factory";
+import { IDutchAuction } from "../../types/contracts/src/interfaces/bureaucracy/IDutchAuction";
+import { IDutchAuction__factory } from "../../types/factories/contracts/src/interfaces/bureaucracy/IDutchAuction__factory";
 import { BaseMixin } from "../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any

@@ -120,4 +120,4 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
 };
 
 export default func;
-func.tags = ["POWBureaus"];
+func.tags = ["POWBureaucracy"];
