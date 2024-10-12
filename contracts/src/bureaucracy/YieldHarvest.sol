@@ -13,6 +13,7 @@ import {IERC1155Receiver} from "@openzeppelin/contracts/token/ERC1155/IERC1155Re
 import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+import {ITheReserve} from "../interfaces/bureaucracy/theReserve/ITheReserve.sol";
 import {IYieldHarvest} from "../interfaces/bureaucracy/IYieldHarvest.sol";
 import {IDeFiManager} from "../interfaces/defi/IDeFiManager.sol";
 import {ILPSFTLendFarm} from "../interfaces/defi/ILPSFTLendFarm.sol";
@@ -39,9 +40,9 @@ contract YieldHarvest is Context, ReentrancyGuard, ERC1155Utils, IYieldHarvest {
   ILPSFTIssuable public immutable noLpSft;
 
   /**
-   * @dev The LP-SFT lend farm
+   * @dev The POW1 LP-SFT lend farm
    */
-  ILPSFTLendFarm public immutable lpSftLendFarm;
+  ILPSFTLendFarm public immutable pow1LpSftLendFarm;
 
   /**
    * @dev The DeFi interface for LP-SFTs
@@ -55,27 +56,18 @@ contract YieldHarvest is Context, ReentrancyGuard, ERC1155Utils, IYieldHarvest {
   /**
    * @dev Initializes the Yield Harvest contract
    *
-   * @param lpSft_ The LP-SFT token contract
-   * @param noLpSft_ The No-LP-SFT token contract
-   * @param lpSftLendFarm_ The LP-SFT lend farm
-   * * @param defiManager_ The address of the LP-SFT DeFi manager
+   * @param theReserve_ The address of The Reserve smart contract
+   * @param defiManager_ The address of the LP-SFT DeFi manager
    */
-  constructor(
-    address lpSft_,
-    address noLpSft_,
-    address lpSftLendFarm_,
-    address defiManager_
-  ) {
+  constructor(address theReserve_, address defiManager_) {
     // Validate parameters
-    require(lpSft_ != address(0), "Invalid LP-SFT");
-    require(noLpSft_ != address(0), "Invalid No-LP-SFT");
-    require(lpSftLendFarm_ != address(0), "Invalid farm");
+    require(theReserve_ != address(0), "Invalid The Reserve");
     require(defiManager_ != address(0), "Invalid DeFi mgr");
 
     // Initialize routes
-    lpSft = ILPSFT(lpSft_);
-    noLpSft = ILPSFTIssuable(noLpSft_);
-    lpSftLendFarm = ILPSFTLendFarm(lpSftLendFarm_);
+    lpSft = ITheReserve(theReserve_).lpSft();
+    noLpSft = ITheReserve(theReserve_).noLpSft();
+    pow1LpSftLendFarm = ITheReserve(theReserve_).pow1LpSftLendFarm();
     defiManager = IDeFiManager(defiManager_);
   }
 
@@ -118,7 +110,7 @@ contract YieldHarvest is Context, ReentrancyGuard, ERC1155Utils, IYieldHarvest {
 
     if (_msgSender() == address(lpSft)) {
       // Call external contracts
-      lpSftLendFarm.lendLpSft(id);
+      pow1LpSftLendFarm.lendLpSft(id);
       noLpSft.mint(from, id, data);
     } else {
       // Verify no POW5 debt
@@ -126,7 +118,7 @@ contract YieldHarvest is Context, ReentrancyGuard, ERC1155Utils, IYieldHarvest {
 
       // Call external contracts
       noLpSft.burn(address(this), id);
-      lpSftLendFarm.withdrawLpSft(id);
+      pow1LpSftLendFarm.withdrawLpSft(id);
       lpSft.safeTransferFrom(address(this), from, id, 1, data);
     }
 
@@ -156,10 +148,10 @@ contract YieldHarvest is Context, ReentrancyGuard, ERC1155Utils, IYieldHarvest {
 
     if (_msgSender() == address(lpSft)) {
       // Call external contracts
-      lpSftLendFarm.lendLpSftBatch(ids);
+      pow1LpSftLendFarm.lendLpSftBatch(ids);
       noLpSft.mintBatch(from, ids, data);
     } else {
-      lpSftLendFarm.withdrawLpSftBatch(ids);
+      pow1LpSftLendFarm.withdrawLpSftBatch(ids);
       noLpSft.burnBatch(address(this), ids);
       lpSft.safeBatchTransferFrom(address(this), from, ids, values, data);
     }
