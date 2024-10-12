@@ -225,6 +225,13 @@ contract TheReserve is ITheReserve {
   }
 
   /**
+   * @dev See {ITheReserveRoutes-noLpSft}
+   */
+  function noLpSft() external view override returns (IERC1155Enumerable) {
+    return _routes.noLpSft;
+  }
+
+  /**
    * @dev See {ITheReserveRoutes-uniswapV3Factory}
    */
   function uniswapV3Factory()

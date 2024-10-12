@@ -52,6 +52,7 @@ interface ITheReserveRoutes is IERC165 {
     IUniswapV3Pool marketStablePool;
     IDexTokenSwapper marketStableSwapper;
     ILPSFT lpSft;
+    ILPSFTIssuable noLpSft;
     IUniswapV3Factory uniswapV3Factory;
     INonfungiblePositionManager uniswapV3NftManager;
   }
@@ -146,9 +147,14 @@ interface ITheReserveRoutes is IERC165 {
   function marketStableSwapper() external view returns (IDexTokenSwapper);
 
   /**
-   * @dev The LP-SFT contract
+   * @dev The LPSFT contract
    */
   function lpSft() external view returns (ILPSFT);
+
+  /**
+   * @dev The NOLPSFT contract
+   */
+  function noLpSft() external view returns (IERC1155Enumerable);
 
   /**
    * @dev The upstream Uniswap V3 factory
