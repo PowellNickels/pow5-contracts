@@ -13,6 +13,9 @@ pragma solidity 0.8.27;
 
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {IERC1155MetadataURI} from "@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+
+import {INOLPSFT} from "../../interfaces/token/ERC1155/INOLPSFT.sol";
 
 import {ERC1155Enumerable} from "./extensions/ERC1155Enumerable.sol";
 import {LPSFTIssuable} from "./extensions/LPSFTIssuable.sol";
@@ -22,7 +25,7 @@ import {LPSFTIssuable} from "./extensions/LPSFTIssuable.sol";
  *
  * @dev See https://eips.ethereum.org/EIPS/eip-1155
  */
-contract NOLPSFT is ERC1155Enumerable, LPSFTIssuable {
+contract NOLPSFT is ERC1155Enumerable, LPSFTIssuable, INOLPSFT {
   //////////////////////////////////////////////////////////////////////////////
   // Routes
   //////////////////////////////////////////////////////////////////////////////
@@ -55,7 +58,8 @@ contract NOLPSFT is ERC1155Enumerable, LPSFTIssuable {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {IERC165} via {ERC1155Enumerable} and {LPSFTIssuable}
+  // Implementation of {IERC165} via {ERC1155Enumerable}, {LPSFTIssuable} and
+  // {INOLPSFT}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -67,7 +71,7 @@ contract NOLPSFT is ERC1155Enumerable, LPSFTIssuable {
     public
     view
     virtual
-    override(ERC1155Enumerable, LPSFTIssuable)
+    override(ERC1155Enumerable, LPSFTIssuable, IERC165)
     returns (bool)
   {
     return super.supportsInterface(interfaceId);
