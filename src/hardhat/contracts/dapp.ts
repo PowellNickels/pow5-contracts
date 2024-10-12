@@ -53,6 +53,7 @@ const POW5_STABLE_POOLER_CONTRACT: string = "POW5StablePooler";
 const POW5_SWAPPER_CONTRACT: string = "POW5StableSwapper";
 const POW5_TOKEN_CONTRACT: string = "POW5";
 const REVERSE_REPO_CONTRACT: string = "ReverseRepo";
+const THE_RESERVE_CONTRACT: string = "TheReserve";
 const UNI_V3_POOL_FACTORY_CONTRACT: string = "UniV3PoolFactory";
 const UNIV3_STAKE_FARM_CONTRACT: string = "UniV3StakeFarm";
 const YIELD_HARVEST_CONTRACT: string = "YieldHarvest";
@@ -119,6 +120,7 @@ export {
   POW5_SWAPPER_CONTRACT,
   POW5_TOKEN_CONTRACT,
   REVERSE_REPO_CONTRACT,
+  THE_RESERVE_CONTRACT,
   UNI_V3_POOL_FACTORY_CONTRACT,
   UNIV3_STAKE_FARM_CONTRACT,
   YIELD_HARVEST_CONTRACT,

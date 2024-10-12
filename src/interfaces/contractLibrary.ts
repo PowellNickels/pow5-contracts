@@ -12,6 +12,7 @@
 import { DutchAuctionContract } from "./bureaucracy/dutchAuctionContract";
 import { LiquidityForgeContract } from "./bureaucracy/liquidityForgeContract";
 import { ReverseRepoContract } from "./bureaucracy/reverseRepoContract";
+import { TheReserveContract } from "./bureaucracy/theReserve/theReserveContract";
 import { YieldHarvestContract } from "./bureaucracy/yieldHarvestContract";
 import { DeFiManagerContract } from "./defi/defiManagerContract";
 import { POW1LpNftStakeFarmContract } from "./defi/pow1LpNftStakeFarmContract";
@@ -33,6 +34,7 @@ import { POW1MarketSwapperContract } from "./token/routes/pow1MarketSwapperContr
 import { POW5StablePoolerContract } from "./token/routes/pow5StablePoolerContract";
 import { POW5StableSwapperContract } from "./token/routes/pow5StableSwapperContract";
 import { UniswapV3PoolContract } from "./uniswap/pool/uniswapV3PoolContract";
+import { UniswapV3FactoryContract } from "./uniswap/uniswapV3FactoryContract";
 import { ERC20Contract } from "./zeppelin/token/erc20/erc20Contract";
 
 /**
@@ -61,6 +63,8 @@ interface ContractLibrary {
   pow5StablePoolerContract: POW5StablePoolerContract;
   pow5StableSwapperContract: POW5StableSwapperContract;
   reverseRepoContract: ReverseRepoContract;
+  theReserveContract: TheReserveContract;
+  uniswapV3FactoryContract: UniswapV3FactoryContract;
   usdcContract: ERC20Contract;
   wrappedNativeContract: WrappedNativeContract;
   wrappedNativeUsdcPoolContract: UniswapV3PoolContract;

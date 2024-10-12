@@ -15,6 +15,7 @@ import { AddressBook } from "../interfaces/addressBook";
 import { DutchAuctionContract } from "../interfaces/bureaucracy/dutchAuctionContract";
 import { LiquidityForgeContract } from "../interfaces/bureaucracy/liquidityForgeContract";
 import { ReverseRepoContract } from "../interfaces/bureaucracy/reverseRepoContract";
+import { TheReserveContract } from "../interfaces/bureaucracy/theReserve/theReserveContract";
 import { YieldHarvestContract } from "../interfaces/bureaucracy/yieldHarvestContract";
 import { ContractLibrary } from "../interfaces/contractLibrary";
 import { DeFiManagerContract } from "../interfaces/defi/defiManagerContract";
@@ -37,6 +38,7 @@ import { POW1MarketSwapperContract } from "../interfaces/token/routes/pow1Market
 import { POW5StablePoolerContract } from "../interfaces/token/routes/pow5StablePoolerContract";
 import { POW5StableSwapperContract } from "../interfaces/token/routes/pow5StableSwapperContract";
 import { UniswapV3PoolContract } from "../interfaces/uniswap/pool/uniswapV3PoolContract";
+import { UniswapV3FactoryContract } from "../interfaces/uniswap/uniswapV3FactoryContract";
 import { ERC20Contract } from "../interfaces/zeppelin/token/erc20/erc20Contract";
 
 //
@@ -114,6 +116,11 @@ function getContractLibrary(
     reverseRepoContract: new ReverseRepoContract(
       signer,
       addressBook.reverseRepo!,
+    ),
+    theReserveContract: new TheReserveContract(signer, addressBook.theReserve!),
+    uniswapV3FactoryContract: new UniswapV3FactoryContract(
+      signer,
+      addressBook.uniswapV3Factory!,
     ),
     usdcContract: new ERC20Contract(signer, addressBook.usdcToken!),
     wrappedNativeContract: new WrappedNativeContract(

@@ -13,6 +13,7 @@ import {
   DUTCH_AUCTION_CONTRACT,
   LIQUIDITY_FORGE_CONTRACT,
   REVERSE_REPO_CONTRACT,
+  THE_RESERVE_CONTRACT,
   YIELD_HARVEST_CONTRACT,
 } from "../src/hardhat/contracts/dapp";
 import { getAddressBook } from "../src/hardhat/getAddressBook";
@@ -39,8 +40,45 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   const addressBook: AddressBook = await getAddressBook(networkName);
 
   //////////////////////////////////////////////////////////////////////////////
-  // Deploy DeFi contracts
+  // Deploy bureaucracy contracts
   //////////////////////////////////////////////////////////////////////////////
+
+  //
+  // Deploy TheReserve
+  //
+
+  console.log(`Deploying ${THE_RESERVE_CONTRACT}`);
+  const theReserveTx = await deployments.deploy(THE_RESERVE_CONTRACT, {
+    ...opts,
+    args: [
+      {
+        pow1Token: addressBook.pow1Token!,
+        pow5Token: addressBook.pow5Token!,
+        lpPow1Token: addressBook.lpPow1Token!,
+        lpPow5Token: addressBook.lpPow5Token!,
+        noPow5Token: addressBook.noPow5Token!,
+        marketToken: addressBook.wrappedNativeToken!,
+        stableToken: addressBook.usdcToken!,
+        lpSft: addressBook.lpSft!,
+        noLpSft: addressBook.noLpSft!,
+        pow1MarketPool: addressBook.pow1MarketPool!,
+        pow5StablePool: addressBook.pow5StablePool!,
+        marketStablePool: addressBook.wrappedNativeUsdcPool!,
+        pow1MarketSwapper: addressBook.pow1MarketSwapper!,
+        pow5StableSwapper: addressBook.pow5StableSwapper!,
+        marketStableSwapper: addressBook.wrappedNativeUsdcSwapper!,
+        pow1MarketPooler: addressBook.pow1MarketPooler!,
+        pow5StablePooler: addressBook.pow5StablePooler!,
+        pow1LpNftStakeFarm: addressBook.pow1LpNftStakeFarm!,
+        pow5LpNftStakeFarm: addressBook.pow5LpNftStakeFarm!,
+        pow1LpSftLendFarm: addressBook.pow1LpSftLendFarm!,
+        pow5LpSftLendFarm: addressBook.pow5LpSftLendFarm!,
+        uniswapV3Factory: addressBook.uniswapV3Factory!,
+        uniswapV3NftManager: addressBook.uniswapV3NftManager!,
+      },
+    ],
+  });
+  addressBook.theReserve = theReserveTx.address as `0x${string}`;
 
   //
   // Deploy DutchAuction
@@ -51,14 +89,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
     ...opts,
     args: [
       deployer, // owner
-      addressBook.pow1Token!, // pow1Token
-      addressBook.wrappedNativeToken!, // marketToken
-      addressBook.pow1MarketPool!, // pow1MarketPool
-      addressBook.pow1MarketSwapper!, // pow1MarketSwapper
-      addressBook.pow1MarketPooler!, // pow1MarketPooler
-      addressBook.pow1LpNftStakeFarm!, // pow1LpNftStakeFarm
-      addressBook.lpSft!, // lpSft
-      addressBook.uniswapV3NftManager!, // uniswapV3NftManager
+      addressBook.theReserve!, // theReserve
     ],
   });
   addressBook.dutchAuction = dutchAuctionTx.address as `0x${string}`;
@@ -71,9 +102,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   const yieldHarvestTx = await deployments.deploy(YIELD_HARVEST_CONTRACT, {
     ...opts,
     args: [
-      addressBook.lpSft!, // lpSft
-      addressBook.noLpSft!, // noLpSft
-      addressBook.pow1LpSftLendFarm!, // lpSftLendFarm
+      addressBook.theReserve!, // theReserve
       addressBook.defiManager!, // defiManager
     ],
   });
@@ -87,10 +116,8 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   const liquidityForgeTx = await deployments.deploy(LIQUIDITY_FORGE_CONTRACT, {
     ...opts,
     args: [
-      addressBook.lpSft!, // lpSft
-      addressBook.noLpSft!, // noLpSft
+      addressBook.theReserve!, // theReserve
       addressBook.defiManager!, // defiManager
-      addressBook.pow5Token!, // pow5
       addressBook.yieldHarvest!, // yieldHarvest
       addressBook.pow5InterestFarm!, // erc20InterestFarm
     ],
@@ -106,14 +133,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
     ...opts,
     args: [
       deployer, // owner
-      addressBook.pow5Token!, // pow5Token
-      addressBook.usdcToken!, // stableToken
-      addressBook.pow5StablePool!, // pow5StablePool
-      addressBook.pow5StableSwapper!, // pow5StableSwapper
-      addressBook.pow5StablePooler!, // pow5StablePooler
-      addressBook.pow5LpNftStakeFarm!, // pow5LpNftStakeFarm
-      addressBook.lpSft!, // lpSft
-      addressBook.uniswapV3NftManager!, // uniswapV3NftManager
+      addressBook.theReserve!, // theReserve
     ],
   });
   addressBook.reverseRepo = reverseRepoTx.address as `0x${string}`;
