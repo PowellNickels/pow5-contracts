@@ -46,6 +46,7 @@ interface AddressBook {
   testRewardMath?: `0x${string}`;
   testStringUtils?: `0x${string}`;
   testTickMath?: `0x${string}`;
+  theReserve?: `0x${string}`;
   uniswapV3Factory?: `0x${string}`;
   uniswapV3NftDescriptor?: `0x${string}`;
   uniswapV3NftManager?: `0x${string}`;

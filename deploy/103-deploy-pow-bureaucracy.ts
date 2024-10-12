@@ -13,6 +13,7 @@ import {
   DUTCH_AUCTION_CONTRACT,
   LIQUIDITY_FORGE_CONTRACT,
   REVERSE_REPO_CONTRACT,
+  THE_RESERVE_CONTRACT,
   YIELD_HARVEST_CONTRACT,
 } from "../src/hardhat/contracts/dapp";
 import { getAddressBook } from "../src/hardhat/getAddressBook";
@@ -39,8 +40,42 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   const addressBook: AddressBook = await getAddressBook(networkName);
 
   //////////////////////////////////////////////////////////////////////////////
-  // Deploy DeFi contracts
+  // Deploy bureaucracy contracts
   //////////////////////////////////////////////////////////////////////////////
+
+  //
+  // Deploy TheReserve
+  //
+
+  console.log(`Deploying ${THE_RESERVE_CONTRACT}`);
+  const theReserveTx = await deployments.deploy(THE_RESERVE_CONTRACT, {
+    ...opts,
+    args: [
+      {
+        pow1Token: addressBook.pow1Token!,
+        pow5Token: addressBook.pow5Token!,
+        lpPow1Token: addressBook.lpPow1Token!,
+        lpPow5Token: addressBook.lpPow5Token!,
+        noPow5Token: addressBook.noPow5Token!,
+        marketToken: addressBook.wrappedNativeToken!,
+        stableToken: addressBook.usdcToken!,
+        pow1MarketPool: addressBook.pow1MarketPool!,
+        pow1MarketSwapper: addressBook.pow1MarketSwapper!,
+        pow1MarketPooler: addressBook.pow1MarketPooler!,
+        pow1LpNftStakeFarm: addressBook.pow1LpNftStakeFarm!,
+        pow5StablePool: addressBook.pow5StablePool!,
+        pow5StableSwapper: addressBook.pow5StableSwapper!,
+        pow5StablePooler: addressBook.pow5StablePooler!,
+        pow5LpNftStakeFarm: addressBook.pow5LpNftStakeFarm!,
+        marketStablePool: addressBook.wrappedNativeUsdcPool!,
+        marketStableSwapper: addressBook.wrappedNativeUsdcSwapper!,
+        lpSft: addressBook.lpSft!,
+        uniswapV3Factory: addressBook.uniswapV3Factory!,
+        uniswapV3NftManager: addressBook.uniswapV3NftManager!,
+      },
+    ],
+  });
+  addressBook.theReserve = theReserveTx.address as `0x${string}`;
 
   //
   // Deploy DutchAuction
@@ -51,14 +86,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
     ...opts,
     args: [
       deployer, // owner
-      addressBook.pow1Token!, // pow1Token
-      addressBook.wrappedNativeToken!, // marketToken
-      addressBook.pow1MarketPool!, // pow1MarketPool
-      addressBook.pow1MarketSwapper!, // pow1MarketSwapper
-      addressBook.pow1MarketPooler!, // pow1MarketPooler
-      addressBook.pow1LpNftStakeFarm!, // pow1LpNftStakeFarm
-      addressBook.lpSft!, // lpSft
-      addressBook.uniswapV3NftManager!, // uniswapV3NftManager
+      addressBook.theReserve!, // theReserve
     ],
   });
   addressBook.dutchAuction = dutchAuctionTx.address as `0x${string}`;
