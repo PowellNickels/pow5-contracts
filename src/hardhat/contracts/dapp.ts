@@ -10,15 +10,18 @@
  */
 
 // Contract ABIs and artifacts (sort by path)
-import dutchAuctionAbi from "../../abi/contracts/src/bureaucracy/DutchAuction.sol/DutchAuction.json";
-import liquidityForgeAbi from "../../abi/contracts/src/bureaucracy/LiquidityForge.sol/LiquidityForge.json";
-import reverseRepoAbi from "../../abi/contracts/src/bureaucracy/ReverseRepo.sol/ReverseRepo.json";
-import yieldHarvestAbi from "../../abi/contracts/src/bureaucracy/YieldHarvest.sol/YieldHarvest.json";
-import defiManagerAbi from "../../abi/contracts/src/defi/DeFiManager.sol/DeFiManager.json";
-import erc20InterestFarmAbi from "../../abi/contracts/src/defi/ERC20InterestFarm.sol/ERC20InterestFarm.json";
-import lpNftStakeFarmAbi from "../../abi/contracts/src/defi/LPNFTStakeFarm.sol/LPNFTStakeFarm.json";
-import lpSftLendFarmAbi from "../../abi/contracts/src/defi/LPSFTLendFarm.sol/LPSFTLendFarm.json";
-import uniV3StakeFarmAbi from "../../abi/contracts/src/defi/UniV3StakeFarm.sol/UniV3StakeFarm.json";
+import dutchAuctionAbi from "../../abi/contracts/src/interfaces/bureaucracy/IDutchAuction.sol/IDutchAuction.json";
+import liquidityForgeAbi from "../../abi/contracts/src/interfaces/bureaucracy/ILiquidityForge.sol/ILiquidityForge.json";
+import reverseRepoAbi from "../../abi/contracts/src/interfaces/bureaucracy/IReverseRepo.sol/IReverseRepo.json";
+import yieldHarvestAbi from "../../abi/contracts/src/interfaces/bureaucracy/IYieldHarvest.sol/IYieldHarvest.json";
+import defiManagerAbi from "../../abi/contracts/src/interfaces/defi/IDeFiManager.sol/IDeFiManager.json";
+import erc20InterestFarmAbi from "../../abi/contracts/src/interfaces/defi/IERC20InterestFarm.sol/IERC20InterestFarm.json";
+import lpNftStakeFarmAbi from "../../abi/contracts/src/interfaces/defi/ILPNFTStakeFarm.sol/ILPNFTStakeFarm.json";
+import lpSftLendFarmAbi from "../../abi/contracts/src/interfaces/defi/ILPSFTLendFarm.sol/ILPSFTLendFarm.json";
+import uniV3StakeFarmAbi from "../../abi/contracts/src/interfaces/defi/IUniV3StakeFarm.sol/IUniV3StakeFarm.json";
+import lpNftAbi from "../../abi/contracts/src/interfaces/token/ERC1155/ILPNFT.sol/ILPNFT.json";
+import lpSftAbi from "../../abi/contracts/src/interfaces/token/ERC1155/ILPSFT.sol/ILPSFT.json";
+import noLpSftAbi from "../../abi/contracts/src/interfaces/token/ERC1155/INOLPSFT.sol/INOLPSFT.json";
 import gameTokenPoolerAbi from "../../abi/contracts/src/interfaces/token/routes/IGameTokenPooler.sol/IGameTokenPooler.json";
 import gameTokenSwapperAbi from "../../abi/contracts/src/interfaces/token/routes/IGameTokenSwapper.sol/IGameTokenSwapper.json";
 import marketStableSwapperAbi from "../../abi/contracts/src/interfaces/token/routes/IMarketStableSwapper.sol/IMarketStableSwapper.json";
@@ -27,9 +30,6 @@ import lpPow5TokenAbi from "../../abi/contracts/src/token/ERC20/LPPOW5.sol/LPPOW
 import noPow5TokenAbi from "../../abi/contracts/src/token/ERC20/NOPOW5.sol/NOPOW5.json";
 import pow1TokenAbi from "../../abi/contracts/src/token/ERC20/POW1.sol/POW1.json";
 import pow5TokenAbi from "../../abi/contracts/src/token/ERC20/POW5.sol/POW5.json";
-import lpNftAbi from "../../abi/contracts/src/token/ERC1155/LPNFT.sol/LPNFT.json";
-import lpSftAbi from "../../abi/contracts/src/token/ERC1155/LPSFT.sol/LPSFT.json";
-import noLpSftAbi from "../../abi/contracts/src/token/ERC1155/NOLPSFT.sol/NOLPSFT.json";
 import uniV3PoolFactoryAbi from "../../abi/contracts/src/utils/helpers/UniV3PoolFactory.sol/UniV3PoolFactory.json";
 
 // Contract names (sort by constant)
