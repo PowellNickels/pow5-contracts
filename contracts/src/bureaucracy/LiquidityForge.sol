@@ -14,7 +14,7 @@ import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 import {ILiquidityForge} from "../interfaces/bureaucracy/ILiquidityForge.sol";
-import {IYieldHarvest} from "../interfaces/bureaucracy/IYieldHarvest.sol";
+import {IYieldHarvest} from "../interfaces/bureaucracy/yieldHarvest/IYieldHarvest.sol";
 import {ITheReserve} from "../interfaces/bureaucracy/theReserve/ITheReserve.sol";
 import {IDeFiManager} from "../interfaces/defi/IDeFiManager.sol";
 import {IERC20InterestFarm} from "../interfaces/defi/IERC20InterestFarm.sol";

@@ -13,13 +13,13 @@ import {IERC1155Receiver} from "@openzeppelin/contracts/token/ERC1155/IERC1155Re
 import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-import {ITheReserve} from "../interfaces/bureaucracy/theReserve/ITheReserve.sol";
-import {IYieldHarvest} from "../interfaces/bureaucracy/IYieldHarvest.sol";
-import {IDeFiManager} from "../interfaces/defi/IDeFiManager.sol";
-import {ILPSFTLendFarm} from "../interfaces/defi/ILPSFTLendFarm.sol";
-import {ILPSFTIssuable} from "../interfaces/token/ERC1155/extensions/ILPSFTIssuable.sol";
-import {ILPSFT} from "../interfaces/token/ERC1155/ILPSFT.sol";
-import {ERC1155Utils} from "../token/ERC1155/utils/ERC1155Utils.sol";
+import {ITheReserve} from "../../interfaces/bureaucracy/theReserve/ITheReserve.sol";
+import {IYieldHarvest} from "../../interfaces/bureaucracy/yieldHarvest/IYieldHarvest.sol";
+import {IDeFiManager} from "../../interfaces/defi/IDeFiManager.sol";
+import {ILPSFTLendFarm} from "../../interfaces/defi/ILPSFTLendFarm.sol";
+import {ILPSFTIssuable} from "../../interfaces/token/ERC1155/extensions/ILPSFTIssuable.sol";
+import {ILPSFT} from "../../interfaces/token/ERC1155/ILPSFT.sol";
+import {ERC1155Utils} from "../../token/ERC1155/utils/ERC1155Utils.sol";
 
 /**
  * @title Bureau of the Yield Harvest

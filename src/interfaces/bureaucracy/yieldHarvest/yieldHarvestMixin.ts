@@ -8,9 +8,9 @@
 
 import { ethers } from "ethers";
 
-import { IYieldHarvest } from "../../types/contracts/src/interfaces/bureaucracy/IYieldHarvest";
-import { IYieldHarvest__factory } from "../../types/factories/contracts/src/interfaces/bureaucracy/IYieldHarvest__factory";
-import { BaseMixin } from "../baseMixin";
+import { IYieldHarvest } from "../../../types/contracts/src/interfaces/bureaucracy/yieldHarvest/IYieldHarvest";
+import { IYieldHarvest__factory } from "../../../types/factories/contracts/src/interfaces/bureaucracy/yieldHarvest/IYieldHarvest__factory";
+import { BaseMixin } from "../../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
 function YieldHarvestMixin<T extends new (...args: any[]) => {}>(Base: T) {

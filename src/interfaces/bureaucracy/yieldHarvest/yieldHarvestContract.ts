@@ -8,7 +8,7 @@
 
 import { ethers } from "ethers";
 
-import { BaseContract } from "../baseContract";
+import { BaseContract } from "../../baseContract";
 import { YieldHarvestMixin } from "./yieldHarvestMixin";
 
 const YieldHarvestContractBase = YieldHarvestMixin(BaseContract);

@@ -16,7 +16,7 @@ import { DutchAuctionContract } from "../interfaces/bureaucracy/dutchAuction/dut
 import { LiquidityForgeContract } from "../interfaces/bureaucracy/liquidityForgeContract";
 import { ReverseRepoContract } from "../interfaces/bureaucracy/reverseRepoContract";
 import { TheReserveContract } from "../interfaces/bureaucracy/theReserve/theReserveContract";
-import { YieldHarvestContract } from "../interfaces/bureaucracy/yieldHarvestContract";
+import { YieldHarvestContract } from "../interfaces/bureaucracy/yieldHarvest/yieldHarvestContract";
 import { ContractLibrary } from "../interfaces/contractLibrary";
 import { DeFiManagerContract } from "../interfaces/defi/defiManagerContract";
 import { POW1LpNftStakeFarmContract } from "../interfaces/defi/pow1LpNftStakeFarmContract";
