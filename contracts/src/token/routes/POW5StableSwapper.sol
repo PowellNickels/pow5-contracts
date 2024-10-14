@@ -66,9 +66,11 @@ contract POW5StableSwapper is
     gameTokenReturned = _buyNumeratorToken(assetTokenAmount, recipient);
 
     // Emit event
-    emit POW5Bought(
+    emit GameTokenBought(
       _msgSender(),
       recipient,
+      address(_numeratorToken),
+      address(_denominatorToken),
       assetTokenAmount,
       gameTokenReturned
     );
@@ -87,7 +89,14 @@ contract POW5StableSwapper is
     assetTokenReturned = _sellNumeratorToken(gameTokenAmount, recipient);
 
     // Emit event
-    emit POW5Sold(_msgSender(), recipient, gameTokenAmount, assetTokenReturned);
+    emit GameTokenSold(
+      _msgSender(),
+      recipient,
+      address(_numeratorToken),
+      address(_denominatorToken),
+      gameTokenAmount,
+      assetTokenReturned
+    );
 
     return assetTokenReturned;
   }
@@ -101,16 +110,16 @@ contract POW5StableSwapper is
     nonReentrant
     returns (uint256 assetTokenReturned)
   {
-    // Read external state
-    uint256 gameTokenAmount = _numeratorToken.balanceOf(_msgSender());
-
     // Call ancestor
-    assetTokenReturned = _exitSwapper();
+    uint256 gameTokenAmount;
+    (gameTokenAmount, assetTokenReturned) = _exitSwapper();
 
     // Emit event
-    emit POW5Sold(
+    emit GameTokenSold(
       _msgSender(),
       _msgSender(),
+      address(_numeratorToken),
+      address(_denominatorToken),
       gameTokenAmount,
       assetTokenReturned
     );

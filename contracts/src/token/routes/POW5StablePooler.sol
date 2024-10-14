@@ -80,9 +80,11 @@ contract POW5StablePooler is
     ) = _mintLpNftWithNumeratorToken(gameTokenAmount, recipient);
 
     // Dispatch event
-    emit POW5LpNftMinted(
+    emit LpNftMinted(
       _msgSender(),
       recipient,
+      address(_numeratorToken),
+      address(_denominatorToken),
       address(_uniswapV3NftManager),
       lpNftTokenId,
       gameTokenShare,
@@ -112,9 +114,11 @@ contract POW5StablePooler is
     ) = _mintLpNftWithDenominatorToken(assetTokenAmount, recipient);
 
     // Dispatch event
-    emit POW5LpNftMinted(
+    emit LpNftMinted(
       _msgSender(),
       recipient,
+      address(_numeratorToken),
+      address(_denominatorToken),
       address(_uniswapV3NftManager),
       lpNftTokenId,
       gameTokenShare,
@@ -145,9 +149,11 @@ contract POW5StablePooler is
     ) = _mintLpNftImbalance(gameTokenAmount, assetTokenAmount, recipient);
 
     // Dispatch event
-    emit POW5LpNftMinted(
+    emit LpNftMinted(
       _msgSender(),
       recipient,
+      address(_numeratorToken),
+      address(_denominatorToken),
       address(_uniswapV3NftManager),
       lpNftTokenId,
       gameTokenShare,
@@ -177,9 +183,11 @@ contract POW5StablePooler is
     ) = _collectFromLpNft(lpNftTokenId, recipient);
 
     // Dispatch event
-    emit POW5LpNftCollected(
+    emit LpNftCollected(
       _msgSender(),
       recipient,
+      address(_numeratorToken),
+      address(_denominatorToken),
       address(_uniswapV3NftManager),
       lpNftTokenId,
       liquidityAmount,
@@ -209,9 +217,11 @@ contract POW5StablePooler is
     ) = _exitPooler(lpNftTokenId);
 
     // Dispatch event
-    emit POW5LpNftCollected(
+    emit LpNftCollected(
       _msgSender(),
       _msgSender(),
+      address(_numeratorToken),
+      address(_denominatorToken),
       address(_uniswapV3NftManager),
       lpNftTokenId,
       liquidityAmount,

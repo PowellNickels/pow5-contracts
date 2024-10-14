@@ -18,7 +18,6 @@ import { getUnnamedSigners } from "hardhat-deploy-ethers/dist/src/helpers";
 import { ContractLibraryEthers } from "../hardhat/contractLibraryEthers";
 import {
   defiManagerAbi,
-  dexTokenSwapperAbi,
   dutchAuctionAbi,
   erc20InterestFarmAbi,
   gameTokenPoolerAbi,
@@ -29,6 +28,7 @@ import {
   lpPow5TokenAbi,
   lpSftAbi,
   lpSftLendFarmAbi,
+  marketStableSwapperAbi,
   noLpSftAbi,
   noPow5TokenAbi,
   pow1TokenAbi,
@@ -261,7 +261,7 @@ async function setupFixture(
   );
   const wrappedNativeUsdcSwapperContract = new ethers.Contract(
     addressBook.wrappedNativeUsdcSwapper!,
-    dexTokenSwapperAbi,
+    marketStableSwapperAbi,
     beneficiary,
   );
   const yieldHarvestContract = new ethers.Contract(

@@ -19,9 +19,9 @@ import erc20InterestFarmAbi from "../../abi/contracts/src/defi/ERC20InterestFarm
 import lpNftStakeFarmAbi from "../../abi/contracts/src/defi/LPNFTStakeFarm.sol/LPNFTStakeFarm.json";
 import lpSftLendFarmAbi from "../../abi/contracts/src/defi/LPSFTLendFarm.sol/LPSFTLendFarm.json";
 import uniV3StakeFarmAbi from "../../abi/contracts/src/defi/UniV3StakeFarm.sol/UniV3StakeFarm.json";
-import dexTokenSwapperAbi from "../../abi/contracts/src/interfaces/token/routes/IDexTokenSwapper.sol/IDexTokenSwapper.json";
 import gameTokenPoolerAbi from "../../abi/contracts/src/interfaces/token/routes/IGameTokenPooler.sol/IGameTokenPooler.json";
 import gameTokenSwapperAbi from "../../abi/contracts/src/interfaces/token/routes/IGameTokenSwapper.sol/IGameTokenSwapper.json";
+import marketStableSwapperAbi from "../../abi/contracts/src/interfaces/token/routes/IMarketStableSwapper.sol/IMarketStableSwapper.json";
 import lpPow1TokenAbi from "../../abi/contracts/src/token/ERC20/LPPOW1.sol/LPPOW1.json";
 import lpPow5TokenAbi from "../../abi/contracts/src/token/ERC20/LPPOW5.sol/LPPOW5.json";
 import noPow5TokenAbi from "../../abi/contracts/src/token/ERC20/NOPOW5.sol/NOPOW5.json";
@@ -34,7 +34,6 @@ import uniV3PoolFactoryAbi from "../../abi/contracts/src/utils/helpers/UniV3Pool
 
 // Contract names (sort by constant)
 const DEFI_MANAGER_CONTRACT: string = "DeFiManager";
-const DEX_TOKEN_SWAPPER_CONTRACT: string = "DexTokenSwapper";
 const DUTCH_AUCTION_CONTRACT: string = "DutchAuction";
 const ERC20_INTEREST_FARM_CONTRACT: string = "ERC20InterestFarm";
 const LIQUIDITY_FORGE_CONTRACT: string = "LiquidityForge";
@@ -44,6 +43,7 @@ const LPPOW1_TOKEN_CONTRACT: string = "LPPOW1";
 const LPPOW5_TOKEN_CONTRACT: string = "LPPOW5";
 const LPSFT_CONTRACT: string = "LPSFT";
 const LPSFT_LEND_FARM_CONTRACT: string = "LPSFTLendFarm";
+const MARKET_STABLE_SWAPPER_CONTRACT: string = "MarketStableSwapper";
 const NOLPSFT_CONTRACT: string = "NOLPSFT";
 const NOPOW5_TOKEN_CONTRACT = "NOPOW5";
 const POW1_MARKET_POOLER_CONTRACT: string = "POW1MarketPooler";
@@ -70,7 +70,6 @@ const POW5_STABLE_POOL_FACTORY_CONTRACT: string = "POW5PoolFactory";
 
 export {
   defiManagerAbi,
-  dexTokenSwapperAbi,
   dutchAuctionAbi,
   erc20InterestFarmAbi,
   gameTokenPoolerAbi,
@@ -82,6 +81,7 @@ export {
   lpPow5TokenAbi,
   lpSftAbi,
   lpSftLendFarmAbi,
+  marketStableSwapperAbi,
   noLpSftAbi,
   noPow5TokenAbi,
   pow1TokenAbi,
@@ -91,7 +91,6 @@ export {
   uniV3StakeFarmAbi,
   yieldHarvestAbi,
   DEFI_MANAGER_CONTRACT,
-  DEX_TOKEN_SWAPPER_CONTRACT,
   DUTCH_AUCTION_CONTRACT,
   ERC20_INTEREST_FARM_CONTRACT,
   LIQUIDITY_FORGE_CONTRACT,
@@ -101,6 +100,7 @@ export {
   LPPOW5_TOKEN_CONTRACT,
   LPSFT_CONTRACT,
   LPSFT_LEND_FARM_CONTRACT,
+  MARKET_STABLE_SWAPPER_CONTRACT,
   NOLPSFT_CONTRACT,
   NOPOW5_TOKEN_CONTRACT,
   POW1_LPNFT_STAKE_FARM_CONTRACT,

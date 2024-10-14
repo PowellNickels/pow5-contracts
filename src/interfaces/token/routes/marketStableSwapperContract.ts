@@ -9,11 +9,11 @@
 import { ethers } from "ethers";
 
 import { BaseContract } from "../../baseContract";
-import { DexTokenSwapperMixin } from "./dexTokenSwapperMixin";
+import { MarketStableSwapperMixin } from "./marketStableSwapperMixin";
 
-const DexTokenSwapperContract = DexTokenSwapperMixin(BaseContract);
+const MarketStableSwapperContractBase = MarketStableSwapperMixin(BaseContract);
 
-class DexSwapperContract extends DexTokenSwapperContract {
+class MarketStableSwapperContract extends MarketStableSwapperContractBase {
   constructor(
     contractRunner: ethers.Provider | ethers.Signer,
     contractAddress: `0x${string}`,
@@ -22,4 +22,4 @@ class DexSwapperContract extends DexTokenSwapperContract {
   }
 }
 
-export { DexSwapperContract };
+export { MarketStableSwapperContract };

@@ -31,6 +31,7 @@ import { POW5Contract } from "../interfaces/token/erc20/pow5Contract";
 import { WrappedNativeContract } from "../interfaces/token/erc20/wrappedNativeContract";
 import { LPSFTContract } from "../interfaces/token/erc1155/lpSftContract";
 import { NOLPSFTContract } from "../interfaces/token/erc1155/noLpSftContract";
+import { MarketStableSwapperContract } from "../interfaces/token/routes/marketStableSwapperContract";
 import { POW1MarketPoolerContract } from "../interfaces/token/routes/pow1MarketPoolerContract";
 import { POW1MarketSwapperContract } from "../interfaces/token/routes/pow1MarketSwapperContract";
 import { POW5StablePoolerContract } from "../interfaces/token/routes/pow5StablePoolerContract";
@@ -118,6 +119,14 @@ function getContractLibrary(
     wrappedNativeContract: new WrappedNativeContract(
       signer,
       addressBook.wrappedNativeToken!,
+    ),
+    wrappedNativeUsdcPoolContract: new UniswapV3PoolContract(
+      signer,
+      addressBook.wrappedNativeUsdcPool!,
+    ),
+    wrappedNativeUsdcSwapperContract: new MarketStableSwapperContract(
+      signer,
+      addressBook.wrappedNativeUsdcSwapper!,
     ),
     yieldHarvestContract: new YieldHarvestContract(
       signer,

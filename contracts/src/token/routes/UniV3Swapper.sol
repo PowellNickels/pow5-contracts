@@ -229,11 +229,15 @@ abstract contract UniV3Swapper is Context, IUniswapV3SwapCallback {
   /**
    * @dev Exit the protocol, selling the numerator token for the denominator token
    *
+   * @return numeratorTokenAmount Amount of the numerator token spent
    * @return denominatorTokenReturned Amount of the denominator token received
    */
-  function _exitSwapper() internal returns (uint256 denominatorTokenReturned) {
+  function _exitSwapper()
+    internal
+    returns (uint256 numeratorTokenAmount, uint256 denominatorTokenReturned)
+  {
     // Read state
-    uint256 numeratorTokenAmount = _numeratorToken.balanceOf(_msgSender());
+    numeratorTokenAmount = _numeratorToken.balanceOf(_msgSender());
 
     // Swap everything
     denominatorTokenReturned = _sellNumeratorToken(
@@ -241,7 +245,7 @@ abstract contract UniV3Swapper is Context, IUniswapV3SwapCallback {
       _msgSender()
     );
 
-    return denominatorTokenReturned;
+    return (numeratorTokenAmount, denominatorTokenReturned);
   }
 
   //////////////////////////////////////////////////////////////////////////////

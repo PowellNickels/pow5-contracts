@@ -20,63 +20,41 @@ interface IGameTokenSwapper {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @dev Emitted when POW1 is purchased with the market token
+   * @dev Emitted when POW1 is purchased with the asset token or POW5 is
+   * purchased with the stable token
    *
-   * @param sender The sender of the market token
+   * @param sender The sender of the asset token
    * @param recipient The address of the recipient of the POW1
-   * @param marketTokenAmount The amount of the market token being spent
+   * @param gameTokenAddress The address of the POW1 or POW5 token contract
+   * @param assetTokenAddress The amount of the asset token being spent
    * @param pow1Returned The amount of POW1 received
    */
-  event POW1Bought(
+  event GameTokenBought(
     address indexed sender,
     address indexed recipient,
-    uint256 marketTokenAmount,
+    address indexed gameTokenAddress,
+    address assetTokenAddress,
+    uint256 assetTokenAmount,
     uint256 pow1Returned
   );
 
   /**
-   * @dev Emitted when POW5 is purchased with the stable token
-   *
-   * @param sender The sender of the market token
-   * @param recipient The address of the recipient of the POW5
-   * @param stableTokenAmount The amount of the stable token being spent
-   * @param pow5Returned The amount of POW5 received
-   */
-  event POW5Bought(
-    address indexed sender,
-    address indexed recipient,
-    uint256 stableTokenAmount,
-    uint256 pow5Returned
-  );
-
-  /**
-   * @dev Emitted when POW1 is sold for the market token
+   * @dev Emitted when POW1 is sold for the asset token or POW5 is sold for
+   * the stable token
    *
    * @param sender The sender of the game token
-   * @param recipient The address of the recipient of the market token
+   * @param recipient The address of the recipient of the asset token
+   * @param gameTokenAddress The address of the POW1 or POW5 token contract
    * @param pow1Amount The amount of POW1 being spent
-   * @param marketTokenReturned The amount of the market token received
+   * @param assetTokenReturned The amount of the asset token received
    */
-  event POW1Sold(
+  event GameTokenSold(
     address indexed sender,
     address indexed recipient,
+    address indexed gameTokenAddress,
+    address assetTokenAddress,
     uint256 pow1Amount,
-    uint256 marketTokenReturned
-  );
-
-  /**
-   * @dev Emitted when POW5 is sold for the stable token
-   *
-   * @param sender The sender of the game token
-   * @param recipient The address of the recipient of the stable token
-   * @param pow5Amount The amount of POW5 being spent
-   * @param stableTokenReturned The amount of the stable token received
-   */
-  event POW5Sold(
-    address indexed sender,
-    address indexed recipient,
-    uint256 pow5Amount,
-    uint256 stableTokenReturned
+    uint256 assetTokenReturned
   );
 
   //////////////////////////////////////////////////////////////////////////////

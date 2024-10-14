@@ -13,7 +13,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction, DeployOptions } from "hardhat-deploy/types";
 
 import {
-  DEX_TOKEN_SWAPPER_CONTRACT,
+  MARKET_STABLE_SWAPPER_CONTRACT,
   POW1_MARKET_POOL_CONTRACT,
   POW1_MARKET_POOL_FACTORY_CONTRACT,
   POW1_MARKET_POOLER_CONTRACT,
@@ -193,12 +193,12 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   //////////////////////////////////////////////////////////////////////////////
 
   //
-  // Deploy DexTokenSwapper
+  // Deploy MarketStableSwapper
   //
 
-  console.log(`Deploying ${DEX_TOKEN_SWAPPER_CONTRACT}`);
-  const dexTokenSwapperTx = await deployments.deploy(
-    DEX_TOKEN_SWAPPER_CONTRACT,
+  console.log(`Deploying ${MARKET_STABLE_SWAPPER_CONTRACT}`);
+  const marketStableSwapperTx = await deployments.deploy(
+    MARKET_STABLE_SWAPPER_CONTRACT,
     {
       ...opts,
       args: [
@@ -209,7 +209,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
     },
   );
   addressBook.wrappedNativeUsdcSwapper =
-    dexTokenSwapperTx.address as `0x${string}`;
+    marketStableSwapperTx.address as `0x${string}`;
 
   //////////////////////////////////////////////////////////////////////////////
   // Record addresses

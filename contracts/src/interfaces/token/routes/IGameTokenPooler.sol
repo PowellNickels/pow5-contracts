@@ -21,19 +21,23 @@ interface IGameTokenPooler {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @dev Emitted when a POW1 Uniswap V3 LP-NFT is minted
+   * @dev Emitted when an LP-NFT is minted
    *
    * @param sender The sender of the assets being paid
    * @param recipient The address of the recipient of the LP-NFT
+   * @param gameTokenAddress The address of the game token
+   * @param assetTokenAddress The address of the asset token
    * @param nftAddress The address of the NFT manager contract
-   * @param lpNftTokenId The ID of the NFT
+   * @param lpNftTokenId The ID of the LP-NFT
    * @param gameTokenShare The amount of the game token in the NFT
    * @param assetTokenShare The amount of the asset token in the NFT
    * @param liquidityAmount The amount of liquidity created
    */
-  event POW1LpNftMinted(
+  event LpNftMinted(
     address indexed sender,
     address indexed recipient,
+    address indexed gameTokenAddress,
+    address assetTokenAddress,
     address nftAddress,
     uint256 lpNftTokenId,
     uint256 gameTokenShare,
@@ -42,31 +46,12 @@ interface IGameTokenPooler {
   );
 
   /**
-   * @dev Emitted when a POW5 Uniswap V3 LP-NFT is minted
-   *
-   * @param sender The sender of the assets being paid
-   * @param recipient The address of the recipient of the LP-NFT
-   * @param nftAddress The address of the NFT manager contract
-   * @param lpNftTokenId The ID of the NFT
-   * @param gameTokenShare The amount of the game token in the NFT
-   * @param assetTokenShare The amount of the asset token in the NFT
-   * @param liquidityAmount The amount of liquidity created
-   */
-  event POW5LpNftMinted(
-    address indexed sender,
-    address indexed recipient,
-    address nftAddress,
-    uint256 lpNftTokenId,
-    uint256 gameTokenShare,
-    uint256 assetTokenShare,
-    uint128 liquidityAmount
-  );
-
-  /**
-   * @dev Emitted when fees are collected from a POW1 Uniswap V3 LP-NFT
+   * @dev Emitted when liquidity and fees are collected from an LP-NFT.
    *
    * @param sender The sender of the collection request
    * @param recipient The address of the recipient of the LP-NFT fees
+   * @param gameTokenAddress The address of the game token
+   * @param assetTokenAddress The address of the asset token
    * @param nftAddress The address of the NFT manager contract
    * @param lpNftTokenId The ID of the NFT
    * @param liquidityAmount The amount of liquidity in the NFT before collection
@@ -75,33 +60,11 @@ interface IGameTokenPooler {
    * @param assetTokenReturned The amount of the asset token returned to the
    *        recipient
    */
-  event POW1LpNftCollected(
+  event LpNftCollected(
     address indexed sender,
     address indexed recipient,
-    address nftAddress,
-    uint256 lpNftTokenId,
-    uint128 liquidityAmount,
-    uint256 gameTokenCollected,
-    uint256 assetTokenCollected,
-    uint256 assetTokenReturned
-  );
-
-  /**
-   * @dev Emitted when fees are collected from a POW5 Uniswap V3 LP-NFT
-   *
-   * @param sender The sender of the collection request
-   * @param recipient The address of the recipient of the LP-NFT fees
-   * @param nftAddress The address of the NFT manager contract
-   * @param lpNftTokenId The ID of the NFT
-   * @param liquidityAmount The amount of liquidity in the NFT before collection
-   * @param gameTokenCollected The amount of game token fees collected
-   * @param assetTokenCollected The amount of asset token fees collected
-   * @param assetTokenReturned The amount of the asset token returned to
-   *        recipient
-   */
-  event POW5LpNftCollected(
-    address indexed sender,
-    address indexed recipient,
+    address indexed gameTokenAddress,
+    address assetTokenAddress,
     address nftAddress,
     uint256 lpNftTokenId,
     uint128 liquidityAmount,

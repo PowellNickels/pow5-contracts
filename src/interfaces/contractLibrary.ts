@@ -27,6 +27,7 @@ import { POW5Contract } from "./token/erc20/pow5Contract";
 import { WrappedNativeContract } from "./token/erc20/wrappedNativeContract";
 import { LPSFTContract } from "./token/erc1155/lpSftContract";
 import { NOLPSFTContract } from "./token/erc1155/noLpSftContract";
+import { MarketStableSwapperContract } from "./token/routes/marketStableSwapperContract";
 import { POW1MarketPoolerContract } from "./token/routes/pow1MarketPoolerContract";
 import { POW1MarketSwapperContract } from "./token/routes/pow1MarketSwapperContract";
 import { POW5StablePoolerContract } from "./token/routes/pow5StablePoolerContract";
@@ -62,6 +63,8 @@ interface ContractLibrary {
   reverseRepoContract: ReverseRepoContract;
   usdcContract: ERC20Contract;
   wrappedNativeContract: WrappedNativeContract;
+  wrappedNativeUsdcPoolContract: UniswapV3PoolContract;
+  wrappedNativeUsdcSwapperContract: MarketStableSwapperContract;
   yieldHarvestContract: YieldHarvestContract;
 }
 

@@ -14,18 +14,18 @@ pragma solidity 0.8.27;
 import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-import {IDexTokenSwapper} from "../../interfaces/token/routes/IDexTokenSwapper.sol";
+import {IMarketStableSwapper} from "../../interfaces/token/routes/IMarketStableSwapper.sol";
 
 import {UniV3Swapper} from "./UniV3Swapper.sol";
 
 /**
  * @dev Token router to swap between the market token and the stable token
  */
-contract DexTokenSwapper is
+contract MarketStableSwapper is
   Context,
   ReentrancyGuard,
   UniV3Swapper,
-  IDexTokenSwapper
+  IMarketStableSwapper
 {
   //////////////////////////////////////////////////////////////////////////////
   // Initialization
@@ -46,11 +46,18 @@ contract DexTokenSwapper is
   ) UniV3Swapper(marketToken_, stableToken_, marketStablePool_) {}
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {IDexTokenSwapper}
+  // Implementation of {IMarketStableSwapper}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @dev See {IDexTokenSwapper-buyMarketToken}
+   * @dev See {IMarketStableSwapper-marketIsToken0}
+   */
+  function marketIsToken0() public view override returns (bool) {
+    return _numeratorIsToken0;
+  }
+
+  /**
+   * @dev See {IMarketStableSwapper-buyMarketToken}
    */
   function buyMarketToken(
     uint256 stableTokenAmount,
@@ -63,6 +70,8 @@ contract DexTokenSwapper is
     emit MarketTokenBought(
       _msgSender(),
       recipient,
+      address(_numeratorToken),
+      address(_denominatorToken),
       stableTokenAmount,
       marketTokenReturned
     );
@@ -71,7 +80,7 @@ contract DexTokenSwapper is
   }
 
   /**
-   * @dev See {IDexTokenSwapper-sellMarketToken}
+   * @dev See {IMarketStableSwapper-sellMarketToken}
    */
   function sellMarketToken(
     uint256 marketTokenAmount,
@@ -83,6 +92,8 @@ contract DexTokenSwapper is
     // Emit event
     emit MarketTokenSold(
       _msgSender(),
+      address(_numeratorToken),
+      address(_denominatorToken),
       recipient,
       marketTokenAmount,
       stableTokenReturned
@@ -92,28 +103,27 @@ contract DexTokenSwapper is
   }
 
   /**
-   * @dev See {IDexTokenSwapper-exit}
+   * @dev See {IMarketStableSwapper-exit}
    */
   function exit()
     public
     override
     nonReentrant
-    returns (uint256 stableTokenReturned)
+    returns (uint256 marketTokenAmount, uint256 stableTokenReturned)
   {
-    // Read external state
-    uint256 marketTokenAmount = _numeratorToken.balanceOf(_msgSender());
-
     // Call ancestor
-    stableTokenReturned = _exitSwapper();
+    (marketTokenAmount, stableTokenReturned) = _exitSwapper();
 
     // Emit event
     emit MarketTokenSold(
       _msgSender(),
       _msgSender(),
+      address(_numeratorToken),
+      address(_denominatorToken),
       marketTokenAmount,
       stableTokenReturned
     );
 
-    return stableTokenReturned;
+    return (stableTokenReturned, marketTokenAmount);
   }
 }

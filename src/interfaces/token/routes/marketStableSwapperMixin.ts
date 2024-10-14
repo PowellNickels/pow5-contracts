@@ -8,14 +8,16 @@
 
 import { ethers } from "ethers";
 
-import { IDexTokenSwapper } from "../../../types/contracts/src/interfaces/token/routes/IDexTokenSwapper";
-import { IDexTokenSwapper__factory } from "../../../types/factories/contracts/src/interfaces/token/routes/IDexTokenSwapper__factory";
+import { IMarketStableSwapper } from "../../../types/contracts/src/interfaces/token/routes/IMarketStableSwapper";
+import { IMarketStableSwapper__factory } from "../../../types/factories/contracts/src/interfaces/token/routes/IMarketStableSwapper__factory";
 import { BaseMixin } from "../../baseMixin";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
-function DexTokenSwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
+function MarketStableSwapperMixin<T extends new (...args: any[]) => {}>(
+  Base: T,
+) {
   return class extends BaseMixin(Base) {
-    private dexTokenSwapper: IDexTokenSwapper;
+    private marketStableSwapper: IMarketStableSwapper;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
@@ -26,7 +28,7 @@ function DexTokenSwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
         `0x${string}`,
       ];
 
-      this.dexTokenSwapper = IDexTokenSwapper__factory.connect(
+      this.marketStableSwapper = IMarketStableSwapper__factory.connect(
         contractAddress,
         contractRunner,
       );
@@ -38,7 +40,7 @@ function DexTokenSwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.dexTokenSwapper.buyMarketToken(
+          await this.marketStableSwapper.buyMarketToken(
             stableTokenAmount,
             recipient,
           );
@@ -53,7 +55,7 @@ function DexTokenSwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.dexTokenSwapper.sellMarketToken(
+          await this.marketStableSwapper.sellMarketToken(
             marketTokenAmount,
             recipient,
           );
@@ -65,7 +67,7 @@ function DexTokenSwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
     async exit(): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.dexTokenSwapper.exit();
+          await this.marketStableSwapper.exit();
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
@@ -73,4 +75,4 @@ function DexTokenSwapperMixin<T extends new (...args: any[]) => {}>(Base: T) {
   };
 }
 
-export { DexTokenSwapperMixin };
+export { MarketStableSwapperMixin };

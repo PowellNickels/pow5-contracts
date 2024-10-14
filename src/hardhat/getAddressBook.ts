@@ -19,12 +19,12 @@ import baseAddresses from "../addresses/base.json";
 import mainnetAddresses from "../addresses/mainnet.json";
 import {
   DEFI_MANAGER_CONTRACT,
-  DEX_TOKEN_SWAPPER_CONTRACT,
   DUTCH_AUCTION_CONTRACT,
   LIQUIDITY_FORGE_CONTRACT,
   LPPOW1_TOKEN_CONTRACT,
   LPPOW5_TOKEN_CONTRACT,
   LPSFT_CONTRACT,
+  MARKET_STABLE_SWAPPER_CONTRACT,
   NOLPSFT_CONTRACT,
   NOPOW5_TOKEN_CONTRACT,
   POW1_LPNFT_STAKE_FARM_CONTRACT,
@@ -270,7 +270,7 @@ async function getAddressBook(networkName: string): Promise<AddressBook> {
     ),
     wrappedNativeUsdcSwapper: await getContractAddress(
       "wrappedNativeUsdcSwapper",
-      DEX_TOKEN_SWAPPER_CONTRACT,
+      MARKET_STABLE_SWAPPER_CONTRACT,
       networkName,
     ),
     yieldHarvest: await getContractAddress(
