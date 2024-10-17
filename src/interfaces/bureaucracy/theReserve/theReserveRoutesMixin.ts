@@ -6,37 +6,6 @@
  * See the file LICENSE.txt for more information.
  */
 
-/*
-
-export declare namespace ITheReserveRoutes {
-  export type RoutesStruct = {
-    pow1Token: AddressLike;
-    pow5Token: AddressLike;
-    lpPow1Token: AddressLike;
-    lpPow5Token: AddressLike;
-    noPow5Token: AddressLike;
-    marketToken: AddressLike;
-    stableToken: AddressLike;
-    lpSft: AddressLike;
-    noLpSft: AddressLike;
-    pow1MarketPool: AddressLike;
-    pow5StablePool: AddressLike;
-    marketStablePool: AddressLike;
-    pow1MarketSwapper: AddressLike;
-    pow5StableSwapper: AddressLike;
-    marketStableSwapper: AddressLike;
-    pow1MarketPooler: AddressLike;
-    pow5StablePooler: AddressLike;
-    pow1LpNftStakeFarm: AddressLike;
-    pow5LpNftStakeFarm: AddressLike;
-    pow1LpSftLendFarm: AddressLike;
-    pow5LpSftLendFarm: AddressLike;
-    uniswapV3Factory: AddressLike;
-    uniswapV3NftManager: AddressLike;
-  };
-
-  */
-
 import { ethers } from "ethers";
 
 import { ITheReserveRoutes } from "../../../types/contracts/src/interfaces/bureaucracy/theReserve/ITheReserveRoutes";
