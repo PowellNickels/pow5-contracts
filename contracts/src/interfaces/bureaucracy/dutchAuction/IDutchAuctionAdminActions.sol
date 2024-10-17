@@ -70,4 +70,19 @@ interface IDutchAuctionAdminActions is IERC165 {
    * @param slot The auction slot
    */
   function removeAuction(uint256 slot) external;
+
+  /**
+   * @dev Set the total number of LP-NFTs for sale
+   *
+   * If this is greater than the current number of LP-NFTs, the difference will
+   * be minted and added to the sale. If it is less, LP-NFTs won't be minted to
+   * replace the current ones as they are sold.
+   *
+   * @param auctionCount The target number of LP-NFTs for sale
+   * @param marketTokenDust Some dust to produre, if needed, to mint the LP-NFTs
+   */
+  function setAuctionCount(
+    uint256 auctionCount,
+    uint256 marketTokenDust
+  ) external;
 }

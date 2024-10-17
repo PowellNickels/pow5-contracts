@@ -88,6 +88,7 @@ abstract contract DutchAuctionBase is
     );
 
     // Mint an LP-NFT
+    // slither-disable-next-line calls-loop
     lpNftTokenId = _routes.pow1MarketPooler.mintLpNftImbalance(
       pow1Amount,
       marketTokenAmount,
@@ -95,19 +96,20 @@ abstract contract DutchAuctionBase is
     );
 
     // Validate external state
+    // slither-disable-next-line calls-loop
     require(
       _routes.uniswapV3NftManager.ownerOf(lpNftTokenId) == address(this),
       "Not owner"
     );
 
     // Read external state
-    // slither-disable-next-line unused-return
+    // slither-disable-next-line calls-loop,unused-return
     (, , , , , , , uint128 liquidityAmount, , , , ) = _routes
       .uniswapV3NftManager
       .positions(lpNftTokenId);
 
     // Withdraw tokens from the pool
-    // slither-disable-next-line unused-return
+    // slither-disable-next-line calls-loop,unused-return
     _routes.uniswapV3NftManager.decreaseLiquidity(
       INonfungiblePositionManager.DecreaseLiquidityParams({
         tokenId: lpNftTokenId,
@@ -119,7 +121,7 @@ abstract contract DutchAuctionBase is
     );
 
     // Collect the tokens and fees
-    // slither-disable-next-line unused-return
+    // slither-disable-next-line calls-loop,unused-return
     _routes.uniswapV3NftManager.collect(
       INonfungiblePositionManager.CollectParams({
         tokenId: lpNftTokenId,

@@ -31,6 +31,11 @@ contract DutchAuctionState is IDutchAuctionState, ERC721Holder, ERC1155Holder {
   bool internal _initialized = false;
 
   /**
+   * @dev Target number of LP-NFTs for sale
+   */
+  uint256 internal _targetLpNftCount;
+
+  /**
    * @dev Mapping from auction slot to auction
    */
   mapping(uint256 slot => VRGDA auction) internal _slotToAuction;
