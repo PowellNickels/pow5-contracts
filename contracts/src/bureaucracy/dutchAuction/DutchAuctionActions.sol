@@ -11,6 +11,7 @@ pragma solidity 0.8.28;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import {INonfungiblePositionManager} from "../../../interfaces/uniswap-v3-periphery/INonfungiblePositionManager.sol";
 
@@ -27,6 +28,7 @@ abstract contract DutchAuctionActions is
   IDutchAuctionActions,
   DutchAuctionBase
 {
+  using EnumerableSet for EnumerableSet.UintSet;
   using SafeERC20 for IERC20;
 
   //////////////////////////////////////////////////////////////////////////////
@@ -53,41 +55,33 @@ abstract contract DutchAuctionActions is
    * @dev See {IDutchAuctionActions-purchase}
    */
   function purchase(
-    uint256 slot,
+    uint256 lpNftTokenId,
     uint256 pow1Amount,
     uint256 marketTokenAmount,
+    address beneficiary,
     address receiver
-  ) external override nonReentrant returns (uint256 nftTokenId) {
+  ) external override nonReentrant {
     // Validate parameters
-    require(pow1Amount > 0 || marketTokenAmount > 0, "Invalid amounts");
+    require(lpNftTokenId != 0, "Invalid LP-NFT ID");
+    require(pow1Amount > 0 || marketTokenAmount > 0, "Invalid payment");
+    require(beneficiary != address(0), "Invalid beneficiary");
     require(receiver != address(0), "Invalid receiver");
 
     // Read state
-    VRGDA auction = _slotToAuction[slot];
-    nftTokenId = _slotToLpNft[slot];
-
-    int256 timeSinceStart = 1; // TODO
-    uint256 sold = 0; // TODO
-    // slither-disable-next-line divide-before-multiply
-    uint256 creatorTipBips = auction.getVRGDAPrice(timeSinceStart, sold) / 1e18;
-
-    // Calculate the auction tip
-    uint256 pow1TipAmount = (pow1Amount * creatorTipBips) / 1e4;
-    uint256 marketTipAmount = (marketTokenAmount * creatorTipBips) / 1e4;
-
-    // Calculate the deposited liquidity
-    uint256 pow1LiquidityAmount = pow1Amount - pow1TipAmount;
-    uint256 marketLiquidityAmount = marketTokenAmount - marketTipAmount;
-
-    // Get the pool fee
-    uint24 poolFee = _routes.pow1MarketPool.fee();
+    AuctionState storage auction = _auctionStates[lpNftTokenId];
 
     // Validate state
-    require(pow1TipAmount > 0 || marketTipAmount > 0, "Invalid tips");
-    require(
-      pow1LiquidityAmount > 0 || marketLiquidityAmount > 0,
-      "Invalid liquidity"
-    );
+    // slither-disable-next-line timestamp
+    require(auction.lpNftTokenId != 0, "LP-NFT not for sale");
+    // slither-disable-next-line incorrect-equality,timestamp
+    require(auction.salePrice == 0, "Auction already sold");
+
+    // Get the current price in bips of the LP-NFT
+    uint256 currentPriceBips = getCurrentPriceBips(lpNftTokenId);
+
+    // Update state
+    _bureauState.lastSalePriceBips = currentPriceBips;
+    auction.salePrice = currentPriceBips;
 
     // Call external contracts
     if (pow1Amount > 0) {
@@ -105,8 +99,35 @@ abstract contract DutchAuctionActions is
       );
     }
 
+    // Amounts to deposit
+    uint256 pow1DepositAmount = pow1Amount;
+    uint256 marketDepositAmount = marketTokenAmount;
+
+    // Handle the tip
+    {
+      // Calculate the auction tip amounts
+      uint256 pow1TipAmount = (pow1Amount * currentPriceBips) / 1e18;
+      uint256 marketTipAmount = (marketTokenAmount * currentPriceBips) / 1e18;
+
+      require(pow1TipAmount > 0 || marketTipAmount > 0, "Invalid tips");
+
+      // Send the tip to the beneficiary (TODO)
+      if (pow1TipAmount > 0) {
+        _routes.pow1Token.safeTransfer(beneficiary, pow1TipAmount);
+        pow1DepositAmount -= pow1TipAmount;
+      }
+      if (marketTipAmount > 0) {
+        _routes.marketToken.safeTransfer(beneficiary, marketTipAmount);
+        marketDepositAmount -= marketTipAmount;
+      }
+    }
+
+    // Get the pool fee
+    uint24 poolFee = _routes.pow1MarketPool.fee();
+
     // Perform single-sided supply swap
-    if (pow1LiquidityAmount == 0) {
+    // slither-disable-next-line incorrect-equality
+    if (pow1DepositAmount == 0) {
       // Get market token reserve
       uint256 marketTokenReserve = _routes.marketToken.balanceOf(
         address(_routes.pow1MarketPool)
@@ -115,10 +136,10 @@ abstract contract DutchAuctionActions is
       // Calculate market swap amount
       uint256 marketSwapAmount = LiquidityMath.computeSwapAmountV2(
         marketTokenReserve,
-        marketLiquidityAmount,
+        marketDepositAmount,
         poolFee
       );
-      require(marketSwapAmount <= marketLiquidityAmount, "Bad liquidity math");
+      require(marketSwapAmount <= marketDepositAmount, "Bad liquidity math");
 
       // Approve swap
       _routes.marketToken.safeIncreaseAllowance(
@@ -127,14 +148,16 @@ abstract contract DutchAuctionActions is
       );
 
       // Perform swap
-      pow1LiquidityAmount = _routes.pow1MarketSwapper.buyGameToken(
+      // slither-disable-next-line reentrancy-no-eth
+      pow1DepositAmount = _routes.pow1MarketSwapper.buyGameToken(
         marketSwapAmount,
         address(this)
       );
 
       // Update amount
-      marketLiquidityAmount -= marketSwapAmount;
-    } else if (marketLiquidityAmount == 0) {
+      marketDepositAmount -= marketSwapAmount;
+      // slither-disable-next-line incorrect-equality
+    } else if (marketDepositAmount == 0) {
       // Get POW1 reserve
       uint256 pow1Reserve = _routes.pow1Token.balanceOf(
         address(_routes.pow1MarketPool)
@@ -143,10 +166,10 @@ abstract contract DutchAuctionActions is
       // Calculate POW1 swap amount
       uint256 pow1SwapAmount = LiquidityMath.computeSwapAmountV2(
         pow1Reserve,
-        pow1LiquidityAmount,
+        pow1DepositAmount,
         poolFee
       );
-      require(pow1SwapAmount <= pow1LiquidityAmount, "Bad liquidity math");
+      require(pow1SwapAmount <= pow1DepositAmount, "Bad liquidity math");
 
       // Approve swap
       _routes.pow1Token.safeIncreaseAllowance(
@@ -155,32 +178,44 @@ abstract contract DutchAuctionActions is
       );
 
       // Perform swap
-      marketLiquidityAmount = _routes.pow1MarketSwapper.sellGameToken(
+      marketDepositAmount = _routes.pow1MarketSwapper.sellGameToken(
         pow1SwapAmount,
         address(this)
       );
 
       // Update amount
-      pow1LiquidityAmount -= pow1SwapAmount;
+      pow1DepositAmount -= pow1SwapAmount;
     }
 
-    // Validate state
+    // Read state
+    uint256 mintDustAmount = _auctionSettings.mintDustAmount;
+
+    // Validate amounts
     require(
-      pow1LiquidityAmount > 0 || marketLiquidityAmount > 0,
-      "Invalid liquidity"
+      pow1DepositAmount > mintDustAmount &&
+        marketDepositAmount > mintDustAmount,
+      "Not enough for dust"
     );
 
+    // Remove the LP-NFT token ID from current auctions
+    require(_currentAuctions.remove(lpNftTokenId), "Auction not found");
+
+    // Mint a new LP-NFT and establish its auction state
+    // slither-disable-next-line reentrancy-no-eth
+    uint256 newLpNftTokenId = _mintLpNft(mintDustAmount, mintDustAmount);
+    _establishAuctionState(newLpNftTokenId);
+
     // Call external contracts
-    if (pow1LiquidityAmount > 0) {
+    if (pow1DepositAmount > 0) {
       _routes.pow1Token.safeIncreaseAllowance(
         address(_routes.uniswapV3NftManager),
-        pow1LiquidityAmount
+        pow1DepositAmount
       );
     }
-    if (marketLiquidityAmount > 0) {
+    if (marketDepositAmount > 0) {
       _routes.marketToken.safeIncreaseAllowance(
         address(_routes.uniswapV3NftManager),
-        marketLiquidityAmount
+        marketDepositAmount
       );
     }
 
@@ -188,15 +223,15 @@ abstract contract DutchAuctionActions is
     // slither-disable-next-line unused-return
     _routes.uniswapV3NftManager.increaseLiquidity(
       INonfungiblePositionManager.IncreaseLiquidityParams({
-        tokenId: nftTokenId,
+        tokenId: lpNftTokenId,
         amount0Desired: address(_routes.pow1Token) <
           address(_routes.marketToken)
-          ? pow1LiquidityAmount
-          : marketLiquidityAmount,
+          ? pow1DepositAmount
+          : marketDepositAmount,
         amount1Desired: address(_routes.pow1Token) <
           address(_routes.marketToken)
-          ? marketLiquidityAmount
-          : pow1LiquidityAmount,
+          ? marketDepositAmount
+          : pow1DepositAmount,
         amount0Min: 0,
         amount1Min: 0,
         // slither-disable-next-line timestamp
@@ -208,112 +243,40 @@ abstract contract DutchAuctionActions is
     _routes.uniswapV3NftManager.safeTransferFrom(
       address(this),
       address(_routes.pow1LpNftStakeFarm),
-      nftTokenId,
+      lpNftTokenId,
       ""
     );
 
     // Return the LP-SFT to the receiver
-    _routes.lpSft.safeTransferFrom(address(this), receiver, nftTokenId, 1, "");
-
-    // Emit event
-    // TODO
-
-    return nftTokenId;
-  }
-
-  /**
-   * @dev See {IDutchAuctionActions-exit}
-   */
-  function exit(uint256 lpNftTokenId) external override nonReentrant {
-    // Validate parameters
-    require(lpNftTokenId != 0, "Invalid token ID");
-
-    // Validate state
-    require(
-      _routes.lpSft.ownerOf(lpNftTokenId) == _msgSender(),
-      "Not LP-SFT owner"
-    );
-
-    // Record POW1 balance to track any recovered from the LP-SFT
-    uint256 pow1Balance = _routes.pow1Token.balanceOf(address(this));
-    uint256 marketTokenBalance = _routes.marketToken.balanceOf(address(this));
-
-    // Transfer the LP-SFT to the contract
     _routes.lpSft.safeTransferFrom(
-      _msgSender(),
       address(this),
+      receiver,
       lpNftTokenId,
       1,
       ""
     );
 
-    // Transfer the LP-SFT to the LP-NFT stake farm
-    _routes.lpSft.safeTransferFrom(
-      address(this),
-      address(_routes.pow1LpNftStakeFarm),
-      lpNftTokenId,
-      1,
-      ""
-    );
-
-    // Read state
-    // slither-disable-next-line unused-return
-    (, , , , , , , uint128 uniV3LiquidityAmount, , , , ) = _routes
-      .uniswapV3NftManager
-      .positions(lpNftTokenId);
-
-    // Withdraw tokens from the pool
-    // slither-disable-next-line unused-return
-    _routes.uniswapV3NftManager.decreaseLiquidity(
-      INonfungiblePositionManager.DecreaseLiquidityParams({
-        tokenId: lpNftTokenId,
-        liquidity: uniV3LiquidityAmount,
-        amount0Min: 0,
-        amount1Min: 0,
-        // slither-disable-next-line timestamp
-        deadline: block.timestamp
-      })
-    );
-
-    // Collect the tokens and fees
-    // slither-disable-next-line unused-return
-    _routes.uniswapV3NftManager.collect(
-      INonfungiblePositionManager.CollectParams({
-        tokenId: lpNftTokenId,
-        recipient: _msgSender(),
-        amount0Max: type(uint128).max,
-        amount1Max: type(uint128).max
-      })
-    );
-
-    // Return the LP-NFT to the sender
-    _routes.uniswapV3NftManager.safeTransferFrom(
-      address(this),
-      _msgSender(),
-      lpNftTokenId,
-      ""
-    );
-
-    // Return tokens recovered from burning the LP-SFT
-    uint256 newPow1Balance = _routes.pow1Token.balanceOf(address(this));
-    uint256 newMarketTokenBalance = _routes.marketToken.balanceOf(
+    // Refund any excess tokens to the buyer
+    uint256 remainingMarketTokens = _routes.marketToken.balanceOf(
       address(this)
     );
-
-    if (newPow1Balance > pow1Balance) {
-      _routes.pow1Token.safeTransfer(
-        address(this),
-        newPow1Balance - pow1Balance
-      );
+    if (remainingMarketTokens > 0) {
+      _routes.marketToken.safeTransfer(msg.sender, remainingMarketTokens);
     }
-    if (newMarketTokenBalance > marketTokenBalance) {
-      _routes.marketToken.safeTransfer(
-        address(this),
-        newMarketTokenBalance - marketTokenBalance
-      );
-    }
+  }
 
-    // Emit event
-    // TODO
+  //////////////////////////////////////////////////////////////////////////////
+  // Internal helper functions
+  //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @dev Computes the tip amount based on the purchase price
+   *
+   * @param price The purchase price of the LP-NFT
+   * @return tip The calculated tip amount
+   */
+  function _computeTip(uint256 price) private pure returns (uint256 tip) {
+    // Example: Tip is 1% of the purchase price
+    tip = (price * 1e16) / 1e18; // 1% of price scaled by 1e18
   }
 }

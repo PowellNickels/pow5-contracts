@@ -13,6 +13,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import {INonfungiblePositionManager} from "../../../interfaces/uniswap-v3-periphery/INonfungiblePositionManager.sol";
 
@@ -31,6 +32,7 @@ abstract contract DutchAuctionBase is
   DutchAuctionRoutes,
   DutchAuctionState
 {
+  using EnumerableSet for EnumerableSet.UintSet;
   using SafeERC20 for IERC20;
 
   //////////////////////////////////////////////////////////////////////////////
@@ -88,6 +90,7 @@ abstract contract DutchAuctionBase is
     );
 
     // Mint an LP-NFT
+    // slither-disable-next-line calls-loop
     lpNftTokenId = _routes.pow1MarketPooler.mintLpNftImbalance(
       pow1Amount,
       marketTokenAmount,
@@ -95,19 +98,20 @@ abstract contract DutchAuctionBase is
     );
 
     // Validate external state
+    // slither-disable-next-line calls-loop
     require(
       _routes.uniswapV3NftManager.ownerOf(lpNftTokenId) == address(this),
       "Not owner"
     );
 
     // Read external state
-    // slither-disable-next-line unused-return
+    // slither-disable-next-line calls-loop,unused-return
     (, , , , , , , uint128 liquidityAmount, , , , ) = _routes
       .uniswapV3NftManager
       .positions(lpNftTokenId);
 
     // Withdraw tokens from the pool
-    // slither-disable-next-line unused-return
+    // slither-disable-next-line calls-loop,reentrancy-no-eth,unused-return
     _routes.uniswapV3NftManager.decreaseLiquidity(
       INonfungiblePositionManager.DecreaseLiquidityParams({
         tokenId: lpNftTokenId,
@@ -119,7 +123,7 @@ abstract contract DutchAuctionBase is
     );
 
     // Collect the tokens and fees
-    // slither-disable-next-line unused-return
+    // slither-disable-next-line calls-loop,reentrancy-no-eth,unused-return
     _routes.uniswapV3NftManager.collect(
       INonfungiblePositionManager.CollectParams({
         tokenId: lpNftTokenId,
@@ -130,5 +134,57 @@ abstract contract DutchAuctionBase is
     );
 
     return lpNftTokenId;
+  }
+
+  function _establishAuctionState(uint256 lpNftTokenId) internal {
+    // Calculate starting price for the new LP-NFT
+    uint256 startingPriceBips = _calculateNextStartingPriceBips();
+
+    // Initialize AuctionState for the new LP-NFT
+    AuctionState memory newAuctionState = AuctionState({
+      lpNftTokenId: lpNftTokenId,
+      startPriceBips: startingPriceBips,
+      endPriceBips: _auctionSettings.minPriceBips,
+      startTime: block.timestamp,
+      salePrice: 0
+    });
+
+    // Store the auction state
+    _auctionStates[lpNftTokenId] = newAuctionState;
+
+    // Update BureauState
+    _bureauState.totalAuctions += 1;
+
+    // Add lpNftTokenId to current auctions set
+    require(_currentAuctions.add(lpNftTokenId), "Already added");
+  }
+
+  /**
+   * @dev Calculates the starting price for the next LP-NFT based on the growth rate
+   *
+   * @return newStartingPriceBips The calculated starting price (scaled by 1e18)
+   */
+  function _calculateNextStartingPriceBips()
+    internal
+    view
+    returns (uint256 newStartingPriceBips)
+  {
+    uint256 lastSalePriceBips = _bureauState.lastSalePriceBips;
+
+    // TODO
+    // Calculate new starting price using growth rate
+    // slither-disable-next-line incorrect-equality
+    if (lastSalePriceBips == 0) {
+      newStartingPriceBips = _auctionSettings.initialPriceBips;
+    } else {
+      newStartingPriceBips = lastSalePriceBips * 2;
+    }
+
+    // Ensure new price does not exceed max price
+    if (newStartingPriceBips > _auctionSettings.maxPriceBips) {
+      newStartingPriceBips = _auctionSettings.maxPriceBips;
+    }
+
+    return newStartingPriceBips;
   }
 }

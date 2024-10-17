@@ -147,13 +147,17 @@ describe("DutchAuctionManager", () => {
         dutchAuction: addressBook.dutchAuction!,
       },
     );
-    await dutchAuctionManager.initialize(
-      poolSetup,
-      roleSetup,
-      INITIAL_POW1_SUPPLY,
-      INITIAL_WETH_AMOUNT,
-      beneficiaryAddress,
-    );
+    const initializationTx: Promise<ethers.ContractTransactionReceipt> =
+      dutchAuctionManager.initialize(
+        poolSetup,
+        roleSetup,
+        INITIAL_POW1_SUPPLY,
+        INITIAL_WETH_AMOUNT,
+        beneficiaryAddress,
+      );
+
+    // Create first LP-NFTs for sale
+    await dutchAuctionManager.createInitialAuctions(initializationTx);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -207,17 +211,4 @@ describe("DutchAuctionManager", () => {
     chai.expect(nftContent).to.haveOwnProperty("description").is.a("string");
     chai.expect(nftContent).to.haveOwnProperty("image").is.a("string");
   });
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Spec: Check token balances
-  //////////////////////////////////////////////////////////////////////////////
-
-  //
-  // TODO: Check everywhere that should have balances:
-  //
-  //   * Pool should have POW1 and W-ETH reserves
-  //   * LP-SFT should have LPPOW1
-  //   * LP-SFT should have POW1 dust
-  //   * Beneficiary should have W-ETH dust
-  //
 });

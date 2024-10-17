@@ -16,6 +16,7 @@ import {INonfungiblePositionManager} from "../../../interfaces/uniswap-v3-periph
 
 import {IDutchAuctionAdminActions} from "../../interfaces/bureaucracy/dutchAuction/IDutchAuctionAdminActions.sol";
 import {VRGDA} from "../../utils/auction/VRGDA.sol";
+import {LiquidityMath} from "../../utils/math/LiquidityMath.sol";
 
 import {DutchAuctionBase} from "./DutchAuctionBase.sol";
 
@@ -150,133 +151,129 @@ abstract contract DutchAuctionAdminActions is
   }
 
   /**
-   * @dev See {IDutchAuctionAdminActions-setAuction}
+   * @dev See {IDutchAuctionAdminActions-setAuctionCount}
    */
-  function setAuction(
-    uint256 slot,
-    int256 targetPrice,
-    int256 priceDecayConstant,
-    uint256 dustLossAmount
-  ) external override nonReentrant {
+  function setAuctionCount(
+    uint32 auctionCount,
+    uint256 marketTokenDust
+  ) external override {
     // Validate access
     _checkRole(DEFAULT_ADMIN_ROLE);
 
-    // Validate parameters
-    // TODO
-
     // Validate state
-    require(address(_slotToAuction[slot]) == address(0), "Auction exists");
-    require(_slotToLpNft[slot] == 0, "NFT exists");
-
-    // Create the auction
-    VRGDA auction = new VRGDA(targetPrice, priceDecayConstant);
-
-    // Get token balances, as Uniswap V3 can't mint a token with zero liquidity
-    uint256 pow1Balance = _routes.pow1Token.balanceOf(address(this));
-    uint256 marketTokenBalance = _routes.marketToken.balanceOf(address(this));
-
-    // Approve pooler to spend tokens
-    // slither-disable-next-line reentrancy-no-eth
-    _routes.pow1Token.safeIncreaseAllowance(
-      address(_routes.pow1MarketPooler),
-      pow1Balance
-    );
-    // slither-disable-next-line reentrancy-no-eth
-    _routes.marketToken.safeIncreaseAllowance(
-      address(_routes.pow1MarketPooler),
-      marketTokenBalance
-    );
-
-    // Mint an LP-NFT
-    // slither-disable-next-line reentrancy-no-eth
-    uint256 nftTokenId = _routes.pow1MarketPooler.mintLpNftImbalance(
-      pow1Balance,
-      marketTokenBalance,
-      address(this)
-    );
-
-    // Update state
-    _slotToAuction[slot] = auction;
-    _slotToLpNft[slot] = nftTokenId;
+    require(_initialized, "Not initialized");
 
     // Read state
-    // slither-disable-next-line unused-return
-    (, , , , , , , uint128 liquidityAmount, , , , ) = _routes
-      .uniswapV3NftManager
-      .positions(nftTokenId);
+    uint32 currentAuctionCount = _targetLpNftCount;
 
-    // Withdraw tokens from the pool
-    // slither-disable-next-line unused-return
-    _routes.uniswapV3NftManager.decreaseLiquidity(
-      INonfungiblePositionManager.DecreaseLiquidityParams({
-        tokenId: nftTokenId,
-        liquidity: liquidityAmount,
-        amount0Min: 0,
-        amount1Min: 0,
-        // slither-disable-next-line timestamp
-        deadline: block.timestamp
-      })
-    );
+    // Update state
+    _targetLpNftCount = auctionCount;
 
-    // Collect the tokens and fees
-    // slither-disable-next-line unused-return
-    _routes.uniswapV3NftManager.collect(
-      INonfungiblePositionManager.CollectParams({
-        tokenId: nftTokenId,
-        recipient: address(this),
-        amount0Max: type(uint128).max,
-        amount1Max: type(uint128).max
-      })
-    );
+    // Mint additional LP-NFTs if necessary
+    if (auctionCount > currentAuctionCount) {
+      uint32 lpNftsToMint = auctionCount - currentAuctionCount;
 
-    // Allow at most a small loss of the POW1
-    require(
-      _routes.pow1Token.balanceOf(address(this)) + dustLossAmount >=
-        pow1Balance,
-      "Game token loss"
-    );
+      // Procure dust
+      _routes.marketToken.safeTransferFrom(
+        _msgSender(),
+        address(this),
+        marketTokenDust
+      );
 
-    // Allow at most a small loss of the POW1
-    require(
-      _routes.pow1Token.balanceOf(address(this)) + dustLossAmount >=
-        pow1Balance,
-      "Game token loss"
-    );
+      // Perform swaps and mint LP-NFTs
+      _mintAndInitializeAuctions(lpNftsToMint, marketTokenDust);
 
-    // Allow at most a small loss of the market token
-    require(
-      _routes.marketToken.balanceOf(address(this)) + dustLossAmount >=
-        marketTokenBalance,
-      "Asset token loss"
-    );
-
-    // Emit event
-    // TODO
+      // Handle remaining tokens and dust
+      _handleRemainingTokens();
+    }
   }
 
   /**
-   * @dev See {IDutchAuctionAdminActions-removeAuction}
+   * @dev See {IDutchAuctionAdminActions-getAuctionCount}
    */
-  function removeAuction(uint256 slot) external nonReentrant {
-    // Validate access
-    _checkRole(DEFAULT_ADMIN_ROLE);
-
+  function getAuctionCount() external view override returns (uint32) {
     // Read state
-    uint256 nftTokenId = _slotToLpNft[slot];
+    return _targetLpNftCount;
+  }
 
-    // Update state
-    delete _slotToAuction[slot];
-    delete _slotToLpNft[slot];
+  //////////////////////////////////////////////////////////////////////////////
+  // Internal helper functions
+  //////////////////////////////////////////////////////////////////////////////
 
-    // Call external contracts
-    if (nftTokenId != 0) {
-      // Return the empty LP-NFT to the sender
-      _routes.uniswapV3NftManager.safeTransferFrom(
-        address(this),
-        _msgSender(),
-        nftTokenId,
-        ""
+  function _mintAndInitializeAuctions(
+    uint256 lpNftsToMint,
+    uint256 marketTokenDust
+  ) private {
+    // Get market token reserve
+    uint256 marketTokenReserve = _routes.marketToken.balanceOf(
+      address(_routes.pow1MarketPool)
+    );
+
+    // Get the pool fee
+    uint24 poolFee = _routes.pow1MarketPool.fee();
+
+    // Calculate swap amount
+    uint256 swapAmount = LiquidityMath.computeSwapAmountV2(
+      marketTokenReserve,
+      marketTokenDust,
+      poolFee
+    );
+    require(swapAmount <= marketTokenDust, "Bad liquidity math");
+
+    // Approve swap
+    _routes.marketToken.safeIncreaseAllowance(
+      address(_routes.pow1MarketSwapper),
+      swapAmount
+    );
+
+    // Perform swap
+    // slither-disable-next-line unused-return,reentrancy-benign
+    _routes.pow1MarketSwapper.buyGameToken(swapAmount, address(this));
+
+    // Mint LP-NFTs
+    for (uint256 i = 0; i < lpNftsToMint; i++) {
+      // Read external state
+      // slither-disable-next-line calls-loop
+      uint256 currentPow1Amount = _routes.pow1Token.balanceOf(address(this));
+      // slither-disable-next-line calls-loop
+      uint256 currentMarketTokenAmount = _routes.marketToken.balanceOf(
+        address(this)
       );
+
+      // Mint an LP-NFT
+      uint256 lpNftTokenId = _mintLpNft(
+        currentPow1Amount,
+        currentMarketTokenAmount
+      );
+
+      // Establish auction state for the new LP-NFT
+      _establishAuctionState(lpNftTokenId);
+    }
+  }
+
+  function _handleRemainingTokens() private {
+    // Read external state
+    uint256 remainingPow1 = _routes.pow1Token.balanceOf(address(this));
+
+    // Swap the POW1 dust back into the market token
+    if (remainingPow1 > 0) {
+      // Approve swap
+      _routes.pow1Token.safeIncreaseAllowance(
+        address(_routes.pow1MarketSwapper),
+        remainingPow1
+      );
+
+      // Perform swap
+      // slither-disable-next-line unused-return
+      _routes.pow1MarketSwapper.sellGameToken(remainingPow1, address(this));
+    }
+
+    // Read external state
+    uint256 remainingMarketToken = _routes.marketToken.balanceOf(address(this));
+
+    // Return the market token dust to the sender
+    if (remainingMarketToken > 0) {
+      _routes.marketToken.safeTransfer(_msgSender(), remainingMarketToken);
     }
   }
 }

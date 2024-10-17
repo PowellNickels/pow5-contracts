@@ -9,7 +9,18 @@
 import { ethers } from "ethers";
 
 import { DutchAuctionContract } from "../../interfaces/bureaucracy/dutchAuction/dutchAuctionContract";
+import { WrappedNativeContract } from "../../interfaces/token/erc20/wrappedNativeContract";
 import { ERC20Contract } from "../../interfaces/zeppelin/token/erc20/erc20Contract";
+
+//////////////////////////////////////////////////////////////////////////////
+// Constants
+//////////////////////////////////////////////////////////////////////////////
+
+// Initial number of LP-NFTs to mint for auction
+const INITIAL_AUCTION_COUNT: number = 3;
+
+// Amount of WETH dust to use for auction creation
+const INITIAL_WETH_DUST: bigint = 1_000n; // 1,000 wei
 
 //////////////////////////////////////////////////////////////////////////////
 // Types
@@ -17,9 +28,9 @@ import { ERC20Contract } from "../../interfaces/zeppelin/token/erc20/erc20Contra
 
 // Required addresses
 type Addresses = {
-  pow1Token: `0x${string}`;
-  marketToken: `0x${string}`;
   dutchAuction: `0x${string}`;
+  marketToken: `0x${string}`;
+  pow1Token: `0x${string}`;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -27,15 +38,27 @@ type Addresses = {
 //////////////////////////////////////////////////////////////////////////////
 
 /**
- * @description Manages the role assignments
+ * @description Manages the Dutch Auction
  */
 class DutchAuctionManager {
   private admin: ethers.Signer;
   private addresses: Addresses;
+  private dutchAuctionContract: DutchAuctionContract;
+  private marketTokenContract: WrappedNativeContract;
+  private pow1Contract: ERC20Contract;
 
   constructor(admin: ethers.Signer, addresses: Addresses) {
     this.admin = admin;
     this.addresses = addresses;
+    this.dutchAuctionContract = new DutchAuctionContract(
+      this.admin,
+      this.addresses.dutchAuction,
+    );
+    this.marketTokenContract = new WrappedNativeContract(
+      this.admin,
+      this.addresses.marketToken,
+    );
+    this.pow1Contract = new ERC20Contract(this.admin, this.addresses.pow1Token);
   }
 
   /**
@@ -63,42 +86,39 @@ class DutchAuctionManager {
     const approvalPromises: Array<Promise<ethers.ContractTransactionReceipt>> =
       [];
 
-    // Create contracts
-    const pow1Contract: ERC20Contract = new ERC20Contract(
-      this.admin,
-      this.addresses.pow1Token,
-    );
-    const marketTokenContract: ERC20Contract = new ERC20Contract(
-      this.admin,
-      this.addresses.marketToken,
-    );
-    const dutchAuctionContract: DutchAuctionContract = new DutchAuctionContract(
-      this.admin,
-      this.addresses.dutchAuction,
-    );
-
     // Approve Dutch Auction spending POW1, if needed
-    const pow1Allowance: bigint = await pow1Contract.allowance(
+    const pow1Allowance: bigint = await this.pow1Contract.allowance(
       (await this.admin.getAddress()) as `0x${string}`,
-      dutchAuctionContract.address,
+      this.dutchAuctionContract.address,
     );
     if (pow1Allowance < initialPow1) {
       approvalPromises.push(
-        pow1Contract.approve(
+        this.pow1Contract.approve(
           this.addresses.dutchAuction,
           initialPow1 - pow1Allowance,
         ),
       );
     }
 
-    // Approve Dutch Auction spending market token, if needed
-    const marketTokenAllowance: bigint = await marketTokenContract.allowance(
+    // Deposit WETH if needed
+    const wethBalance: bigint = await this.marketTokenContract.balanceOf(
       (await this.admin.getAddress()) as `0x${string}`,
-      dutchAuctionContract.address,
     );
+    if (wethBalance < initialMarketToken) {
+      approvalPromises.push(
+        this.marketTokenContract.deposit(initialMarketToken - wethBalance),
+      );
+    }
+
+    // Approve Dutch Auction spending market token, if needed
+    const marketTokenAllowance: bigint =
+      await this.marketTokenContract.allowance(
+        (await this.admin.getAddress()) as `0x${string}`,
+        this.dutchAuctionContract.address,
+      );
     if (marketTokenAllowance < initialMarketToken) {
       approvalPromises.push(
-        marketTokenContract.approve(
+        this.marketTokenContract.approve(
           this.addresses.dutchAuction,
           initialMarketToken - marketTokenAllowance,
         ),
@@ -108,11 +128,67 @@ class DutchAuctionManager {
     // Wait for all setup transactions to complete
     await Promise.all([poolSetup, roleSetup, Promise.all(approvalPromises)]);
 
-    return dutchAuctionContract.initialize(
+    return this.dutchAuctionContract.initialize(
       initialPow1,
       initialMarketToken,
       lpSftReceiver,
     );
+  }
+
+  async isInitialized(): Promise<boolean> {
+    return this.dutchAuctionContract.isInitialized();
+  }
+
+  async createInitialAuctions(
+    initializeTx: Promise<ethers.ContractTransactionReceipt> | null,
+  ): Promise<ethers.ContractTransactionReceipt> {
+    // Wait for initial tokens to be spent
+    if (initializeTx) {
+      await initializeTx;
+    }
+
+    const pendingTransactions: Array<
+      Promise<ethers.ContractTransactionReceipt>
+    > = [];
+
+    // Get dust for LP-NFT creation, if needed
+    const marketTokenBalance = await this.marketTokenContract.balanceOf(
+      (await this.admin.getAddress()) as `0x${string}`,
+    );
+    if (marketTokenBalance < INITIAL_WETH_DUST) {
+      pendingTransactions.push(
+        this.marketTokenContract.deposit(
+          INITIAL_WETH_DUST - marketTokenBalance,
+        ),
+      );
+    }
+
+    // Approve spending dust for LP-NFT creation, if needed
+    const marketTokenAllowance = await this.marketTokenContract.allowance(
+      (await this.admin.getAddress()) as `0x${string}`,
+      this.addresses.dutchAuction,
+    );
+    if (marketTokenAllowance < INITIAL_WETH_DUST) {
+      pendingTransactions.push(
+        this.marketTokenContract.approve(
+          this.addresses.dutchAuction,
+          INITIAL_WETH_DUST - marketTokenAllowance,
+        ),
+      );
+    }
+
+    // Wait for all pending transactions to complete
+    await Promise.all(pendingTransactions);
+
+    // Set auction count
+    return this.dutchAuctionContract.setAuctionCount(
+      INITIAL_AUCTION_COUNT,
+      INITIAL_WETH_DUST,
+    );
+  }
+
+  async getCurrentAuctionCount(): Promise<number> {
+    return this.dutchAuctionContract.getAuctionCount();
   }
 }
 

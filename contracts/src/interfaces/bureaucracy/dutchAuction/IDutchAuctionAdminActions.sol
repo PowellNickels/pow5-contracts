@@ -49,25 +49,24 @@ interface IDutchAuctionAdminActions is IERC165 {
   function isInitialized() external view returns (bool);
 
   /**
-   * @dev Set the auction for a slot, allowing for multiple auctions
+   * @dev Set the total number of LP-NFTs for sale
    *
-   * @param slot The auction slot
-   * @param targetPrice Target price for a token if sold on pace, scaled by 1e18
-   * @param priceDecayConstant The percent price decays per unit of time with
-   *                           no sales, scaled by 1e18
-   * @param dustLossAmount The maximum loss of either token to dust in the pool
+   * If this is greater than the current number of LP-NFTs, the difference will
+   * be minted and added to the sale. If it is less, LP-NFTs won't be minted to
+   * replace the current ones as they are sold.
+   *
+   * @param auctionCount The target number of LP-NFTs for sale
+   * @param marketTokenDust Some dust to produre, if needed, to mint the LP-NFTs
    */
-  function setAuction(
-    uint256 slot,
-    int256 targetPrice,
-    int256 priceDecayConstant,
-    uint256 dustLossAmount
+  function setAuctionCount(
+    uint32 auctionCount,
+    uint256 marketTokenDust
   ) external;
 
   /**
-   * @dev Remove the auction for a slot
+   * @dev Get the total number of LP-NFTs for sale
    *
-   * @param slot The auction slot
+   * @return The total number of LP-NFTs for sale
    */
-  function removeAuction(uint256 slot) external;
+  function getAuctionCount() external view returns (uint32);
 }

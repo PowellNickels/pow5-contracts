@@ -56,34 +56,23 @@ function DutchAuctionAdminActionsMixin<T extends new (...args: any[]) => {}>(
       return await this.dutchAuctionAdminActions.isInitialized();
     }
 
-    async setAuction(
-      slot: bigint,
-      targetPrice: bigint,
-      priceDecayConstant: bigint,
-      dustLossAmount: bigint,
+    async setAuctionCount(
+      auctionCount: number,
+      marketTokenDust: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.dutchAuctionAdminActions.setAuction(
-            slot,
-            targetPrice,
-            priceDecayConstant,
-            dustLossAmount,
+          await this.dutchAuctionAdminActions.setAuctionCount(
+            auctionCount,
+            marketTokenDust,
           );
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
     }
 
-    async removeAuction(
-      slot: bigint,
-    ): Promise<ethers.ContractTransactionReceipt> {
-      return this.withSigner(async () => {
-        const tx: ethers.ContractTransactionResponse =
-          await this.dutchAuctionAdminActions.removeAuction(slot);
-
-        return (await tx.wait()) as ethers.ContractTransactionReceipt;
-      });
+    async getAuctionCount(): Promise<number> {
+      return Number(await this.dutchAuctionAdminActions.getAuctionCount());
     }
   };
 }
