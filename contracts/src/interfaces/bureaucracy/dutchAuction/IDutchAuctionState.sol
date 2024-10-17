@@ -21,31 +21,90 @@ interface IDutchAuctionState is IERC165 {
   // Types
   //////////////////////////////////////////////////////////////////////////////
 
-  // TODO
-  /**
-   * @dev The VRGDA parameters for a logistic-to-linear schedule
-   *
-  struct VRGDAParams {
-    int256 targetPrice; // p0
-    int256 priceDecayPercent; // k
-    int256 logisticLimit; // L
-    int256 timeScale; // s
-    int256 soldBySwitch; // n at switch
-    int256 switchTime; // t at switch
-    int256 perTimeUnit; // r
+  struct AuctionMetadata {
+    uint256 totalAuctions; // Total number of LP-NFTs up for auction
+    uint256 minPriceBips; // Minimum possible price for any LP-NFT (scaled by 1e18)
+    uint256 maxPriceBips; // Maximum possible price for any LP-NFT (scaled by 1e18)
+    uint256 lastSalePriceBips; // The price at which the last NFT was sold (scaled by 1e18)
   }
-  */
+
+  struct AuctionSettings {
+    uint256 priceDecayRate; // The rate at which the price decreases (scaled by 1e18)
+    uint256 mintDustAmount; // Amount of dust required for pre-minting
+    uint256 priceIncrement; // Price increase ratio after each purchase (scaled by 1e18)
+    uint256 initialPriceBips; // Initial starting price (scaled by 1e18)
+    uint256 minPriceBips; // Minimum possible price (scaled by 1e18)
+    uint256 maxPriceBips; // Maximum possible price (scaled by 1e18)
+  }
+
+  struct AuctionState {
+    uint256 lpNftTokenId; // ID of the LP-NFT for sale
+    uint256 startPriceBips; // The starting price of the NFT (scaled by 1e18)
+    uint256 endPriceBips; // The end price after the auction's decay (minPrice)
+    uint256 startTime; // The time the auction starts
+    bool sold; // Whether the NFT has been sold or not
+  }
 
   //////////////////////////////////////////////////////////////////////////////
   // Public interface
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @dev Get the LP-NFT price for a slot
+   * @dev Returns the metadata of the Dutch Auction
    *
-   * @param slot The auction slot
-   *
-   * @return The LP-NFT price in bips, scaled by 1e18
+   * @return The AuctionMetadata struct containing the auction metadata
    */
-  function getPrice(uint256 slot) external view returns (uint256);
+  function getAuctionMetadata() external view returns (AuctionMetadata memory);
+
+  /**
+   * @dev Returns the auction settings
+   *
+   * @return The AuctionSettings struct containing the auction configuration
+   */
+  function getAuctionSettings() external view returns (AuctionSettings memory);
+
+  /**
+   * @dev Returns the number of active auctions
+   *
+   * @return The total number of auctions in progress
+   */
+  function getCurrentAuctionCount() external view returns (uint256);
+
+  /**
+   * @dev Returns the list of current LP-NFT token IDs on auction
+   *
+   * @return An array of LP-NFT token IDs
+   */
+  function getCurrentAuctions() external view returns (uint256[] memory);
+
+  /**
+   * @dev Returns the auction states of the current auctions
+   *
+   * @return An array of AuctionState structs
+   */
+  function getCurrentAuctionStates()
+    external
+    view
+    returns (AuctionState[] memory);
+
+  /**
+   * @dev Returns the auction state for a given LP-NFT
+   *
+   * @param lpNftTokenId The token ID of the LP-NFT
+   * @return The AuctionState struct containing the auction details
+   */
+  function getAuctionState(
+    uint256 lpNftTokenId
+  ) external view returns (AuctionState memory);
+
+  /**
+   * @dev Get the current tip price for an LP-NFT
+   *
+   * @param lpNftTokenId The LP-NFT token ID
+   *
+   * @return The LP-NFT tip price, scaled by 1e18
+   */
+  function getCurrentPriceBips(
+    uint256 lpNftTokenId
+  ) external view returns (uint256);
 }

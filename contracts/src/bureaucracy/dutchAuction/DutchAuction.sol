@@ -40,7 +40,29 @@ contract DutchAuction is DutchAuctionAdminActions, DutchAuctionActions {
   )
     DutchAuctionAdminActions(owner_)
     DutchAuctionRoutes(ITheReserveRoutes(theReserve_).getRoutes())
-  {}
+  {
+    // Initialize auction settings
+    _auctionSettings = AuctionSettings({
+      priceDecayRate: DECAY_CONSTANT,
+      mintDustAmount: 1_000, // TODO
+      priceIncrement: GROWTH_RATE,
+      initialPriceBips: INITIAL_PRICE_BIPS,
+      minPriceBips: MIN_PRICE_BIPS,
+      maxPriceBips: MAX_PRICE_BIPS
+    });
+
+    // Initialize auction metadata
+    _initializeAuctionMetadata();
+  }
+
+  function _initializeAuctionMetadata() private {
+    _auctionMetadata = AuctionMetadata({
+      totalAuctions: 0,
+      minPriceBips: _auctionSettings.minPriceBips,
+      maxPriceBips: _auctionSettings.maxPriceBips,
+      lastSalePriceBips: _auctionSettings.initialPriceBips
+    });
+  }
 
   //////////////////////////////////////////////////////////////////////////////
   // Implementation of {IERC165} via {IDutchAuction}, {DutchAuctionAdminActions}

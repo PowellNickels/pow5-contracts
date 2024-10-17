@@ -30,29 +30,17 @@ interface IDutchAuctionActions is IERC165 {
    * Upon purchase, the LP-NFT is staked in a stake farm, and an LP-SFT is
    * minted to the receiver.
    *
-   * @param slot The auction slot
+   * @param lpNftTokenId The LP-NFT token ID to purchase
    * @param pow1Amount The amount of the game token to deposit
    * @param marketTokenAmount The amount of the market token to deposit
+   * @param beneficiary The beneficiary of the tip paid as part of the auction
    * @param receiver The receiver of the LP-SFT
-   *
-   * @return nftTokenId The LP-NFT/LP-SFT token ID
    */
   function purchase(
-    uint256 slot,
+    uint256 lpNftTokenId,
     uint256 pow1Amount,
     uint256 marketTokenAmount,
+    address beneficiary,
     address receiver
-  ) external returns (uint256 nftTokenId);
-
-  /**
-   * @dev Exit a POW1 LP-SFT position
-   *
-   * This function allows an LP-SFT holder to exit the pool, receiving their
-   * share of the pool's assets in the form of the asset token. The LP-SFT is
-   * burned in the process. The empty LP-NFT is returned to the sender as a
-   * keepsake.
-   *
-   * @param lpNftTokenId The LP-NFT token ID
-   */
-  function exit(uint256 lpNftTokenId) external;
+  ) external;
 }

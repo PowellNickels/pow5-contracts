@@ -32,8 +32,96 @@ function DutchAuctionStateMixin<T extends new (...args: any[]) => {}>(Base: T) {
       );
     }
 
-    async getPrice(slot: bigint): Promise<bigint> {
-      return await this.dutchAuctionState.getPrice(slot);
+    async getAuctionMetadata(): Promise<{
+      totalAuctions: bigint;
+      minPriceBips: bigint;
+      maxPriceBips: bigint;
+      lastSalePriceBips: bigint;
+    }> {
+      const auctionMetadata: IDutchAuctionState.AuctionMetadataStruct =
+        await this.dutchAuctionState.getAuctionMetadata();
+
+      return {
+        totalAuctions: BigInt(auctionMetadata.totalAuctions),
+        minPriceBips: BigInt(auctionMetadata.minPriceBips),
+        maxPriceBips: BigInt(auctionMetadata.maxPriceBips),
+        lastSalePriceBips: BigInt(auctionMetadata.lastSalePriceBips),
+      };
+    }
+
+    async getAuctionSettings(): Promise<{
+      priceDecayRate: bigint;
+      mintDustAmount: bigint;
+      priceIncrement: bigint;
+      initialPriceBips: bigint;
+      minPriceBips: bigint;
+      maxPriceBips: bigint;
+    }> {
+      const auctionSettings: IDutchAuctionState.AuctionSettingsStruct =
+        await this.dutchAuctionState.getAuctionSettings();
+
+      return {
+        priceDecayRate: BigInt(auctionSettings.priceDecayRate),
+        mintDustAmount: BigInt(auctionSettings.mintDustAmount),
+        priceIncrement: BigInt(auctionSettings.priceIncrement),
+        initialPriceBips: BigInt(auctionSettings.initialPriceBips),
+        minPriceBips: BigInt(auctionSettings.minPriceBips),
+        maxPriceBips: BigInt(auctionSettings.maxPriceBips),
+      };
+    }
+
+    async getCurrentAuctionCount(): Promise<bigint> {
+      return await this.dutchAuctionState.getCurrentAuctionCount();
+    }
+
+    async getCurrentAuctions(): Promise<bigint[]> {
+      return await this.dutchAuctionState.getCurrentAuctions();
+    }
+
+    async getCurrentAuctionStates(): Promise<
+      {
+        lpNftTokenId: bigint;
+        startPriceBips: bigint;
+        endPriceBips: bigint;
+        startTime: bigint;
+        sold: boolean;
+      }[]
+    > {
+      const currentAuctionStates: IDutchAuctionState.AuctionStateStruct[] =
+        await this.dutchAuctionState.getCurrentAuctionStates();
+
+      return currentAuctionStates.map(
+        (auctionState: IDutchAuctionState.AuctionStateStruct) => ({
+          lpNftTokenId: BigInt(auctionState.lpNftTokenId),
+          startPriceBips: BigInt(auctionState.startPriceBips),
+          endPriceBips: BigInt(auctionState.endPriceBips),
+          startTime: BigInt(auctionState.startTime),
+          sold: auctionState.sold,
+        }),
+      );
+    }
+
+    async getAuctionState(lpNftTokenId: bigint): Promise<{
+      lpNftTokenId: bigint;
+      startPriceBips: bigint;
+      endPriceBips: bigint;
+      startTime: bigint;
+      sold: boolean;
+    }> {
+      const auctionState: IDutchAuctionState.AuctionStateStruct =
+        await this.dutchAuctionState.getAuctionState(lpNftTokenId);
+
+      return {
+        lpNftTokenId: BigInt(auctionState.lpNftTokenId),
+        startPriceBips: BigInt(auctionState.startPriceBips),
+        endPriceBips: BigInt(auctionState.endPriceBips),
+        startTime: BigInt(auctionState.startTime),
+        sold: auctionState.sold,
+      };
+    }
+
+    async getCurrentPriceBips(lpNftTokenId: bigint): Promise<bigint> {
+      return await this.dutchAuctionState.getCurrentPriceBips(lpNftTokenId);
     }
   };
 }

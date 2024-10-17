@@ -35,28 +35,21 @@ function DutchAuctionActionsMixin<T extends new (...args: any[]) => {}>(
     }
 
     async purchase(
-      slot: bigint,
+      lpNftTokenId: bigint,
       pow1Amount: bigint,
       marketTokenAmount: bigint,
+      beneficiary: `0x${string}`,
       receiver: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
           await this.dutchAuctionActions.purchase(
-            slot,
+            lpNftTokenId,
             pow1Amount,
             marketTokenAmount,
+            beneficiary,
             receiver,
           );
-
-        return (await tx.wait()) as ethers.ContractTransactionReceipt;
-      });
-    }
-
-    async exit(tokenId: bigint): Promise<ethers.ContractTransactionReceipt> {
-      return this.withSigner(async () => {
-        const tx: ethers.ContractTransactionResponse =
-          await this.dutchAuctionActions.exit(tokenId);
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });

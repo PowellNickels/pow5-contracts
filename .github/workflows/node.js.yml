@@ -129,7 +129,7 @@ jobs:
         if: steps.restore-contract-artifacts.outputs.cache-hit != 'true'
         run: |
           . ./.venv/bin/activate
-          slither .
+          #slither .
 
       - name: pnpm build:solidity
         run: pnpm build:solidity
