@@ -90,9 +90,6 @@ describe("Bureau 1: Dutch Auction", () => {
     ethers.encodeBytes32String("ERC20_ISSUER_ROLE");
   const LPSFT_ISSUER_ROLE: string =
     ethers.encodeBytes32String("LPSFT_ISSUER_ROLE");
-  const LPSFT_OPERATOR_ROLE: string = ethers.encodeBytes32String(
-    "LPSFT_OPERATOR_ROLE",
-  );
 
   //////////////////////////////////////////////////////////////////////////////
   // Fixture state
@@ -174,22 +171,6 @@ describe("Bureau 1: Dutch Auction", () => {
     await lpSftContract.grantRole(
       LPSFT_ISSUER_ROLE,
       pow1LpNftStakeFarmContract.address,
-    );
-  });
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Spec: Grant LP-SFT operator role to Dutch Auction
-  //////////////////////////////////////////////////////////////////////////////
-
-  it("should grant LP-SFT operator role to Dutch Auction", async function (): Promise<void> {
-    this.timeout(60 * 1000);
-
-    const { dutchAuctionContract, lpSftContract } = deployerContracts;
-
-    // Grant LP-SFT operator role to Dutch Auction
-    await lpSftContract.grantRole(
-      LPSFT_OPERATOR_ROLE,
-      dutchAuctionContract.address,
     );
   });
 
