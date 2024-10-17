@@ -42,6 +42,13 @@ const setupTest = hardhat.deployments.createFixture(setupFixture);
 const INITIAL_WETH_AMOUNT: bigint =
   ethers.parseEther(INITIAL_LPPOW1_WETH_VALUE.toString()) / BigInt(ETH_PRICE); // $100 in WETH
 
+// Initial amount of WETH to mint initial auction LP-NFTs
+const INITIAL_WETH_DUST: bigint =
+  ethers.parseEther("0.01") / BigInt(ETH_PRICE) / 1_000_000_000n; // 1 billionth of a cent of WETH
+
+// Amount of WETH lost to the pool when minting initial auction LP-NFTs
+const INITIAL_WETH_LOSS: bigint = 33n; // 33 wei
+
 // POW1 test reward for LPPOW1 staking incentive
 const LPPOW1_REWARD_AMOUNT: bigint = ethers.parseUnits("1000", POW1_DECIMALS); // 1,000 POW1 ($10)
 
@@ -60,15 +67,15 @@ const WETH_DUST_AMOUNT: bigint =
 // Maximum amount of loss in the auction due to entering/exiting Uniswap pool
 const MAX_LOSS_AMOUNT: bigint = 35n; // 35 units of dust of either token
 
+// Token ID of the first LP-NFT/LP-SFT sold at auction
+const AUCTION_LPNFT_TOKEN_ID: bigint = 5n;
+
 // Amount of WETH to deposit in the first auction
 const AUCTION_WETH_AMOUNT: bigint =
   ethers.parseEther("1000") / BigInt(ETH_PRICE); // $1,000 in ETH
 
 // Amount of LPPOW1 minted in the first auction
-const AUCTION_LPPOW1_AMOUNT: bigint = 38_970_275_607_839_900_943n; // 38.970 LPPOW1
-
-// Token ID of the first LP-NFT/LP-SFT sold at auction
-const AUCTION_LPNFT_TOKEN_ID: bigint = 2n;
+const AUCTION_LPPOW1_AMOUNT: bigint = 38_970_275_607_839_896_949n; // 38.970 LPPOW1
 
 //
 // Debug parameters
@@ -203,7 +210,9 @@ describe("Bureau 1: Dutch Auction", () => {
     const { wrappedNativeContract } = deployerContracts;
 
     // Deposit ETH into W-ETH
-    await wrappedNativeContract.deposit(INITIAL_WETH_AMOUNT);
+    await wrappedNativeContract.deposit(
+      INITIAL_WETH_AMOUNT + INITIAL_WETH_DUST,
+    );
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -310,7 +319,7 @@ describe("Bureau 1: Dutch Auction", () => {
     // Approve Dutch Auction spending WETH
     await wrappedNativeContract.approve(
       dutchAuctionContract.address,
-      INITIAL_WETH_AMOUNT,
+      INITIAL_WETH_AMOUNT + INITIAL_WETH_DUST,
     );
   });
 
@@ -351,6 +360,42 @@ describe("Bureau 1: Dutch Auction", () => {
       INITIAL_WETH_AMOUNT, // marketTokenAmount
       beneficiaryAddress, // receiver
     );
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Spec: Create initial Dutch Auction LP-NFTs
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should create initial DutchAuction LP-NFTs", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const { dutchAuctionContract } = deployerContracts;
+
+    // Initialize DutchAuction
+    await dutchAuctionContract.setAuctionCount(3, INITIAL_WETH_DUST);
+  });
+
+  it("should check WETH dust lost to initial LP-NFT creation", async function (): Promise<void> {
+    const { wrappedNativeContract } = deployerContracts;
+
+    // Check WETH balance
+    const wethBalance: bigint =
+      await wrappedNativeContract.balanceOf(deployerAddress);
+
+    // Calculate DeFi metrics
+    const wethAmount: bigint = INITIAL_WETH_DUST - wethBalance;
+    const wethValue: string = ethers.formatEther(
+      wethAmount / BigInt(ETH_PRICE),
+    );
+
+    // Log DeFi metrics
+    console.log(
+      `    WETH dust lost: ${ethers
+        .formatUnits(wethAmount, "gwei")
+        .toLocaleString()} gwei ($${wethValue})`,
+    );
+
+    chai.expect(wethBalance).to.equal(INITIAL_WETH_DUST - INITIAL_WETH_LOSS);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -429,7 +474,9 @@ describe("Bureau 1: Dutch Auction", () => {
     );
 
     chai.expect(pow1Balance).to.equal(INITIAL_POW1_SUPPLY - LPPOW1_POW1_DUST);
-    chai.expect(wethBalance).to.equal(INITIAL_WETH_AMOUNT - LPPOW1_WETH_DUST);
+    chai
+      .expect(wethBalance)
+      .to.equal(INITIAL_WETH_AMOUNT - LPPOW1_WETH_DUST + INITIAL_WETH_LOSS);
   });
 
   it("should check initial LP-SFT LPPOW1 balance", async function (): Promise<void> {
@@ -615,7 +662,12 @@ describe("Bureau 1: Dutch Auction", () => {
       .to.equal(INITIAL_POW1_SUPPLY - LPPOW1_POW1_DUST - POW1_DUST_AMOUNT);
     chai
       .expect(wethBalance)
-      .to.equal(INITIAL_WETH_AMOUNT - LPPOW1_WETH_DUST + WETH_DUST_AMOUNT);
+      .to.equal(
+        INITIAL_WETH_AMOUNT -
+          LPPOW1_WETH_DUST +
+          WETH_DUST_AMOUNT +
+          INITIAL_WETH_LOSS,
+      );
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -775,7 +827,7 @@ describe("Bureau 1: Dutch Auction", () => {
 
     // Check total supply
     const totalSupply: bigint = await uniswapV3NftManagerContract.totalSupply();
-    chai.expect(totalSupply).to.equal(2n);
+    chai.expect(totalSupply).to.equal(5n);
 
     // Test ownerOf()
     const owner: `0x${string}` = await uniswapV3NftManagerContract.ownerOf(

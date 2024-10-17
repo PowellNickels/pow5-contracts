@@ -85,6 +85,21 @@ function DutchAuctionAdminActionsMixin<T extends new (...args: any[]) => {}>(
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
     }
+
+    async setAuctionCount(
+      auctionCount: number,
+      marketTokenDust: bigint,
+    ): Promise<ethers.ContractTransactionReceipt> {
+      return this.withSigner(async () => {
+        const tx: ethers.ContractTransactionResponse =
+          await this.dutchAuctionAdminActions.setAuctionCount(
+            auctionCount,
+            marketTokenDust,
+          );
+
+        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+      });
+    }
   };
 }
 

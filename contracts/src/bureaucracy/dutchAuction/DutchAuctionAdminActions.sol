@@ -16,6 +16,7 @@ import {INonfungiblePositionManager} from "../../../interfaces/uniswap-v3-periph
 
 import {IDutchAuctionAdminActions} from "../../interfaces/bureaucracy/dutchAuction/IDutchAuctionAdminActions.sol";
 import {VRGDA} from "../../utils/auction/VRGDA.sol";
+import {LiquidityMath} from "../../utils/math/LiquidityMath.sol";
 
 import {DutchAuctionBase} from "./DutchAuctionBase.sol";
 
@@ -277,6 +278,102 @@ abstract contract DutchAuctionAdminActions is
         nftTokenId,
         ""
       );
+    }
+  }
+
+  /**
+   * @dev See {IDutchAuctionAdminActions-setAuctionCount}
+   */
+  function setAuctionCount(
+    uint256 auctionCount,
+    uint256 marketTokenDust
+  ) external override {
+    // Validate access
+    _checkRole(DEFAULT_ADMIN_ROLE);
+
+    // Validate state
+    require(_initialized, "Not initialized");
+
+    // Read state
+    uint256 currentAuctionCount = _targetLpNftCount;
+
+    // Update state
+    _targetLpNftCount = auctionCount;
+
+    // Mint additional LP-NFTs if necessary
+    if (auctionCount > currentAuctionCount) {
+      // Procure dust
+      _routes.marketToken.safeTransferFrom(
+        _msgSender(),
+        address(this),
+        marketTokenDust
+      );
+
+      // Get market token reserve
+      uint256 marketTokenReserve = _routes.marketToken.balanceOf(
+        address(_routes.pow1MarketPool)
+      );
+
+      // Get the pool fee
+      uint24 poolFee = _routes.pow1MarketPool.fee();
+
+      // Calculate swap amount
+      uint256 swapAmount = LiquidityMath.computeSwapAmountV2(
+        marketTokenReserve,
+        marketTokenDust,
+        poolFee
+      );
+      require(swapAmount <= marketTokenDust, "Bad liquidity math");
+
+      // Approve swap
+      _routes.marketToken.safeIncreaseAllowance(
+        address(_routes.pow1MarketSwapper),
+        swapAmount
+      );
+
+      // Perform swap
+      // slither-disable-next-line unused-return
+      _routes.pow1MarketSwapper.buyGameToken(swapAmount, address(this));
+
+      // Mint LP-NFTs
+      for (uint256 i = currentAuctionCount; i < auctionCount; i++) {
+        // Read external state
+        // slither-disable-next-line calls-loop
+        uint256 currentPow1Amount = _routes.pow1Token.balanceOf(address(this));
+        // slither-disable-next-line calls-loop
+        uint256 currentMarketTokenAmount = _routes.marketToken.balanceOf(
+          address(this)
+        );
+
+        // Mint an LP-NFT
+        _mintLpNft(currentPow1Amount, currentMarketTokenAmount);
+      }
+
+      // Read external state
+      uint256 finalPow1Amount = _routes.pow1Token.balanceOf(address(this));
+
+      // Swap the POW1 dust back into the market token
+      if (finalPow1Amount > 0) {
+        // Approve swap
+        _routes.pow1Token.safeIncreaseAllowance(
+          address(_routes.pow1MarketSwapper),
+          finalPow1Amount
+        );
+
+        // Perform swap
+        // slither-disable-next-line unused-return
+        _routes.pow1MarketSwapper.sellGameToken(finalPow1Amount, address(this));
+      }
+
+      // Read external state
+      uint256 finalMarketTokenAmount = _routes.marketToken.balanceOf(
+        address(this)
+      );
+
+      // Return the market token dust to the sender
+      if (finalMarketTokenAmount > 0) {
+        _routes.marketToken.safeTransfer(_msgSender(), finalMarketTokenAmount);
+      }
     }
   }
 }
