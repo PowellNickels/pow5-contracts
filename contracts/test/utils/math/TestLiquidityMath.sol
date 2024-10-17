@@ -17,37 +17,14 @@ import "../../../src/utils/math/LiquidityMath.sol";
  * @dev Contract wrapper for testing liquidity math
  */
 contract TestLiquidityMath {
-  //////////////////////////////////////////////////////////////////////////////
-  // State
-  //////////////////////////////////////////////////////////////////////////////
-
-  LiquidityMath public liquidityMath;
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Initialization
-  //////////////////////////////////////////////////////////////////////////////
-
-  constructor() {
-    // Initialize state
-    liquidityMath = new LiquidityMath();
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // External interface
-  //////////////////////////////////////////////////////////////////////////////
-
   /**
-   * @dev Compute the amount of token A to swap for token B
-   *
-   * @param reserveA The reserve of token A
-   * @param amountA The amount of token A to add
-   * @param swapFee The swap fee of the pool, denominated in hundredths of a bip
+   * @dev See {LiquidityMath-computeSwapAmountV2}
    */
-  function testComputeSwapAmountV2(
+  function computeSwapAmountV2(
     uint256 reserveA,
     uint256 amountA,
     uint24 swapFee
-  ) external view returns (uint256) {
-    return liquidityMath.computeSwapAmountV2(reserveA, amountA, swapFee);
+  ) external pure returns (uint256) {
+    return LiquidityMath.computeSwapAmountV2(reserveA, amountA, swapFee);
   }
 }

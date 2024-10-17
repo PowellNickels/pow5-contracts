@@ -63,7 +63,7 @@ describe("LiquidityMath", () => {
     const { testLiquidityMathContract } = contracts;
 
     const swapAmountA: bigint =
-      await testLiquidityMathContract.testComputeSwapAmountV2(
+      await testLiquidityMathContract.computeSwapAmountV2(
         RESERVE_A_AMOUNT,
         ADD_A_AMOUNT,
         SWAP_FEE,
@@ -75,28 +75,28 @@ describe("LiquidityMath", () => {
     const { testLiquidityMathContract } = contracts;
 
     let swapAmountA: bigint =
-      await testLiquidityMathContract.testComputeSwapAmountV2(
+      await testLiquidityMathContract.computeSwapAmountV2(
         0n,
         ADD_A_AMOUNT,
         SWAP_FEE,
       );
     chai.expect(swapAmountA).to.equal(0n);
 
-    swapAmountA = await testLiquidityMathContract.testComputeSwapAmountV2(
+    swapAmountA = await testLiquidityMathContract.computeSwapAmountV2(
       RESERVE_A_AMOUNT,
       0n,
       SWAP_FEE,
     );
     chai.expect(swapAmountA).to.equal(0n);
 
-    swapAmountA = await testLiquidityMathContract.testComputeSwapAmountV2(
+    swapAmountA = await testLiquidityMathContract.computeSwapAmountV2(
       0n,
       0n,
       SWAP_FEE,
     );
     chai.expect(swapAmountA).to.equal(0n);
 
-    swapAmountA = await testLiquidityMathContract.testComputeSwapAmountV2(
+    swapAmountA = await testLiquidityMathContract.computeSwapAmountV2(
       RESERVE_A_AMOUNT,
       ADD_A_AMOUNT,
       0,

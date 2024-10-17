@@ -17,7 +17,7 @@ import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
  * @dev Liquidity math for computing the optimal one-sided supply to a
  * liquidity pool
  */
-contract LiquidityMath {
+library LiquidityMath {
   /**
    * @dev Compute swap amount needed for adding liquidity to a pool in the
    * absence of concentrated liquidity (such as a Uniswap V2 pool)
@@ -82,7 +82,7 @@ contract LiquidityMath {
     uint256 reserveA,
     uint256 amountA,
     uint24 swapfee
-  ) public pure returns (uint256 swapA) {
+  ) internal pure returns (uint256 swapA) {
     // prettier-ignore
     swapA = (
       Math.sqrt(

@@ -27,12 +27,7 @@ import {UniV3Swapper} from "./UniV3Swapper.sol";
  * @dev Token router send to liquidity to the Uniswap V3 pool in exchange for
  *      an LP-NFT
  */
-abstract contract UniV3Pooler is
-  Context,
-  ERC721Holder,
-  LiquidityMath,
-  UniV3Swapper
-{
+abstract contract UniV3Pooler is Context, ERC721Holder, UniV3Swapper {
   using SafeERC20 for IERC20;
 
   //////////////////////////////////////////////////////////////////////////////

@@ -36,7 +36,6 @@ contract ReverseRepo is
   AccessControl,
   ERC721Holder,
   ERC1155Holder,
-  LiquidityMath,
   IReverseRepo
 {
   using SafeERC20 for IERC20;

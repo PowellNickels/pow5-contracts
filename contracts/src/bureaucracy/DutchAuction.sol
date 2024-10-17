@@ -39,7 +39,6 @@ contract DutchAuction is
   AccessControl,
   ERC721Holder,
   ERC1155Holder,
-  LiquidityMath,
   IDutchAuction
 {
   using SafeERC20 for IERC20;
