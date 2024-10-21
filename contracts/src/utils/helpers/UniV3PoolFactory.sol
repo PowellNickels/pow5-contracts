@@ -9,7 +9,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-pragma solidity 0.8.27;
+pragma solidity 0.8.28;
 
 import {IUniswapV3Factory} from "../../../interfaces/uniswap-v3-core/IUniswapV3Factory.sol";
 import {IUniswapV3Pool} from "../../../interfaces/uniswap-v3-core/IUniswapV3Pool.sol";

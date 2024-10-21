@@ -9,7 +9,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-pragma solidity 0.8.27;
+pragma solidity 0.8.28;
 
 import {IERC1155Errors} from "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
 import {Arrays} from "@openzeppelin/contracts/utils/Arrays.sol";

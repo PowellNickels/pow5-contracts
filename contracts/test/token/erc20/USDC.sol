@@ -9,7 +9,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-pragma solidity 0.8.27;
+pragma solidity 0.8.28;
 
 import "./extensions/TestERC20Mintable.sol";
 
