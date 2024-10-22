@@ -16,6 +16,7 @@ library StringUtils {
    * @dev Converts a bytes32 value to its ASCII string representation
    *
    * @param _bytes32 The bytes32 value to convert
+   *
    * @return The string representation of the bytes32 value
    */
   function bytes32ToString(

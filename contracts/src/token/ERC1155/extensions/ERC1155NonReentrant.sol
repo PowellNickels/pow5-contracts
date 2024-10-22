@@ -11,7 +11,7 @@
 
 pragma solidity 0.8.28;
 
-import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import {ERC1155Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 
 import {ERC1155EnumerableNonReentrant} from "../../../utils/guards/ERC1155EnumerableNonReentrant.sol";
 import {LPNFTHolderNonReentrant} from "../../../utils/guards/LPNFTHolderNonReentrant.sol";
@@ -30,5 +30,5 @@ abstract contract ERC1155NonReentrant is
   LPNFTHolderNonReentrant,
   LPSFTIssuableNonReentrant,
   LPSFTNonReentrant,
-  ERC1155
+  ERC1155Upgradeable
 {}

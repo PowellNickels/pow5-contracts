@@ -11,7 +11,7 @@
 
 pragma solidity 0.8.28;
 
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 
 import {ERC20Issuable} from "./extensions/ERC20Issuable.sol";
 
@@ -46,15 +46,26 @@ contract POW5 is ERC20Issuable {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
+   * @dev Constructor
+   */
+  constructor(address owner_) {
+    initialize(owner_);
+  }
+
+  /**
    * @dev Initializes the ERC-20 token with a name and symbol
    *
    * @param owner_ The owner of the token
    */
-  constructor(address owner_) ERC20(TOKEN_NAME, TOKEN_SYMBOL) {
+  function initialize(address owner_) public initializer {
     // Validate parameters
     require(owner_ != address(0), "Invalid owner");
 
-    // Initialize {AccessControl}
+    // Initialize ancestors
+    __AccessControl_init();
+    __ERC20_init(TOKEN_NAME, TOKEN_SYMBOL);
+
+    // Initialize {AccessControl} via {ERC20Issuable}
     _grantRole(DEFAULT_ADMIN_ROLE, owner_);
   }
 

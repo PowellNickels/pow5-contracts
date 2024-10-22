@@ -23,8 +23,8 @@ abstract contract ERC1155EnumerableNonReentrant {
   //////////////////////////////////////////////////////////////////////////////
 
   // Unique identifier for the ERC1155Enumerable inteface
-  bytes32 private immutable ERC1155_ENUMERABLE_ID =
-    "ERC1155EnumerableNonReentrant";
+  bytes32 private constant ERC1155_ENUMERABLE_ID =
+    bytes32("ERC1155EnumerableNonReentrant");
 
   //////////////////////////////////////////////////////////////////////////////
   // State

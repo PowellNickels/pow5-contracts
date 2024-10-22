@@ -11,7 +11,7 @@
 
 pragma solidity 0.8.28;
 
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 
 import {ERC20Issuable} from "./extensions/ERC20Issuable.sol";
 import {ERC20Nontransferable} from "./extensions/ERC20Nontransferable.sol";
@@ -47,13 +47,24 @@ contract LPPOW1 is ERC20Issuable, ERC20Nontransferable {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
+   * @dev Constructor
+   */
+  constructor(address owner_) {
+    initialize(owner_);
+  }
+
+  /**
    * @dev Initializes the ERC-20 token with a name and symbol
    *
    * @param owner_ The owner of the token
    */
-  constructor(address owner_) ERC20(TOKEN_NAME, TOKEN_SYMBOL) {
+  function initialize(address owner_) public initializer {
     // Validate parameters
     require(owner_ != address(0), "Invalid owner");
+
+    // Initialize ancestors
+    __AccessControl_init();
+    __ERC20_init(TOKEN_NAME, TOKEN_SYMBOL);
 
     // Initialize {AccessControl} via {ERC20Issuable}
     _grantRole(DEFAULT_ADMIN_ROLE, owner_);
@@ -71,17 +82,18 @@ contract LPPOW1 is ERC20Issuable, ERC20Nontransferable {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {ERC20} via {ERC20Issuable} and {ERC20Nontransferable}
+  // Implementation of {ERC20Upgradeable} via {ERC20Issuable} and
+  // {ERC20Nontransferable}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @dev See {ERC20-_update}
+   * @dev See {ERC20Upgradeable-_update}
    */
   function _update(
     address from,
     address to,
     uint256 value
-  ) internal virtual override(ERC20, ERC20Nontransferable) {
+  ) internal virtual override(ERC20Upgradeable, ERC20Nontransferable) {
     // Call ancesor
     super._update(from, to, value);
   }

@@ -11,9 +11,9 @@
 
 pragma solidity 0.8.28;
 
-import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {IERC1155MetadataURI} from "@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {ERC1155Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 
 import {INOLPSFT} from "../../interfaces/token/ERC1155/INOLPSFT.sol";
 
@@ -33,11 +33,18 @@ contract NOLPSFT is INOLPSFT, ERC1155Enumerable, LPSFTIssuable {
   /**
    * @dev The LP-SFT contract
    */
-  IERC1155MetadataURI public immutable lpSft;
+  IERC1155MetadataURI public lpSft;
 
   //////////////////////////////////////////////////////////////////////////////
   // Initialization
   //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @dev Constructor
+   */
+  constructor(address owner_, address lpSft_) {
+    initialize(owner_, lpSft_);
+  }
 
   /**
    * @dev Initializes the ERC-1155 contract
@@ -45,7 +52,7 @@ contract NOLPSFT is INOLPSFT, ERC1155Enumerable, LPSFTIssuable {
    * @param owner_ The owner of the ERC-1155 contract
    * @param lpSft_ The LP-SFT contract
    */
-  constructor(address owner_, address lpSft_) ERC1155("") {
+  function initialize(address owner_, address lpSft_) public initializer {
     // Validate parameters
     require(owner_ != address(0), "Invalid owner");
     require(lpSft_ != address(0), "Invalid LP-SFT");
@@ -93,7 +100,8 @@ contract NOLPSFT is INOLPSFT, ERC1155Enumerable, LPSFTIssuable {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {ERC1155} via {ERC1155Enumerable} and {LPSFTIssuable}
+  // Implementation of {ERC1155Upgradeable} via {ERC1155Enumerable} and
+  // {LPSFTIssuable}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -104,7 +112,7 @@ contract NOLPSFT is INOLPSFT, ERC1155Enumerable, LPSFTIssuable {
     address to,
     uint256[] memory ids,
     uint256[] memory values
-  ) internal virtual override(ERC1155, ERC1155Enumerable) {
+  ) internal virtual override(ERC1155Upgradeable, ERC1155Enumerable) {
     // Call ancestors
     super._update(from, to, ids, values);
   }

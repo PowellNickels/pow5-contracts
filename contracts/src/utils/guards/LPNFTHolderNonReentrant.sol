@@ -23,7 +23,8 @@ abstract contract LPNFTHolderNonReentrant {
   //////////////////////////////////////////////////////////////////////////////
 
   // Unique identifier for the LPNFTHolder interface
-  bytes32 private immutable LP_NFT_HOLDER_ID = "LPNFTHolderNonReentrant";
+  bytes32 private constant LP_NFT_HOLDER_ID =
+    bytes32("LPNFTHolderNonReentrant");
 
   //////////////////////////////////////////////////////////////////////////////
   // State

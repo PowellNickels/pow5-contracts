@@ -11,11 +11,11 @@
 
 pragma solidity 0.8.28;
 
-import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {Arrays} from "@openzeppelin/contracts/utils/Arrays.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import {ERC1155Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 
 import {INonfungiblePositionManager} from "../../../interfaces/uniswap-v3-periphery/INonfungiblePositionManager.sol";
 
@@ -32,7 +32,7 @@ import {LPSFTIssuable} from "./extensions/LPSFTIssuable.sol";
  *
  * @dev See https://eips.ethereum.org/EIPS/eip-1155
  */
-contract LPSFT is ILPSFT, ERC1155Enumerable, LPSFTIssuable, LPNFTHolder {
+contract LPSFT is ILPSFT, ERC1155Enumerable, LPNFTHolder, LPSFTIssuable {
   using Arrays for uint256[];
   using SafeERC20 for IERC20;
 
@@ -43,12 +43,12 @@ contract LPSFT is ILPSFT, ERC1155Enumerable, LPSFTIssuable, LPNFTHolder {
   /**
    * @dev The POW1 token
    */
-  IERC20 public immutable pow1Token;
+  IERC20 public pow1Token;
 
   /**
    * @dev The POW5 token
    */
-  IERC20 public immutable pow5Token;
+  IERC20 public pow5Token;
 
   /**
    * @dev The LP POW1 token
@@ -63,18 +63,14 @@ contract LPSFT is ILPSFT, ERC1155Enumerable, LPSFTIssuable, LPNFTHolder {
   /**
    * @dev The Uniswap V3 NFT manager
    */
-  INonfungiblePositionManager public immutable uniswapV3NftManager;
+  INonfungiblePositionManager public uniswapV3NftManager;
 
   //////////////////////////////////////////////////////////////////////////////
   // Initialization
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @dev Initializes the ERC-1155 contract
-   *
-   * @param owner_ The owner of the ERC-1155 contract
-   * @param lpNftTemplate_ The LP-NFT contract used for clones
-   * @param uniswapV3NftManager_ The Uniswap V3 NFT manager
+   * @dev Constructor
    */
   constructor(
     address owner_,
@@ -84,9 +80,41 @@ contract LPSFT is ILPSFT, ERC1155Enumerable, LPSFTIssuable, LPNFTHolder {
     address lpPow1Token_,
     address lpPow5Token_,
     address uniswapV3NftManager_
-  ) ERC1155("") LPNFTHolder(lpNftTemplate_) {
+  ) {
+    initialize(
+      owner_,
+      lpNftTemplate_,
+      pow1Token_,
+      pow5Token_,
+      lpPow1Token_,
+      lpPow5Token_,
+      uniswapV3NftManager_
+    );
+  }
+
+  /**
+   * @dev Initializes the ERC-1155 contract
+   *
+   * @param owner_ The owner of the ERC-1155 contract
+   * @param lpNftTemplate_ The LP-NFT contract used for clones
+   * @param pow1Token_ The POW1 token
+   * @param pow5Token_ The POW5 token
+   * @param lpPow1Token_ The LPPOW1 token
+   * @param lpPow5Token_ The LPPOW5 token
+   * @param uniswapV3NftManager_ The Uniswap V3 NFT manager
+   */
+  function initialize(
+    address owner_,
+    address lpNftTemplate_,
+    address pow1Token_,
+    address pow5Token_,
+    address lpPow1Token_,
+    address lpPow5Token_,
+    address uniswapV3NftManager_
+  ) public initializer {
     // Validate parameters
     require(owner_ != address(0), "Invalid owner");
+    require(lpNftTemplate_ != address(0), "Invalid LPNFT");
     require(pow1Token_ != address(0), "Invalid POW1");
     require(pow5Token_ != address(0), "Invalid POW5");
     require(lpPow1Token_ != address(0), "Invalid LPPOW1");
@@ -96,7 +124,12 @@ contract LPSFT is ILPSFT, ERC1155Enumerable, LPSFTIssuable, LPNFTHolder {
       "Invalid Uniswap V3 NFT manager"
     );
 
-    // Initialize {AccessControl}
+    // Initialize ancestors
+    __AccessControl_init();
+    __ERC1155_init("");
+    __LPNFTHolder_init(lpNftTemplate_);
+
+    // Initialize {AccessControl} via {LPSFTIssuable}
     _grantRole(DEFAULT_ADMIN_ROLE, owner_);
 
     // Initialize routes
@@ -158,8 +191,8 @@ contract LPSFT is ILPSFT, ERC1155Enumerable, LPSFTIssuable, LPNFTHolder {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {ERC1155} via {ERC1155Enumerable}, {LSFTIssuable} and
-  // {LPNFTHolder}
+  // Implementation of {ERC1155Upgradeable} via {ERC1155Enumerable},
+  // {LSFTIssuable} and {LPNFTHolder}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -173,7 +206,7 @@ contract LPSFT is ILPSFT, ERC1155Enumerable, LPSFTIssuable, LPNFTHolder {
   )
     internal
     virtual
-    override(ERC1155, ERC1155Enumerable, LPNFTHolder)
+    override(ERC1155Upgradeable, ERC1155Enumerable, LPNFTHolder)
     nonReentrantLPSFT
   {
     // Translate parameters

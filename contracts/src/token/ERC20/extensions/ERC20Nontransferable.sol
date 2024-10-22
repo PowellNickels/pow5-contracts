@@ -8,14 +8,14 @@
 
 pragma solidity 0.8.28;
 
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 
 /**
  * @title ERC-20: Token Standard, optional nontransferable extension
  *
  * @dev See https://eips.ethereum.org/EIPS/eip-20
  */
-abstract contract ERC20Nontransferable is ERC20 {
+abstract contract ERC20Nontransferable is ERC20Upgradeable {
   //////////////////////////////////////////////////////////////////////////////
   // Errors
   //////////////////////////////////////////////////////////////////////////////
@@ -30,11 +30,11 @@ abstract contract ERC20Nontransferable is ERC20 {
   error ERC20TransferAttempted(address from, address to, uint256 value);
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {ERC20}
+  // Implementation of {ERC20Upgradeable}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @dev See {ERC20-_update}
+   * @dev See {ERC20Upgradeable-_update}
    */
   function _update(
     address from,

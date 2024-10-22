@@ -9,9 +9,9 @@
 pragma solidity 0.8.28;
 
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
-import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {Arrays} from "@openzeppelin/contracts/utils/Arrays.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import {ERC1155Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 
 import {IERC1155Enumerable} from "../../../interfaces/token/ERC1155/extensions/IERC1155Enumerable.sol";
 import {ILPNFT} from "../../../interfaces/token/ERC1155/ILPNFT.sol";
@@ -25,7 +25,7 @@ import {ERC1155NonReentrant} from "./ERC1155NonReentrant.sol";
 /**
  * @title LP-NFT holder for SFT contract
  */
-abstract contract LPNFTHolder is ERC1155NonReentrant, ILPNFTHolder {
+abstract contract LPNFTHolder is ILPNFTHolder, ERC1155NonReentrant {
   using Arrays for uint256[];
 
   //////////////////////////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@ abstract contract LPNFTHolder is ERC1155NonReentrant, ILPNFTHolder {
   /**
    * @dev The LP-NFT used for clones
    */
-  ILPNFT public immutable lpNftTemplate;
+  ILPNFT public lpNftTemplate;
 
   //////////////////////////////////////////////////////////////////////////////
   // State
@@ -56,13 +56,15 @@ abstract contract LPNFTHolder is ERC1155NonReentrant, ILPNFTHolder {
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @dev Initializes the ERC-1155 contract
+   * @dev Initializes the contract
    *
    * @param lpNftTemplate_ The LP-NFT contract used for clones
    */
-  constructor(address lpNftTemplate_) {
+  function __LPNFTHolder_init(
+    address lpNftTemplate_
+  ) internal onlyInitializing {
     // Validate parameters
-    require(lpNftTemplate_ != address(0), "Invalid LP-NFT");
+    require(lpNftTemplate_ != address(0), "Invalid LPNFT");
 
     // Initialize routes
     lpNftTemplate = ILPNFT(lpNftTemplate_);
@@ -77,18 +79,18 @@ abstract contract LPNFTHolder is ERC1155NonReentrant, ILPNFTHolder {
    */
   function supportsInterface(
     bytes4 interfaceId
-  ) public view virtual override(ERC1155, IERC165) returns (bool) {
+  ) public view virtual override(IERC165, ERC1155Upgradeable) returns (bool) {
     return
       super.supportsInterface(interfaceId) ||
       interfaceId == type(ILPNFTHolder).interfaceId;
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {ERC1155} via {ERC1155NonReentrant}
+  // Implementation of {ERC1155Upgradeable} via {ERC1155NonReentrant}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @dev See {ERC1155-_update}
+   * @dev See {ERC1155Upgradeable-_update}
    */
   // slither-disable-next-line reentrancy-events
   function _update(

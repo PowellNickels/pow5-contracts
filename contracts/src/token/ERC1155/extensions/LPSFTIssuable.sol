@@ -11,10 +11,10 @@
 
 pragma solidity 0.8.28;
 
-import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {IERC1155Errors} from "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
-import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import {ERC1155Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 
 import {ILPSFTIssuable} from "../../../interfaces/token/ERC1155/extensions/ILPSFTIssuable.sol";
 import {ILPSFT} from "../../../interfaces/token/ERC1155/ILPSFT.sol";
@@ -27,9 +27,9 @@ import {ERC1155NonReentrant} from "./ERC1155NonReentrant.sol";
  * @title LP-SFT issuable extension for LP-SFT minting and burning
  */
 abstract contract LPSFTIssuable is
-  AccessControl,
-  ERC1155NonReentrant,
-  ILPSFTIssuable
+  ILPSFTIssuable,
+  AccessControlUpgradeable,
+  ERC1155NonReentrant
 {
   //////////////////////////////////////////////////////////////////////////////
   // Roles
@@ -52,7 +52,7 @@ abstract contract LPSFTIssuable is
     public
     view
     virtual
-    override(AccessControl, ERC1155, IERC165)
+    override(IERC165, AccessControlUpgradeable, ERC1155Upgradeable)
     returns (bool)
   {
     return

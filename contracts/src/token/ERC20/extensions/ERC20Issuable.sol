@@ -11,11 +11,11 @@
 
 pragma solidity 0.8.28;
 
-import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 
 import {IERC20Issuable} from "../../../interfaces/token/ERC20/extensions/IERC20Issuable.sol";
 
@@ -24,7 +24,11 @@ import {IERC20Issuable} from "../../../interfaces/token/ERC20/extensions/IERC20I
  *
  * @dev See https://eips.ethereum.org/EIPS/eip-20
  */
-abstract contract ERC20Issuable is AccessControl, ERC20, IERC20Issuable {
+abstract contract ERC20Issuable is
+  IERC20Issuable,
+  AccessControlUpgradeable,
+  ERC20Upgradeable
+{
   //////////////////////////////////////////////////////////////////////////////
   // Roles
   //////////////////////////////////////////////////////////////////////////////
@@ -41,7 +45,13 @@ abstract contract ERC20Issuable is AccessControl, ERC20, IERC20Issuable {
    */
   function supportsInterface(
     bytes4 interfaceId
-  ) public view virtual override(AccessControl, IERC165) returns (bool) {
+  )
+    public
+    view
+    virtual
+    override(IERC165, AccessControlUpgradeable)
+    returns (bool)
+  {
     return
       super.supportsInterface(interfaceId) ||
       interfaceId == type(IERC20).interfaceId ||

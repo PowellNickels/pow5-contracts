@@ -23,7 +23,7 @@ abstract contract LPSFTNonReentrant {
   //////////////////////////////////////////////////////////////////////////////
 
   // Unique identifier for the LPSFT inteface
-  bytes32 private immutable LP_SFT_ID = "LPSFTNonReentrant";
+  bytes32 private constant LP_SFT_ID = bytes32("LPSFTNonReentrant");
 
   //////////////////////////////////////////////////////////////////////////////
   // State

@@ -23,7 +23,8 @@ abstract contract LPSFTIssuableNonReentrant {
   //////////////////////////////////////////////////////////////////////////////
 
   // Unique identifier for the LPSFTIssuable interface
-  bytes32 private immutable LP_SFT_ISSUABLE_ID = "LPSFTIssuableNonReentrant";
+  bytes32 private constant LP_SFT_ISSUABLE_ID =
+    bytes32("LPSFTIssuableNonReentrant");
 
   //////////////////////////////////////////////////////////////////////////////
   // State
