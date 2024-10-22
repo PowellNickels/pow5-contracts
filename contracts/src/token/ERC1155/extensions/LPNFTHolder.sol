@@ -18,18 +18,14 @@ import {ILPNFT} from "../../../interfaces/token/ERC1155/ILPNFT.sol";
 import {ILPNFTHolder} from "../../../interfaces/token/ERC1155/extensions/ILPNFTHolder.sol";
 import {ILPSFT} from "../../../interfaces/token/ERC1155/ILPSFT.sol";
 
-import {ERC1155Utils} from "../utils/ERC1155Utils.sol";
+import {ERC1155Helpers} from "../utils/ERC1155Helpers.sol";
 
 import {ERC1155NonReentrant} from "./ERC1155NonReentrant.sol";
 
 /**
  * @title LP-NFT holder for SFT contract
  */
-abstract contract LPNFTHolder is
-  ERC1155NonReentrant,
-  ERC1155Utils,
-  ILPNFTHolder
-{
+abstract contract LPNFTHolder is ERC1155NonReentrant, ILPNFTHolder {
   using Arrays for uint256[];
 
   //////////////////////////////////////////////////////////////////////////////
@@ -102,7 +98,7 @@ abstract contract LPNFTHolder is
     uint256[] memory values
   ) internal virtual override nonReentrantLPNFTHolder {
     // Validate parameters
-    ERC1155Utils.checkAmountArray(ids, values);
+    ERC1155Helpers.checkAmountArray(ids, values);
 
     // Translate parameters
     uint256 tokenCount = ids.length;

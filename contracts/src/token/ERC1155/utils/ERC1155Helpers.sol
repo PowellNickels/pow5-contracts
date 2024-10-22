@@ -19,7 +19,7 @@ import {IERC1155Enumerable} from "../../../interfaces/token/ERC1155/extensions/I
 /**
  * @title ERC-1155 Utility Functions
  */
-contract ERC1155Utils {
+library ERC1155Helpers {
   using Arrays for uint256[];
 
   //////////////////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ contract ERC1155Utils {
    */
   function getAmountArray(
     uint256 tokenCount
-  ) public pure returns (uint256[] memory) {
+  ) internal pure returns (uint256[] memory) {
     uint256[] memory array = new uint256[](tokenCount);
 
     for (uint256 i = 0; i < tokenCount; i++) {
@@ -56,7 +56,7 @@ contract ERC1155Utils {
   function checkAmountArray(
     uint256[] memory tokenIds,
     uint256[] memory amounts
-  ) public pure {
+  ) internal pure {
     // Validate parameters
     if (tokenIds.length != amounts.length) {
       revert IERC1155Errors.ERC1155InvalidArrayLength(

@@ -19,7 +19,7 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 
 import {INonfungiblePositionManager} from "../../interfaces/uniswap-v3-periphery/INonfungiblePositionManager.sol";
 
-import {ERC1155Utils} from "../token/ERC1155/utils/ERC1155Utils.sol";
+import {ERC1155Helpers} from "../token/ERC1155/utils/ERC1155Helpers.sol";
 import {RewardMath} from "../utils/math/RewardMath.sol";
 
 import {ILPNFTStakeFarm} from "../interfaces/defi/ILPNFTStakeFarm.sol";
@@ -35,12 +35,7 @@ import {ILPSFT} from "../interfaces/token/ERC1155/ILPSFT.sol";
  *
  * Rewards are updated on every interaction.
  */
-contract LPNFTStakeFarm is
-  Context,
-  ReentrancyGuard,
-  ERC1155Utils,
-  ILPNFTStakeFarm
-{
+contract LPNFTStakeFarm is Context, ReentrancyGuard, ILPNFTStakeFarm {
   using Arrays for uint256[];
   using RewardMath for uint256;
   using SafeERC20 for IERC20;
@@ -263,7 +258,7 @@ contract LPNFTStakeFarm is
     if (from == address(0)) {
       revert IERC1155Errors.ERC1155InvalidSender(from);
     }
-    ERC1155Utils.checkAmountArray(ids, values);
+    ERC1155Helpers.checkAmountArray(ids, values);
 
     // Translate parameters
     uint256 tokenCount = ids.length;

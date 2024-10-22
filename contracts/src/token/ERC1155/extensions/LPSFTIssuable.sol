@@ -19,7 +19,7 @@ import {IERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import {ILPSFTIssuable} from "../../../interfaces/token/ERC1155/extensions/ILPSFTIssuable.sol";
 import {ILPSFT} from "../../../interfaces/token/ERC1155/ILPSFT.sol";
 
-import {ERC1155Utils} from "../utils/ERC1155Utils.sol";
+import {ERC1155Helpers} from "../utils/ERC1155Helpers.sol";
 
 import {ERC1155NonReentrant} from "./ERC1155NonReentrant.sol";
 
@@ -29,7 +29,6 @@ import {ERC1155NonReentrant} from "./ERC1155NonReentrant.sol";
 abstract contract LPSFTIssuable is
   AccessControl,
   ERC1155NonReentrant,
-  ERC1155Utils,
   ILPSFTIssuable
 {
   //////////////////////////////////////////////////////////////////////////////
@@ -105,7 +104,7 @@ abstract contract LPSFTIssuable is
     }
 
     // Translate parameters
-    uint256[] memory tokenAmounts = ERC1155Utils.getAmountArray(
+    uint256[] memory tokenAmounts = ERC1155Helpers.getAmountArray(
       sftTokenIds.length
     );
 
@@ -151,7 +150,7 @@ abstract contract LPSFTIssuable is
     }
 
     // Translate parameters
-    uint256[] memory tokenAmounts = ERC1155Utils.getAmountArray(
+    uint256[] memory tokenAmounts = ERC1155Helpers.getAmountArray(
       sftTokenIds.length
     );
 

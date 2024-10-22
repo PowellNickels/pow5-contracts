@@ -19,12 +19,12 @@ import {IDeFiManager} from "../../interfaces/defi/IDeFiManager.sol";
 import {ILPSFTLendFarm} from "../../interfaces/defi/ILPSFTLendFarm.sol";
 import {ILPSFTIssuable} from "../../interfaces/token/ERC1155/extensions/ILPSFTIssuable.sol";
 import {ILPSFT} from "../../interfaces/token/ERC1155/ILPSFT.sol";
-import {ERC1155Utils} from "../../token/ERC1155/utils/ERC1155Utils.sol";
+import {ERC1155Helpers} from "../../token/ERC1155/utils/ERC1155Helpers.sol";
 
 /**
  * @title Bureau of the Yield Harvest
  */
-contract YieldHarvest is Context, ReentrancyGuard, ERC1155Utils, IYieldHarvest {
+contract YieldHarvest is Context, ReentrancyGuard, IYieldHarvest {
   //////////////////////////////////////////////////////////////////////////////
   // Routes
   //////////////////////////////////////////////////////////////////////////////
@@ -150,7 +150,7 @@ contract YieldHarvest is Context, ReentrancyGuard, ERC1155Utils, IYieldHarvest {
 
     // Validate parameters
     require(from != address(0), "Invalid sender");
-    ERC1155Utils.checkAmountArray(ids, values);
+    ERC1155Helpers.checkAmountArray(ids, values);
 
     if (_msgSender() == address(lpSft)) {
       // Call external contracts

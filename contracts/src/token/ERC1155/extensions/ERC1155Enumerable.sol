@@ -21,18 +21,14 @@ import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet
 
 import {IERC1155Enumerable} from "../../../interfaces/token/ERC1155/extensions/IERC1155Enumerable.sol";
 
-import {ERC1155Utils} from "../utils/ERC1155Utils.sol";
+import {ERC1155Helpers} from "../utils/ERC1155Helpers.sol";
 
 import {ERC1155NonReentrant} from "./ERC1155NonReentrant.sol";
 
 /**
  * @title ERC-1155: Multi Token Standard, enumerable extension implementation
  */
-abstract contract ERC1155Enumerable is
-  ERC1155NonReentrant,
-  ERC1155Utils,
-  IERC1155Enumerable
-{
+abstract contract ERC1155Enumerable is ERC1155NonReentrant, IERC1155Enumerable {
   using Arrays for uint256[];
   using EnumerableSet for EnumerableSet.UintSet;
 
@@ -84,7 +80,7 @@ abstract contract ERC1155Enumerable is
     uint256[] memory values
   ) internal virtual override nonReentrantERC1155Enumerable {
     // Validate parameters
-    ERC1155Utils.checkAmountArray(ids, values);
+    ERC1155Helpers.checkAmountArray(ids, values);
 
     // Translate parameters
     uint256 tokenCount = ids.length;

@@ -14,7 +14,7 @@ pragma solidity 0.8.28;
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
 import {ERC1155Enumerable} from "../../../../src/token/ERC1155/extensions/ERC1155Enumerable.sol";
-import {ERC1155Utils} from "../../../../src/token/ERC1155/utils/ERC1155Utils.sol";
+import {ERC1155Helpers} from "../../../../src/token/ERC1155/utils/ERC1155Helpers.sol";
 
 /**
  * @title ERC-1155: Multi Token Standard, mintable extension for test purposes
@@ -24,7 +24,7 @@ import {ERC1155Utils} from "../../../../src/token/ERC1155/utils/ERC1155Utils.sol
  *
  * FOR TESTING ONLY.
  */
-contract TestERC1155Enumerable is ERC1155Utils, ERC1155Enumerable {
+contract TestERC1155Enumerable is ERC1155Enumerable {
   //////////////////////////////////////////////////////////////////////////////
   // Initialization
   //////////////////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ contract TestERC1155Enumerable is ERC1155Utils, ERC1155Enumerable {
     uint256[] memory nftTokenIds
   ) external {
     // Translate parameters
-    uint256[] memory tokenAmounts = ERC1155Utils.getAmountArray(
+    uint256[] memory tokenAmounts = ERC1155Helpers.getAmountArray(
       nftTokenIds.length
     );
 
@@ -94,7 +94,7 @@ contract TestERC1155Enumerable is ERC1155Utils, ERC1155Enumerable {
     uint256[] memory nftTokenIds
   ) external {
     // Translate parameters
-    uint256[] memory tokenAmounts = ERC1155Utils.getAmountArray(
+    uint256[] memory tokenAmounts = ERC1155Helpers.getAmountArray(
       nftTokenIds.length
     );
 
