@@ -12,6 +12,7 @@ import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import uniswapV3NftManagerAbi from "../../src/abi/contracts/depends/uniswap-v3-periphery/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
+import { PoolManager } from "../../src/game/admin/poolManager";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { getNetworkName } from "../../src/hardhat/hardhatUtils";
 import { AddressBook } from "../../src/interfaces/addressBook";
@@ -27,7 +28,6 @@ import {
   LPPOW1_DECIMALS,
   POW1_DECIMALS,
 } from "../../src/utils/constants";
-import { encodePriceSqrt } from "../../src/utils/fixedMath";
 import { getContractLibrary } from "../../src/utils/getContractLibrary";
 import { extractJSONFromURI } from "../../src/utils/lpNftUtils";
 
@@ -102,7 +102,6 @@ describe("Bureau 1: Dutch Auction", () => {
   let addressBook: AddressBook;
   let deployerContracts: ContractLibrary;
   let beneficiaryContracts: ContractLibrary;
-  let pow1IsToken0: boolean;
 
   //////////////////////////////////////////////////////////////////////////////
   // Mocha setup
@@ -243,6 +242,8 @@ describe("Bureau 1: Dutch Auction", () => {
     const { pow1Contract, pow1MarketPoolContract, wrappedNativeContract } =
       deployerContracts;
 
+    let pow1IsToken0: boolean;
+
     const token0: `0x${string}` = await pow1MarketPoolContract.token0();
     const token1: `0x${string}` = await pow1MarketPoolContract.token1();
 
@@ -274,16 +275,19 @@ describe("Bureau 1: Dutch Auction", () => {
   it("should initialize the LPPOW1 pool", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { pow1MarketPoolContract } = deployerContracts;
+    const poolManager: PoolManager = new PoolManager(deployer, {
+      pow1Token: addressBook.pow1Token!,
+      marketToken: addressBook.wrappedNativeToken!,
+      pow1MarketPool: addressBook.pow1MarketPool!,
+      pow5Token: addressBook.pow5Token!,
+      stableToken: addressBook.usdcToken!,
+      pow5StablePool: addressBook.pow5StablePool!,
+    });
 
-    // The initial sqrt price [sqrt(amountToken1/amountToken0)] as a Q64.96 value
-    const INITIAL_PRICE: bigint = encodePriceSqrt(
-      pow1IsToken0 ? INITIAL_WETH_AMOUNT : INITIAL_POW1_SUPPLY,
-      pow1IsToken0 ? INITIAL_POW1_SUPPLY : INITIAL_WETH_AMOUNT,
-    );
+    const transactions: Array<ethers.ContractTransactionReceipt> =
+      await poolManager.initializePools();
 
-    // Initialize the Uniswap V3 pool
-    await pow1MarketPoolContract.initialize(INITIAL_PRICE);
+    chai.expect(transactions.length).to.equal(2);
   });
 
   //////////////////////////////////////////////////////////////////////////////

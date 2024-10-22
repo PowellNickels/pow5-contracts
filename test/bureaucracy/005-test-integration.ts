@@ -10,6 +10,7 @@ import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src
 import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
+import { PoolManager } from "../../src/game/admin/poolManager";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { getNetworkName } from "../../src/hardhat/hardhatUtils";
 import { AddressBook } from "../../src/interfaces/addressBook";
@@ -28,7 +29,6 @@ import {
   POW1_DECIMALS,
   USDC_DECIMALS,
 } from "../../src/utils/constants";
-import { encodePriceSqrt } from "../../src/utils/fixedMath";
 import { getContractLibrary } from "../../src/utils/getContractLibrary";
 
 // Setup Hardhat
@@ -116,6 +116,25 @@ describe("Bureau integration test", () => {
     // Get the contract libraries
     deployerContracts = getContractLibrary(deployer, addressBook);
     beneficiaryContracts = getContractLibrary(beneficiary, addressBook);
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Test setup: Initialize pools
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should initialize Uniswap V3 pools", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const poolManager: PoolManager = new PoolManager(deployer, {
+      pow1Token: addressBook.pow1Token!,
+      marketToken: addressBook.wrappedNativeToken!,
+      pow1MarketPool: addressBook.pow1MarketPool!,
+      pow5Token: addressBook.pow5Token!,
+      stableToken: addressBook.usdcToken!,
+      pow5StablePool: addressBook.pow5StablePool!,
+    });
+
+    await poolManager.initializePools();
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -286,76 +305,6 @@ describe("Bureau integration test", () => {
     await usdcTokenContract.approve(
       reverseRepoContract.address,
       INITIAL_USDC_AMOUNT,
-    );
-  });
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Test setup: Initialize pools
-  //////////////////////////////////////////////////////////////////////////////
-
-  it("should initialize Uniswap V3 pools", async function (): Promise<void> {
-    this.timeout(60 * 1000);
-
-    const {
-      pow1Contract,
-      pow1MarketPoolContract,
-      pow5Contract,
-      pow5StablePoolContract,
-      usdcContract,
-      wrappedNativeContract,
-    } = deployerContracts;
-
-    // Get POW1 pool token order
-    let pow1IsToken0: boolean;
-    const pow1Token0: `0x${string}` = await pow1MarketPoolContract.token0();
-    const pow1Token1: `0x${string}` = await pow1MarketPoolContract.token1();
-    if (
-      pow1Token0.toLowerCase() === pow1Contract.address.toLowerCase() &&
-      pow1Token1.toLowerCase() === wrappedNativeContract.address.toLowerCase()
-    ) {
-      pow1IsToken0 = true;
-    } else if (
-      pow1Token0.toLowerCase() ===
-        wrappedNativeContract.address.toLowerCase() &&
-      pow1Token1.toLowerCase() === pow1Contract.address.toLowerCase()
-    ) {
-      pow1IsToken0 = false;
-    } else {
-      throw new Error("POW1 pool tokens are incorrect");
-    }
-
-    // Initialize the Uniswap V3 pool for POW1
-    await pow1MarketPoolContract.initialize(
-      encodePriceSqrt(
-        pow1IsToken0 ? INITIAL_WETH_AMOUNT : INITIAL_POW1_SUPPLY,
-        pow1IsToken0 ? INITIAL_POW1_SUPPLY : INITIAL_WETH_AMOUNT,
-      ),
-    );
-
-    // Get POW5 pool token order
-    let pow5IsToken0: boolean;
-    const pow5Token0: `0x${string}` = await pow5StablePoolContract.token0();
-    const pow5Token1: `0x${string}` = await pow5StablePoolContract.token1();
-    if (
-      pow5Token0.toLowerCase() === pow5Contract.address.toLowerCase() &&
-      pow5Token1.toLowerCase() === usdcContract.address.toLowerCase()
-    ) {
-      pow5IsToken0 = true;
-    } else if (
-      pow5Token0.toLowerCase() === usdcContract.address.toLowerCase() &&
-      pow5Token1.toLowerCase() === pow5Contract.address.toLowerCase()
-    ) {
-      pow5IsToken0 = false;
-    } else {
-      throw new Error("POW1 pool tokens are incorrect");
-    }
-
-    // Initialize the Uniswap V3 pool for POW5
-    await pow5StablePoolContract.initialize(
-      encodePriceSqrt(
-        pow5IsToken0 ? INITIAL_USDC_AMOUNT : INITIAL_POW5_DEPOSIT,
-        pow5IsToken0 ? INITIAL_POW5_DEPOSIT : INITIAL_USDC_AMOUNT,
-      ),
     );
   });
 
