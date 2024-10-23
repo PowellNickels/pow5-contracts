@@ -12,6 +12,7 @@ import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import uniswapV3NftManagerAbi from "../../src/abi/contracts/depends/uniswap-v3-periphery/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
+import { PermissionManager } from "../../src/game/admin/permissionManager";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { getNetworkName } from "../../src/hardhat/hardhatUtils";
 import { AddressBook } from "../../src/interfaces/addressBook";
@@ -102,16 +103,6 @@ describe("Bureau 4: Reverse Repo", () => {
 
   const ERC20_ISSUER_ROLE: string =
     ethers.encodeBytes32String("ERC20_ISSUER_ROLE");
-  const ERC20_FARM_OPERATOR_ROLE: string = ethers.encodeBytes32String(
-    "ERC20_FARM_OPERATOR_ROLE",
-  );
-  const LPSFT_ISSUER_ROLE: string =
-    ethers.encodeBytes32String("LPSFT_ISSUER_ROLE");
-  const DEFI_OPERATOR_ROLE: string =
-    ethers.encodeBytes32String("DEFI_OPERATOR_ROLE");
-  const LPSFT_FARM_OPERATOR_ROLE: string = ethers.encodeBytes32String(
-    "LPSFT_FARM_OPERATOR_ROLE",
-  );
 
   //////////////////////////////////////////////////////////////////////////////
   // Fixture state
@@ -155,6 +146,42 @@ describe("Bureau 4: Reverse Repo", () => {
   });
 
   //////////////////////////////////////////////////////////////////////////////
+  // Test setup: Grant roles
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should grant roles to contracts", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const permissionManager: PermissionManager = new PermissionManager(
+      deployer,
+      {
+        pow1Token: addressBook.pow1Token!,
+        pow5Token: addressBook.pow5Token!,
+        lpPow1Token: addressBook.lpPow1Token!,
+        lpPow5Token: addressBook.lpPow5Token!,
+        noPow5Token: addressBook.noPow5Token!,
+        lpSft: addressBook.lpSft!,
+        noLpSft: addressBook.noLpSft!,
+        dutchAuction: addressBook.dutchAuction!,
+        yieldHarvest: addressBook.yieldHarvest!,
+        liquidityForge: addressBook.liquidityForge!,
+        reverseRepo: addressBook.reverseRepo!,
+        pow1LpNftStakeFarm: addressBook.pow1LpNftStakeFarm!,
+        pow5LpNftStakeFarm: addressBook.pow5LpNftStakeFarm!,
+        pow1LpSftLendFarm: addressBook.pow1LpSftLendFarm!,
+        pow5LpSftLendFarm: addressBook.pow5LpSftLendFarm!,
+        defiManager: addressBook.defiManager!,
+        pow5InterestFarm: addressBook.pow5InterestFarm!,
+      },
+    );
+
+    const transactions: Array<ethers.ContractTransactionReceipt> =
+      await permissionManager.initializeRoles();
+
+    chai.expect(transactions.length).to.equal(11);
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
   // Test setup: Initialize Dutch Auction
   //////////////////////////////////////////////////////////////////////////////
 
@@ -163,20 +190,10 @@ describe("Bureau 4: Reverse Repo", () => {
 
     const {
       dutchAuctionContract,
-      lpPow1Contract,
-      lpSftContract,
       pow1Contract,
-      pow1LpNftStakeFarmContract,
       pow1MarketPoolContract,
       wrappedNativeContract,
     } = deployerContracts;
-
-    // Setup roles
-    await lpPow1Contract.grantRole(ERC20_ISSUER_ROLE, lpSftContract.address);
-    await lpSftContract.grantRole(
-      LPSFT_ISSUER_ROLE,
-      pow1LpNftStakeFarmContract.address,
-    );
 
     // Obtain tokens
     await wrappedNativeContract.deposit(INITIAL_WETH_AMOUNT);
@@ -233,23 +250,11 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should initialize YieldHarvest", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const {
-      noLpSftContract,
-      pow1Contract,
-      pow1LpSftLendFarmContract,
-      yieldHarvestContract,
-    } = deployerContracts;
+    const { pow1Contract, pow1LpSftLendFarmContract, yieldHarvestContract } =
+      deployerContracts;
     const { lpSftContract } = beneficiaryContracts;
 
     // Grant roles
-    await noLpSftContract.grantRole(
-      LPSFT_ISSUER_ROLE,
-      yieldHarvestContract.address,
-    );
-    await pow1LpSftLendFarmContract.grantRole(
-      LPSFT_FARM_OPERATOR_ROLE,
-      yieldHarvestContract.address,
-    );
     await pow1Contract.grantRole(ERC20_ISSUER_ROLE, deployerAddress);
 
     // Mint POW1 to the POW1 LP-SFT lend farm
@@ -275,31 +280,7 @@ describe("Bureau 4: Reverse Repo", () => {
   it("should initialize LiquidityForge", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const {
-      defiManagerContract,
-      noPow5Contract,
-      pow5Contract,
-      pow5InterestFarmContract,
-    } = deployerContracts;
     const { liquidityForgeContract } = beneficiaryContracts;
-
-    // Grant roles
-    await defiManagerContract.grantRole(
-      DEFI_OPERATOR_ROLE,
-      liquidityForgeContract.address,
-    );
-    await pow5InterestFarmContract.grantRole(
-      ERC20_FARM_OPERATOR_ROLE,
-      liquidityForgeContract.address,
-    );
-    await pow5Contract.grantRole(
-      ERC20_ISSUER_ROLE,
-      defiManagerContract.address,
-    );
-    await noPow5Contract.grantRole(
-      ERC20_ISSUER_ROLE,
-      defiManagerContract.address,
-    );
 
     // Borrow POW5 from LiquidityForge
     await liquidityForgeContract.borrowPow5(
@@ -365,35 +346,6 @@ describe("Bureau 4: Reverse Repo", () => {
 
     // Mint USDC to deployer
     await usdcTokenContract.mint(deployerAddress, INITIAL_USDC_AMOUNT);
-  });
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Spec: Grant LPPOW5 issuer role to LPSFT
-  //////////////////////////////////////////////////////////////////////////////
-
-  it("should grant LPPOW5 issuer role to LPSFT", async function (): Promise<void> {
-    this.timeout(60 * 1000);
-
-    const { lpPow5Contract, lpSftContract } = deployerContracts;
-
-    // Grant ERC-20 issuer role to LP-SFT
-    await lpPow5Contract.grantRole(ERC20_ISSUER_ROLE, lpSftContract.address);
-  });
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Spec: Grant LP-SFT minter role to LPPOW5 stake farm
-  //////////////////////////////////////////////////////////////////////////////
-
-  it("should grant LP-SFT minter role to LPPOW5 stake farm", async function (): Promise<void> {
-    this.timeout(60 * 1000);
-
-    const { lpSftContract, pow5LpNftStakeFarmContract } = deployerContracts;
-
-    // Grant LP-SFT minter role to LPPOW1 stake farm
-    await lpSftContract.grantRole(
-      LPSFT_ISSUER_ROLE,
-      pow5LpNftStakeFarmContract.address,
-    );
   });
 
   //////////////////////////////////////////////////////////////////////////////

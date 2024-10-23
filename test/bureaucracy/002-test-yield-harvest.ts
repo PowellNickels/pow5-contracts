@@ -11,6 +11,7 @@ import chai from "chai";
 import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
+import { PermissionManager } from "../../src/game/admin/permissionManager";
 import { PoolManager } from "../../src/game/admin/poolManager";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { getNetworkName } from "../../src/hardhat/hardhatUtils";
@@ -51,11 +52,6 @@ describe("Bureau 2: Yield Harvest", () => {
 
   const ERC20_ISSUER_ROLE: string =
     ethers.encodeBytes32String("ERC20_ISSUER_ROLE");
-  const LPSFT_ISSUER_ROLE: string =
-    ethers.encodeBytes32String("LPSFT_ISSUER_ROLE");
-  const LPSFT_FARM_OPERATOR_ROLE: string = ethers.encodeBytes32String(
-    "LPSFT_FARM_OPERATOR_ROLE",
-  );
 
   //////////////////////////////////////////////////////////////////////////////
   // Fixture state
@@ -120,27 +116,50 @@ describe("Bureau 2: Yield Harvest", () => {
   });
 
   //////////////////////////////////////////////////////////////////////////////
+  // Test setup: Grant roles
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should grant roles to contracts", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const permissionManager: PermissionManager = new PermissionManager(
+      deployer,
+      {
+        pow1Token: addressBook.pow1Token!,
+        pow5Token: addressBook.pow5Token!,
+        lpPow1Token: addressBook.lpPow1Token!,
+        lpPow5Token: addressBook.lpPow5Token!,
+        noPow5Token: addressBook.noPow5Token!,
+        lpSft: addressBook.lpSft!,
+        noLpSft: addressBook.noLpSft!,
+        dutchAuction: addressBook.dutchAuction!,
+        yieldHarvest: addressBook.yieldHarvest!,
+        liquidityForge: addressBook.liquidityForge!,
+        reverseRepo: addressBook.reverseRepo!,
+        pow1LpNftStakeFarm: addressBook.pow1LpNftStakeFarm!,
+        pow5LpNftStakeFarm: addressBook.pow5LpNftStakeFarm!,
+        pow1LpSftLendFarm: addressBook.pow1LpSftLendFarm!,
+        pow5LpSftLendFarm: addressBook.pow5LpSftLendFarm!,
+        defiManager: addressBook.defiManager!,
+        pow5InterestFarm: addressBook.pow5InterestFarm!,
+      },
+    );
+
+    const transactions: Array<ethers.ContractTransactionReceipt> =
+      await permissionManager.initializeRoles();
+
+    chai.expect(transactions.length).to.equal(11);
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
   // Test setup: Initialize Dutch Auction
   //////////////////////////////////////////////////////////////////////////////
 
   it("should initialize Dutch Auction", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const {
-      dutchAuctionContract,
-      lpPow1Contract,
-      lpSftContract,
-      pow1Contract,
-      pow1LpNftStakeFarmContract,
-      wrappedNativeContract,
-    } = deployerContracts;
-
-    // Setup roles
-    await lpPow1Contract.grantRole(ERC20_ISSUER_ROLE, lpSftContract.address);
-    await lpSftContract.grantRole(
-      LPSFT_ISSUER_ROLE,
-      pow1LpNftStakeFarmContract.address,
-    );
+    const { dutchAuctionContract, pow1Contract, wrappedNativeContract } =
+      deployerContracts;
 
     // Obtain tokens
     await wrappedNativeContract.deposit(INITIAL_WETH_AMOUNT);
@@ -160,39 +179,6 @@ describe("Bureau 2: Yield Harvest", () => {
       INITIAL_POW1_SUPPLY, // gameTokenAmount
       INITIAL_WETH_AMOUNT, // assetTokenAmount
       beneficiaryAddress, // receiver
-    );
-  });
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Spec: Grant LPSFT_ISSUER_ROLE role to YieldHarvest
-  //////////////////////////////////////////////////////////////////////////////
-
-  it("should grant LPSFT_ISSUER_ROLE to YieldHarvest", async function (): Promise<void> {
-    this.timeout(60 * 1000);
-
-    const { noLpSftContract, yieldHarvestContract } = deployerContracts;
-
-    // Grant LPSFT_ISSUER_ROLE to YieldHarvest
-    await noLpSftContract.grantRole(
-      LPSFT_ISSUER_ROLE,
-      yieldHarvestContract.address,
-    );
-  });
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Spec: Grant LPSFT_FARM_OPERATOR_ROLE role to YieldHarvest
-  //////////////////////////////////////////////////////////////////////////////
-
-  it("should grant LPSFT_FARM_OPERATOR_ROLE to YieldHarvest", async function (): Promise<void> {
-    this.timeout(60 * 1000);
-
-    const { pow1LpSftLendFarmContract, yieldHarvestContract } =
-      deployerContracts;
-
-    // Grant LPSFT_FARM_OPERATOR_ROLE to YieldHarvest
-    await pow1LpSftLendFarmContract.grantRole(
-      LPSFT_FARM_OPERATOR_ROLE,
-      yieldHarvestContract.address,
     );
   });
 

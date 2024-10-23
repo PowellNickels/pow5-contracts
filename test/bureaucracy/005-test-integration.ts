@@ -7,16 +7,17 @@
  */
 
 import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
+import chai from "chai";
 import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
+import { PermissionManager } from "../../src/game/admin/permissionManager";
 import { PoolManager } from "../../src/game/admin/poolManager";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { getNetworkName } from "../../src/hardhat/hardhatUtils";
 import { AddressBook } from "../../src/interfaces/addressBook";
 import { ContractLibrary } from "../../src/interfaces/contractLibrary";
 import { TestERC20MintableContract } from "../../src/interfaces/test/token/erc20/extensions/testErc20MintableContract";
-import { AccessControlContract } from "../../src/interfaces/zeppelin/access/accessControlContract";
 import { ERC20Contract } from "../../src/interfaces/zeppelin/token/erc20/erc20Contract";
 import { ETH_PRICE, USDC_PRICE } from "../../src/testing/defiMetrics";
 import { setupFixture } from "../../src/testing/setupFixture";
@@ -67,16 +68,6 @@ describe("Bureau integration test", () => {
 
   const ERC20_ISSUER_ROLE: string =
     ethers.encodeBytes32String("ERC20_ISSUER_ROLE");
-  const ERC20_FARM_OPERATOR_ROLE: string = ethers.encodeBytes32String(
-    "ERC20_FARM_OPERATOR_ROLE",
-  );
-  const LPSFT_ISSUER_ROLE: string =
-    ethers.encodeBytes32String("LPSFT_ISSUER_ROLE");
-  const DEFI_OPERATOR_ROLE: string =
-    ethers.encodeBytes32String("DEFI_OPERATOR_ROLE");
-  const LPSFT_FARM_OPERATOR_ROLE: string = ethers.encodeBytes32String(
-    "LPSFT_FARM_OPERATOR_ROLE",
-  );
 
   //////////////////////////////////////////////////////////////////////////////
   // Fixture state
@@ -138,106 +129,52 @@ describe("Bureau integration test", () => {
   });
 
   //////////////////////////////////////////////////////////////////////////////
-  // Test setup: Setup roles
+  // Test setup: Grant roles
   //////////////////////////////////////////////////////////////////////////////
 
-  it("should grant roles", async function (): Promise<void> {
+  it("should grant roles to contracts", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const {
-      defiManagerContract,
-      liquidityForgeContract,
-      lpPow1Contract,
-      lpPow5Contract,
-      lpSftContract,
-      noLpSftContract,
-      noPow5Contract,
-      pow1Contract,
-      pow1LpNftStakeFarmContract,
-      pow1LpSftLendFarmContract,
-      pow5Contract,
-      pow5InterestFarmContract,
-      pow5LpNftStakeFarmContract,
-      yieldHarvestContract,
-    }: ContractLibrary = deployerContracts;
+    const permissionManager: PermissionManager = new PermissionManager(
+      deployer,
+      {
+        pow1Token: addressBook.pow1Token!,
+        pow5Token: addressBook.pow5Token!,
+        lpPow1Token: addressBook.lpPow1Token!,
+        lpPow5Token: addressBook.lpPow5Token!,
+        noPow5Token: addressBook.noPow5Token!,
+        lpSft: addressBook.lpSft!,
+        noLpSft: addressBook.noLpSft!,
+        dutchAuction: addressBook.dutchAuction!,
+        yieldHarvest: addressBook.yieldHarvest!,
+        liquidityForge: addressBook.liquidityForge!,
+        reverseRepo: addressBook.reverseRepo!,
+        pow1LpNftStakeFarm: addressBook.pow1LpNftStakeFarm!,
+        pow5LpNftStakeFarm: addressBook.pow5LpNftStakeFarm!,
+        pow1LpSftLendFarm: addressBook.pow1LpSftLendFarm!,
+        pow5LpSftLendFarm: addressBook.pow5LpSftLendFarm!,
+        defiManager: addressBook.defiManager!,
+        pow5InterestFarm: addressBook.pow5InterestFarm!,
+      },
+    );
 
-    // Declarative structure for roles with contract and address pairs
-    const roleAssignments: Record<
-      string,
-      Array<{ contract: AccessControlContract; address: `0x${string}` }>
-    > = {
-      // ERC20_ISSUER_ROLE
-      [ERC20_ISSUER_ROLE]: [
-        {
-          contract: pow1Contract,
-          address: deployerAddress,
-        },
-        {
-          contract: pow5Contract,
-          address: defiManagerContract.address,
-        },
-        {
-          contract: noPow5Contract,
-          address: defiManagerContract.address,
-        },
-        {
-          contract: lpPow1Contract,
-          address: lpSftContract.address,
-        },
-        {
-          contract: lpPow5Contract,
-          address: lpSftContract.address,
-        },
-      ],
-      // LPSFT_ISSUER_ROLE
-      [LPSFT_ISSUER_ROLE]: [
-        {
-          contract: lpSftContract,
-          address: pow1LpNftStakeFarmContract.address,
-        },
-        {
-          contract: lpSftContract,
-          address: pow5LpNftStakeFarmContract.address,
-        },
-        {
-          contract: noLpSftContract,
-          address: yieldHarvestContract.address,
-        },
-      ],
-      // DEFI_OPERATOR_ROLE
-      [DEFI_OPERATOR_ROLE]: [
-        {
-          contract: defiManagerContract,
-          address: liquidityForgeContract.address,
-        },
-      ],
-      // LPSFT_FARM_OPERATOR_ROLE
-      [LPSFT_FARM_OPERATOR_ROLE]: [
-        {
-          contract: pow1LpSftLendFarmContract,
-          address: yieldHarvestContract.address,
-        },
-      ],
-      // ERC20_FARM_OPERATOR_ROLE
-      [ERC20_FARM_OPERATOR_ROLE]: [
-        {
-          contract: pow5InterestFarmContract,
-          address: liquidityForgeContract.address,
-        },
-      ],
-    };
+    const transactions: Array<ethers.ContractTransactionReceipt> =
+      await permissionManager.initializeRoles();
 
-    // Loop over the declarative structure to grant roles
-    for (const [role, assignments] of Object.entries(roleAssignments)) {
-      for (const { contract, address } of assignments) {
-        await contract.grantRole(role, address);
-      }
-    }
+    chai.expect(transactions.length).to.equal(11);
   });
 
   //////////////////////////////////////////////////////////////////////////////
   // Test setup: Obtain tokens
   //////////////////////////////////////////////////////////////////////////////
+
+  it("should grant POW1 minting role to deployer", async function (): Promise<void> {
+    this.timeout(60 * 1000);
+
+    const { pow1Contract }: ContractLibrary = deployerContracts;
+
+    await pow1Contract.grantRole(ERC20_ISSUER_ROLE, deployerAddress);
+  });
 
   it("should obtain tokens", async function (): Promise<void> {
     this.timeout(60 * 1000);

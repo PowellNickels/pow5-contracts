@@ -12,6 +12,7 @@ import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import uniswapV3NftManagerAbi from "../../src/abi/contracts/depends/uniswap-v3-periphery/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
+import { PermissionManager } from "../../src/game/admin/permissionManager";
 import { PoolManager } from "../../src/game/admin/poolManager";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { getNetworkName } from "../../src/hardhat/hardhatUtils";
@@ -88,8 +89,6 @@ describe("Bureau 1: Dutch Auction", () => {
 
   const ERC20_ISSUER_ROLE: string =
     ethers.encodeBytes32String("ERC20_ISSUER_ROLE");
-  const LPSFT_ISSUER_ROLE: string =
-    ethers.encodeBytes32String("LPSFT_ISSUER_ROLE");
 
   //////////////////////////////////////////////////////////////////////////////
   // Fixture state
@@ -206,32 +205,39 @@ describe("Bureau 1: Dutch Auction", () => {
   });
 
   //////////////////////////////////////////////////////////////////////////////
-  // Spec: Grant LPPOW1 issuer role to LPSFT
+  // Spec: Grant roles
   //////////////////////////////////////////////////////////////////////////////
 
-  it("should grant LPPOW1 issuer role to LPSFT", async function (): Promise<void> {
+  it("should grant roles to contracts", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const { lpPow1Contract, lpSftContract } = deployerContracts;
-
-    // Grant ERC-20 issuer role to LP-SFT
-    await lpPow1Contract.grantRole(ERC20_ISSUER_ROLE, lpSftContract.address);
-  });
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Spec: Grant LP-SFT minter role to LPPOW1 stake farm
-  //////////////////////////////////////////////////////////////////////////////
-
-  it("should grant LP-SFT minter role to LPPOW1 stake farm", async function (): Promise<void> {
-    this.timeout(60 * 1000);
-
-    const { lpSftContract, pow1LpNftStakeFarmContract } = deployerContracts;
-
-    // Grant LP-SFT minter role to LPPOW1 stake farm
-    await lpSftContract.grantRole(
-      LPSFT_ISSUER_ROLE,
-      pow1LpNftStakeFarmContract.address,
+    const permissionManager: PermissionManager = new PermissionManager(
+      deployer,
+      {
+        pow1Token: addressBook.pow1Token!,
+        pow5Token: addressBook.pow5Token!,
+        lpPow1Token: addressBook.lpPow1Token!,
+        lpPow5Token: addressBook.lpPow5Token!,
+        noPow5Token: addressBook.noPow5Token!,
+        lpSft: addressBook.lpSft!,
+        noLpSft: addressBook.noLpSft!,
+        dutchAuction: addressBook.dutchAuction!,
+        yieldHarvest: addressBook.yieldHarvest!,
+        liquidityForge: addressBook.liquidityForge!,
+        reverseRepo: addressBook.reverseRepo!,
+        pow1LpNftStakeFarm: addressBook.pow1LpNftStakeFarm!,
+        pow5LpNftStakeFarm: addressBook.pow5LpNftStakeFarm!,
+        pow1LpSftLendFarm: addressBook.pow1LpSftLendFarm!,
+        pow5LpSftLendFarm: addressBook.pow5LpSftLendFarm!,
+        defiManager: addressBook.defiManager!,
+        pow5InterestFarm: addressBook.pow5InterestFarm!,
+      },
     );
+
+    const transactions: Array<ethers.ContractTransactionReceipt> =
+      await permissionManager.initializeRoles();
+
+    chai.expect(transactions.length).to.equal(11);
   });
 
   //////////////////////////////////////////////////////////////////////////////
