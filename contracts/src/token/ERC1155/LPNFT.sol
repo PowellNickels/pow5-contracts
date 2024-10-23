@@ -9,9 +9,9 @@
 pragma solidity 0.8.28;
 
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
+import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
 import {INonfungiblePositionManager} from "../../../interfaces/uniswap-v3-periphery/INonfungiblePositionManager.sol";
@@ -21,7 +21,7 @@ import {ILPNFT} from "../../interfaces/token/ERC1155/ILPNFT.sol";
 /**
  * @title LP-NFT: Liquidity Pool Non-Fungible Token
  */
-contract LPNFT is Context, AccessControl, ILPNFT {
+contract LPNFT is ILPNFT, Initializable, AccessControl {
   using SafeERC20 for IERC20;
 
   //////////////////////////////////////////////////////////////////////////////
@@ -65,12 +65,12 @@ contract LPNFT is Context, AccessControl, ILPNFT {
   /**
    * @dev The LP-NFT's token ID
    */
-  uint256 private _tokenId;
+  uint256 private _tokenId = 0;
 
   /**
    * @dev Enum for which pool the LP-NFT belongs to, either LPPOW1 or LPPOW5
    */
-  Pool private _pool;
+  Pool private _pool = Pool.INVALID;
 
   //////////////////////////////////////////////////////////////////////////////
   // Initialization
@@ -102,6 +102,9 @@ contract LPNFT is Context, AccessControl, ILPNFT {
     require(noPow5Token_ != address(0), "Invalid NOPOW5");
     require(uniswapV3NftManager_ != address(0), "Invalid NFT mgr");
 
+    // Initialize {Initializable}
+    _disableInitializers();
+
     // Initialize routes
     pow1Token = IERC20(pow1Token_);
     pow5Token = IERC20(pow5Token_);
@@ -109,9 +112,6 @@ contract LPNFT is Context, AccessControl, ILPNFT {
     lpPow5Token = IERC20(lpPow5Token_);
     noPow5Token = IERC20(noPow5Token_);
     uniswapV3NftManager = INonfungiblePositionManager(uniswapV3NftManager_);
-
-    // Initialize state
-    _pool = Pool.INVALID;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -136,15 +136,10 @@ contract LPNFT is Context, AccessControl, ILPNFT {
   /**
    * @dev See {ILPNFT-initialize}
    */
-  function initialize(uint256 lpNftTokenId) public override {
+  function initialize(uint256 lpNftTokenId) public override initializer {
     // Validate parameters
     if (lpNftTokenId == 0) {
       revert LPNFTInvalidTokenID();
-    }
-
-    // Validate state
-    if (_tokenId != 0 || _pool != Pool.INVALID) {
-      revert LPNFTReinitializationNotAllowed(_tokenId, _pool);
     }
 
     // Initialize {AccessControl}
@@ -189,6 +184,10 @@ contract LPNFT is Context, AccessControl, ILPNFT {
       revert LPNFTInvalidPool(_tokenId);
     }
 
+    // Update state
+    _tokenId = 0;
+    _pool = Pool.INVALID;
+
     // Recover ETH
     uint256 ethBalance = address(this).balance;
     if (ethBalance > 0) {
@@ -207,6 +206,9 @@ contract LPNFT is Context, AccessControl, ILPNFT {
     if (recoveredPow5Balance > 0) {
       pow5Token.safeTransfer(beneficiary, recoveredPow5Balance);
     }
+
+    // Deinitialize {AccessControl}
+    _revokeRole(DEFAULT_ADMIN_ROLE, _msgSender());
   }
 
   /**

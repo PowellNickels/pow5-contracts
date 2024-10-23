@@ -40,14 +40,6 @@ interface ILPNFT is IERC165 {
   error LPNFTInvalidTokenID();
 
   /**
-   * @dev Error raised if an initialized LP-NFT is reinitialized
-   *
-   * @param tokenId The token ID of the LP-NFT
-   * @param pool The pool of the LP-NFT
-   */
-  error LPNFTReinitializationNotAllowed(uint256 tokenId, Pool pool);
-
-  /**
    * @dev Error raised if the LP-NFT is for neither LPPOW1 nor LPPOW5 pools
    *
    * @param tokenId The token ID of the LP-NFT
