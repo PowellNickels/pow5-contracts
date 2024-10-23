@@ -46,14 +46,14 @@ const INITIAL_WETH_AMOUNT: bigint =
 const LPPOW1_REWARD_AMOUNT: bigint = ethers.parseUnits("1000", POW1_DECIMALS); // 1,000 POW1 ($10)
 
 // Remaining dust balances after depositing into LP pool
-const LPPOW1_POW1_DUST: bigint = 387n;
-const LPPOW1_WETH_DUST: bigint = 0n;
+const LPPOW1_POW1_DUST: bigint = 443n;
+const LPPOW1_WETH_DUST: bigint = 1n;
 
 // Token ID of initial minted LP-NFT/L-SFT
 const LPPOW1_LPNFT_TOKEN_ID: bigint = 1n;
 
 // Amount of POW1 and WETH dust to give to the Dutch Auction
-const POW1_DUST_AMOUNT: bigint = 989_584_199n; // About 1 billionth of a POW1
+const POW1_DUST_AMOUNT: bigint = 989_674_299n; // About 1 billionth of a POW1
 const WETH_DUST_AMOUNT: bigint =
   ethers.parseEther("0.01") / BigInt(ETH_PRICE) / 1_000_000_000n; // 1 billionth of a cent of WETH
 
@@ -65,7 +65,7 @@ const AUCTION_WETH_AMOUNT: bigint =
   ethers.parseEther("1000") / BigInt(ETH_PRICE); // $1,000 in ETH
 
 // Amount of LPPOW1 minted in the first auction
-const AUCTION_LPPOW1_AMOUNT: bigint = 38_970_275_607_839_900_943n; // 38.970 LPPOW1
+const AUCTION_LPPOW1_AMOUNT: bigint = 46_180_275_135_042_394_693n; // 46.180 LPPOW1
 
 // Token ID of the first LP-NFT/LP-SFT sold at auction
 const AUCTION_LPNFT_TOKEN_ID: bigint = 2n;
@@ -393,7 +393,7 @@ describe("Bureau 1: Dutch Auction", () => {
       await wrappedNativeContract.balanceOf(beneficiaryAddress);
 
     // Log WETH balance
-    if (LPPOW1_WETH_DUST > 0n) {
+    if (wethBalance > 0n) {
       console.log(
         `    Beneficiary WETH balance: ${ethers
           .formatEther(wethBalance)
