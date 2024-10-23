@@ -57,16 +57,17 @@ library ERC1155Helpers {
     uint256[] memory tokenIds,
     uint256[] memory amounts
   ) internal pure {
+    // Translate parameters
+    uint256 tokenCount = tokenIds.length;
+    uint256 amountCount = amounts.length;
+
     // Validate parameters
-    if (tokenIds.length != amounts.length) {
-      revert IERC1155Errors.ERC1155InvalidArrayLength(
-        tokenIds.length,
-        amounts.length
-      );
+    if (tokenCount != amountCount) {
+      revert IERC1155Errors.ERC1155InvalidArrayLength(tokenCount, amountCount);
     }
 
     // Loop through tokens
-    for (uint256 i = 0; i < amounts.length; i++) {
+    for (uint256 i = 0; i < tokenCount; i++) {
       // Translate parameters
       uint256 amount = amounts.unsafeMemoryAccess(i);
 
