@@ -72,7 +72,7 @@ const POW5_LPNFT_TOKEN_ID: bigint = 2n;
 // Remaining dust balances after depositing into LP pools
 const LPPOW1_POW1_DUST: bigint = 443n;
 const LPPOW1_WETH_DUST: bigint = 0n;
-const LPPOW5_POW5_DUST: bigint = 134_419n;
+const LPPOW5_POW5_DUST: bigint = 355_055n;
 const LPPOW5_USDC_DUST: bigint = 0n;
 
 //

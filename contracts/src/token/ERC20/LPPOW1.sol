@@ -40,7 +40,7 @@ contract LPPOW1 is ERC20Issuable, ERC20Nontransferable {
   /**
    * @dev The number of decimal places to which the token is divisible
    */
-  uint8 private constant DECIMALS = 15;
+  uint8 private constant DECIMALS = 16;
 
   //////////////////////////////////////////////////////////////////////////////
   // Initialization

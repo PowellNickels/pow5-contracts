@@ -40,7 +40,7 @@ contract NOPOW5 is ERC20Issuable, ERC20Nontransferable {
   /**
    * @dev The number of decimal places to which the token is divisible
    */
-  uint8 public constant DECIMALS = 15;
+  uint8 public constant DECIMALS = 16;
 
   //////////////////////////////////////////////////////////////////////////////
   // Initialization

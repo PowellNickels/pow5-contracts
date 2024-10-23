@@ -64,7 +64,7 @@ const LPPOW1_REWARD_AMOUNT: bigint = ethers.parseUnits("1000", POW1_DECIMALS); /
 const LPPOW5_REWARD_AMOUNT: bigint = ethers.parseUnits("1000", POW1_DECIMALS); // 1,000 POW1 ($10)
 
 // Remaining dust balances after depositing into LP pool
-const LPPOW5_POW5_DUST: bigint = 134_419n;
+const LPPOW5_POW5_DUST: bigint = 355_055n;
 const LPPOW5_USDC_DUST: bigint = 0n;
 
 // Token IDs of minted LP-NFTs
@@ -77,13 +77,13 @@ const PURCHASE_USDC_AMOUNT: bigint =
   ethers.parseUnits("1000", USDC_DECIMALS) / BigInt(USDC_PRICE); // 1,000 USDC ($1,000)
 
 // Amount of LPPOW5 minted in the first sale
-const PURCHASE_LPPOW5_AMOUNT: bigint = 32_597_676_069_972n; // 32 LPPOW5
+const PURCHASE_LPPOW5_AMOUNT: bigint = 103_082_902_006_930n; // 103 LPPOW5
 
 // Returned USDC after buying
-const PURCHASE_POW5_RETURNED: bigint = 21_333n; // TODO
+const PURCHASE_POW5_RETURNED: bigint = 32_875n; // TODO
 
 // USDC lost when a POW5 LP-SFT is purchased and then liquidated
-const PURCHASE_USDC_LOST: bigint = 3_030_615n; // 3.031 USDC ($3.03)
+const PURCHASE_USDC_LOST: bigint = 3_030_617n; // 3.031 USDC ($3.03)
 
 //
 // Debug parameters
@@ -778,7 +778,7 @@ describe("Bureau 4: Reverse Repo", () => {
     // Check USDC balance
     const usdcBalance: bigint =
       await usdcTokenContract.balanceOf(beneficiaryAddress);
-    chai.expect(usdcBalance).to.equal(5_366_714n); // TODO: Magic constant
+    chai.expect(usdcBalance).to.equal(5_366_724n); // TODO: Magic constant
   });
 
   //////////////////////////////////////////////////////////////////////////////

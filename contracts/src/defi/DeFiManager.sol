@@ -415,11 +415,7 @@ contract DeFiManager is ReentrancyGuard, AccessControl, IDeFiManager {
     uint256 newNoPow5Balance = noPow5Balance_ + amount;
 
     // Verify new collateralization ratio is below the threshold
-    // TODO: Magic constant
-    require(
-      newNoPow5Balance <= (lpPow1Balance_ * 99) / 100,
-      "Insufficent collateral"
-    );
+    require(newNoPow5Balance <= lpPow1Balance_, "Insufficent collateral");
 
     // Call external contracts
     pow5Token.mint(recipient, amount);

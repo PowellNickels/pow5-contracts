@@ -30,12 +30,12 @@ const POW1_DECIMALS: number = 18;
 /**
  * @description The decimal count for POW5
  */
-const POW5_DECIMALS: number = 15;
+const POW5_DECIMALS: number = 16;
 
 /**
  * @description The decimal count for LPPOW1
  */
-const LPPOW1_DECIMALS: number = 15;
+const LPPOW1_DECIMALS: number = 16;
 
 /**
  * @description The decimal count for LPPOW5
@@ -45,7 +45,7 @@ const LPPOW5_DECIMALS: number = 9;
 /**
  * @description The decimal count for NOPOW5
  */
-const NOPOW5_DECIMALS: number = 15;
+const NOPOW5_DECIMALS: number = 16;
 
 /**
  * @description The decimal count for USDC
@@ -94,17 +94,17 @@ const INITIAL_LPPOW5_USDC_VALUE: number = 100; // $100
 /**
  * @description The initial LPPOW1 amount, sqrt(POW1 * WETH)
  */
-const INITIAL_LPPOW1_AMOUNT: bigint = 20_036_097_492_521_525_709n; // 20,036 LPPOW1
+const INITIAL_LPPOW1_AMOUNT: bigint = 20_036_097_492_521_525_709n; // 2,004 LPPOW1
 
 /**
  * @description The initial POW5 amount, LPPOW1 * 99 / 100
  */
-const INITIAL_POW5_AMOUNT: bigint = (INITIAL_LPPOW1_AMOUNT * 99n) / 100n; // 99% of LPPOW1
+const INITIAL_POW5_AMOUNT: bigint = INITIAL_LPPOW1_AMOUNT; // 100% of LPPOW1
 
 /**
  * @description The initial LPPOW5 liquidity amount, sqrt(POW5 * USDC)
  */
-const INITIAL_LPPOW5_AMOUNT: bigint = 14_142_135_623_730n; // 14 LPPOW5
+const INITIAL_LPPOW5_AMOUNT: bigint = 44_721_359_549_995n; // 44 LPPOW5
 
 ////////////////////////////////////////////////////////////////////////////////
 // Uniswap constants
