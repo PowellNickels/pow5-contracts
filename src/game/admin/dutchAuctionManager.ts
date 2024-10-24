@@ -9,6 +9,7 @@
 import { ethers } from "ethers";
 
 import { DutchAuctionContract } from "../../interfaces/bureaucracy/dutchAuction/dutchAuctionContract";
+import { WrappedNativeContract } from "../../interfaces/token/erc20/wrappedNativeContract";
 import { ERC20Contract } from "../../interfaces/zeppelin/token/erc20/erc20Contract";
 
 //////////////////////////////////////////////////////////////////////////////
@@ -113,6 +114,57 @@ class DutchAuctionManager {
       initialMarketToken,
       lpSftReceiver,
     );
+  }
+
+  async createInitialAuctions(
+    initializeTx: Promise<ethers.ContractTransactionReceipt>,
+  ): Promise<ethers.ContractTransactionReceipt> {
+    const marketDust: bigint = 1_000n;
+
+    // Create contracts
+    const dutchAuctionContract: DutchAuctionContract = new DutchAuctionContract(
+      this.admin,
+      this.addresses.dutchAuction,
+    );
+    const wrappedNativeContract: WrappedNativeContract =
+      new WrappedNativeContract(this.admin, this.addresses.marketToken);
+
+    // Wait for initial tokens to be spent
+    await initializeTx;
+
+    const pendingTransactions: Array<
+      Promise<ethers.ContractTransactionReceipt>
+    > = [];
+
+    // Get dust for LP-NFT creation, if needed
+    const marketTokenBalance = await wrappedNativeContract.balanceOf(
+      (await this.admin.getAddress()) as `0x${string}`,
+    );
+    if (marketTokenBalance < marketDust) {
+      pendingTransactions.push(
+        wrappedNativeContract.deposit(marketDust - marketTokenBalance),
+      );
+    }
+
+    // Approve spending dust for LP-NFT creation, if needed
+    const marketTokenAllowance = await wrappedNativeContract.allowance(
+      (await this.admin.getAddress()) as `0x${string}`,
+      this.addresses.dutchAuction,
+    );
+    if (marketTokenAllowance < marketDust) {
+      pendingTransactions.push(
+        wrappedNativeContract.approve(
+          this.addresses.dutchAuction,
+          marketDust - marketTokenAllowance,
+        ),
+      );
+    }
+
+    // Wait for all pending transactions to complete
+    await Promise.all(pendingTransactions);
+
+    // Set auction count
+    return dutchAuctionContract.setAuctionCount(3, marketDust);
   }
 }
 

@@ -147,13 +147,17 @@ describe("DutchAuctionManager", () => {
         dutchAuction: addressBook.dutchAuction!,
       },
     );
-    await dutchAuctionManager.initialize(
-      poolSetup,
-      roleSetup,
-      INITIAL_POW1_SUPPLY,
-      INITIAL_WETH_AMOUNT,
-      beneficiaryAddress,
-    );
+    const initializationTx: Promise<ethers.ContractTransactionReceipt> =
+      dutchAuctionManager.initialize(
+        poolSetup,
+        roleSetup,
+        INITIAL_POW1_SUPPLY,
+        INITIAL_WETH_AMOUNT,
+        beneficiaryAddress,
+      );
+
+    // Create first LP-NFTs for sale
+    await dutchAuctionManager.createInitialAuctions(initializationTx);
   });
 
   //////////////////////////////////////////////////////////////////////////////
