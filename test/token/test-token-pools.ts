@@ -24,6 +24,7 @@ import { TestPOW1MarketStakerContract } from "../../src/interfaces/test/token/ro
 import { TestPOW5StableStakerContract } from "../../src/interfaces/test/token/routes/testPow5StableStakerContract";
 import { ETH_PRICE, USDC_PRICE } from "../../src/testing/defiMetrics";
 import { setupFixture } from "../../src/testing/setupFixture";
+import { TokenTracker } from "../../src/testing/tokenTracker";
 import {
   INITIAL_LPPOW1_AMOUNT,
   INITIAL_LPPOW1_WETH_VALUE,
@@ -169,7 +170,26 @@ describe("Token Pools", () => {
       new TestERC20MintableContract(deployer, addressBook.usdcToken!);
 
     // Mint USDC
-    await usdcContract.mint(deployerAddress, USDC_TOKEN_AMOUNT);
+    const receipt: ethers.ContractTransactionReceipt = await usdcContract.mint(
+      deployerAddress,
+      USDC_TOKEN_AMOUNT,
+    );
+
+    // Check token transfers
+    const tokenRoutes: Array<{
+      token: `0x${string}`;
+      from: `0x${string}`;
+      to: `0x${string}`;
+      value: bigint;
+    }> = await TokenTracker.getErc20Routes(receipt.logs);
+    chai.expect(tokenRoutes.length).to.equal(1);
+
+    chai.expect(tokenRoutes[0]).to.deep.equal({
+      token: usdcContract.address,
+      from: ZERO_ADDRESS,
+      to: deployerAddress,
+      value: USDC_TOKEN_AMOUNT,
+    });
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -191,7 +211,26 @@ describe("Token Pools", () => {
     const { pow1Contract } = deployerContracts;
 
     // Mint POW1
-    await pow1Contract.mint(deployerAddress, LPPOW1_REWARD_AMOUNT);
+    const receipt: ethers.ContractTransactionReceipt = await pow1Contract.mint(
+      deployerAddress,
+      LPPOW1_REWARD_AMOUNT,
+    );
+
+    // Check token transfers
+    const tokenRoutes: Array<{
+      token: `0x${string}`;
+      from: `0x${string}`;
+      to: `0x${string}`;
+      value: bigint;
+    }> = await TokenTracker.getErc20Routes(receipt.logs);
+    chai.expect(tokenRoutes.length).to.equal(1);
+
+    chai.expect(tokenRoutes[0]).to.deep.equal({
+      token: pow1Contract.address,
+      from: ZERO_ADDRESS,
+      to: deployerAddress,
+      value: LPPOW1_REWARD_AMOUNT,
+    });
   });
 
   it("should mint LPPOW5 reward to deployer", async function (): Promise<void> {
@@ -200,25 +239,26 @@ describe("Token Pools", () => {
     const { pow1Contract } = deployerContracts;
 
     // Mint POW1
-    await pow1Contract.mint(deployerAddress, LPPOW5_REWARD_AMOUNT);
-  });
+    const receipt: ethers.ContractTransactionReceipt = await pow1Contract.mint(
+      deployerAddress,
+      LPPOW5_REWARD_AMOUNT,
+    );
 
-  //////////////////////////////////////////////////////////////////////////////
-  // Spec: Transfer initial POW1 supply
-  //////////////////////////////////////////////////////////////////////////////
+    // Check token transfers
+    const tokenRoutes: Array<{
+      token: `0x${string}`;
+      from: `0x${string}`;
+      to: `0x${string}`;
+      value: bigint;
+    }> = await TokenTracker.getErc20Routes(receipt.logs);
+    chai.expect(tokenRoutes.length).to.equal(1);
 
-  //
-  // POW1 initial supply is minted to the deployer, who then transfers it to the
-  // deployer.
-  //
-
-  it("should transfer initial POW1 to deployer", async function (): Promise<void> {
-    this.timeout(60 * 1000);
-
-    const { pow1Contract } = deployerContracts;
-
-    // Transfer POW1 to deployer
-    await pow1Contract.transfer(deployerAddress, INITIAL_POW1_SUPPLY);
+    chai.expect(tokenRoutes[0]).to.deep.equal({
+      token: pow1Contract.address,
+      from: ZERO_ADDRESS,
+      to: deployerAddress,
+      value: LPPOW5_REWARD_AMOUNT,
+    });
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -531,9 +571,30 @@ describe("Token Pools", () => {
     // Create incentive
     const receipt: ethers.ContractTransactionReceipt =
       await testPow1MarketStakerContract.createIncentive(LPPOW1_REWARD_AMOUNT);
+    chai.expect(receipt.logs.length).to.equal(4);
 
-    const logs: (ethers.EventLog | ethers.Log)[] = receipt.logs;
-    chai.expect(logs.length).to.equal(4);
+    // Check token transfers
+    const tokenRoutes: Array<{
+      token: `0x${string}`;
+      from: `0x${string}`;
+      to: `0x${string}`;
+      value: bigint;
+    }> = await TokenTracker.getErc20Routes(receipt.logs);
+    chai.expect(tokenRoutes.length).to.equal(2);
+
+    chai.expect(tokenRoutes[0]).to.deep.equal({
+      token: addressBook.pow1Token,
+      from: deployerAddress,
+      to: testPow1MarketStakerContract.address,
+      value: LPPOW1_REWARD_AMOUNT,
+    });
+
+    chai.expect(tokenRoutes[1]).to.deep.equal({
+      token: addressBook.pow1Token,
+      from: testPow1MarketStakerContract.address,
+      to: addressBook.uniswapV3Staker,
+      value: LPPOW1_REWARD_AMOUNT,
+    });
   });
 
   it("should check incentive for LPPOW1", async function (): Promise<void> {
@@ -557,6 +618,29 @@ describe("Token Pools", () => {
 
     const logs: (ethers.EventLog | ethers.Log)[] = receipt.logs;
     chai.expect(logs.length).to.equal(4);
+
+    // Check token transfers
+    const tokenRoutes: Array<{
+      token: `0x${string}`;
+      from: `0x${string}`;
+      to: `0x${string}`;
+      value: bigint;
+    }> = await TokenTracker.getErc20Routes(receipt.logs);
+    chai.expect(tokenRoutes.length).to.equal(2);
+
+    chai.expect(tokenRoutes[0]).to.deep.equal({
+      token: addressBook.pow1Token,
+      from: deployerAddress,
+      to: testPow5StableStakerContract.address,
+      value: LPPOW5_REWARD_AMOUNT,
+    });
+
+    chai.expect(tokenRoutes[1]).to.deep.equal({
+      token: addressBook.pow1Token,
+      from: testPow5StableStakerContract.address,
+      to: addressBook.uniswapV3Staker,
+      value: LPPOW5_REWARD_AMOUNT,
+    });
   });
 
   it("should check incentive for LPPOW5", async function (): Promise<void> {
@@ -708,6 +792,8 @@ describe("Token Pools", () => {
   it("should mint POW1/WETH LP-NFT", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
+    const { lpSftContract } = deployerContracts;
+
     // Calculate DeFi metrics
     const pow1DepositAmount: number = parseInt(
       ethers.formatUnits(INITIAL_POW1_SUPPLY, POW1_DECIMALS),
@@ -759,6 +845,85 @@ describe("Token Pools", () => {
         }
       }
     }
+
+    // Check token transfers
+    const tokenRoutes: Array<{
+      token: `0x${string}`;
+      from: `0x${string}`;
+      to: `0x${string}`;
+      value: bigint;
+    }> = await TokenTracker.getErc20Routes(receipt.logs);
+    chai.expect(tokenRoutes.length).to.equal(10);
+
+    chai.expect(tokenRoutes[0]).to.deep.equal({
+      token: addressBook.pow1Token,
+      from: deployerAddress,
+      to: testPow1MarketStakerContract.address,
+      value: INITIAL_POW1_SUPPLY,
+    });
+
+    chai.expect(tokenRoutes[1]).to.deep.equal({
+      token: addressBook.wrappedNativeToken,
+      from: deployerAddress,
+      to: testPow1MarketStakerContract.address,
+      value: WETH_TOKEN_AMOUNT,
+    });
+
+    chai.expect(tokenRoutes[2]).to.deep.equal({
+      token: addressBook.pow1Token,
+      from: testPow1MarketStakerContract.address,
+      to: addressBook.pow1MarketPooler,
+      value: INITIAL_POW1_SUPPLY,
+    });
+
+    chai.expect(tokenRoutes[3]).to.deep.equal({
+      token: addressBook.wrappedNativeToken,
+      from: testPow1MarketStakerContract.address,
+      to: addressBook.pow1MarketPooler,
+      value: WETH_TOKEN_AMOUNT,
+    });
+
+    chai.expect(tokenRoutes[4]).to.deep.equal({
+      token: addressBook.wrappedNativeToken,
+      from: addressBook.pow1MarketPooler,
+      to: addressBook.pow1MarketPool,
+      value: WETH_TOKEN_AMOUNT - 1n,
+    });
+
+    chai.expect(tokenRoutes[5]).to.deep.equal({
+      token: addressBook.pow1Token,
+      from: addressBook.pow1MarketPooler,
+      to: addressBook.pow1MarketPool,
+      value: INITIAL_POW1_SUPPLY - LPPOW1_POW1_DUST,
+    });
+
+    chai.expect(tokenRoutes[6]).to.deep.equal({
+      token: addressBook.wrappedNativeToken,
+      from: addressBook.pow1MarketPooler,
+      to: testPow1MarketStakerContract.address,
+      value: 1n,
+    });
+
+    chai.expect(tokenRoutes[7]).to.deep.equal({
+      token: addressBook.pow1Token,
+      from: addressBook.pow1MarketPooler,
+      to: testPow1MarketStakerContract.address,
+      value: LPPOW1_POW1_DUST,
+    });
+
+    chai.expect(tokenRoutes[8]).to.deep.equal({
+      token: addressBook.lpPow1Token,
+      from: ZERO_ADDRESS,
+      to: await lpSftContract.tokenIdToAddress(POW1_LPNFT_TOKEN_ID),
+      value: INITIAL_LPPOW1_AMOUNT,
+    });
+
+    chai.expect(tokenRoutes[9]).to.deep.equal({
+      token: addressBook.pow1Token,
+      from: testPow1MarketStakerContract.address,
+      to: deployerAddress,
+      value: LPPOW1_POW1_DUST,
+    });
   });
 
   it("should check LPPOW1 LP-NFT position", async function (): Promise<void> {
@@ -987,6 +1152,8 @@ describe("Token Pools", () => {
   it("should mint POW5/USDC LP-NFT", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
+    const { lpSftContract } = deployerContracts;
+
     // Calculate DeFi properties
     const pow5Value: string = ethers.formatUnits(
       INITIAL_POW5_DEPOSIT / BigInt(1 / INITIAL_POW5_PRICE),
@@ -1041,6 +1208,78 @@ describe("Token Pools", () => {
         }
       }
     }
+
+    // Check token transfers
+    const tokenRoutes: Array<{
+      token: `0x${string}`;
+      from: `0x${string}`;
+      to: `0x${string}`;
+      value: bigint;
+    }> = await TokenTracker.getErc20Routes(receipt.logs);
+    chai.expect(tokenRoutes.length).to.equal(9);
+
+    chai.expect(tokenRoutes[0]).to.deep.equal({
+      token: addressBook.pow5Token,
+      from: deployerAddress,
+      to: testPow5StableStakerContract.address,
+      value: INITIAL_POW5_DEPOSIT,
+    });
+
+    chai.expect(tokenRoutes[1]).to.deep.equal({
+      token: addressBook.usdcToken,
+      from: deployerAddress,
+      to: testPow5StableStakerContract.address,
+      value: USDC_TOKEN_AMOUNT,
+    });
+
+    chai.expect(tokenRoutes[2]).to.deep.equal({
+      token: addressBook.pow5Token,
+      from: testPow5StableStakerContract.address,
+      to: addressBook.pow5StablePooler,
+      value: INITIAL_POW5_DEPOSIT,
+    });
+
+    chai.expect(tokenRoutes[3]).to.deep.equal({
+      token: addressBook.usdcToken,
+      from: testPow5StableStakerContract.address,
+      to: addressBook.pow5StablePooler,
+      value: USDC_TOKEN_AMOUNT,
+    });
+
+    chai.expect(tokenRoutes[4]).to.deep.equal({
+      token: addressBook.pow5Token,
+      from: addressBook.pow5StablePooler,
+      to: addressBook.pow5StablePool,
+      value: INITIAL_POW5_DEPOSIT - LPPOW5_POW5_DUST,
+    });
+
+    chai.expect(tokenRoutes[5]).to.deep.equal({
+      token: addressBook.usdcToken,
+      from: addressBook.pow5StablePooler,
+      to: addressBook.pow5StablePool,
+      value: USDC_TOKEN_AMOUNT,
+    });
+
+    chai.expect(tokenRoutes[6]).to.deep.equal({
+      token: addressBook.pow5Token,
+      from: addressBook.pow5StablePooler,
+      to: testPow5StableStakerContract.address,
+      value: LPPOW5_POW5_DUST,
+    });
+
+    chai.expect(tokenRoutes[7]).to.deep.equal({
+      token: addressBook.lpPow5Token,
+      from: ZERO_ADDRESS,
+      to: await lpSftContract.tokenIdToAddress(POW5_LPNFT_TOKEN_ID),
+      value: INITIAL_LPPOW5_AMOUNT,
+    });
+
+    chai.expect(tokenRoutes[8]).to.deep.equal({
+      token: addressBook.pow5Token,
+      from: testPow5StableStakerContract.address,
+      to: deployerAddress,
+      value: LPPOW5_POW5_DUST,
+    });
   });
 
   it("should check LPPOW5 LP-NFT position", async function (): Promise<void> {
