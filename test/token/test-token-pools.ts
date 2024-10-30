@@ -14,7 +14,6 @@ import chai from "chai";
 import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
-import uniswapV3NftManagerAbi from "../../src/abi/contracts/depends/uniswap-v3-periphery/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
 import { getAddressBook } from "../../src/hardhat/getAddressBook";
 import { getNetworkName } from "../../src/hardhat/hardhatUtils";
 import { AddressBook } from "../../src/interfaces/addressBook";
@@ -927,12 +926,8 @@ describe("Token Pools", () => {
   });
 
   it("should check LPPOW1 LP-NFT position", async function (): Promise<void> {
-    const { pow1Contract, wrappedNativeContract } = deployerContracts;
-    const uniswapV3NftManagerContract: ethers.Contract = new ethers.Contract(
-      addressBook.uniswapV3NftManager!,
-      uniswapV3NftManagerAbi,
-      deployer,
-    );
+    const { pow1Contract, uniswapV3NftManagerContract, wrappedNativeContract } =
+      deployerContracts;
 
     // Calculate DeFi metrics
     const lpPow1Price: number = INITIAL_POW5_PRICE;
@@ -950,29 +945,39 @@ describe("Token Pools", () => {
         .toLocaleString()} LPPOW1 ($${lpPow1Value.toLocaleString()})`,
     );
 
-    const positions: ethers.Result[] =
-      await uniswapV3NftManagerContract.positions(POW1_LPNFT_TOKEN_ID);
-    chai.expect(positions.length).to.equal(12);
-    chai.expect(positions[0]).to.equal(0n); // nonce for permits
-    chai.expect(positions[1]).to.equal(ZERO_ADDRESS); // operator
-    chai
-      .expect(positions[2])
-      .to.equal(
-        pow1IsToken0 ? pow1Contract.address : wrappedNativeContract.address,
-      ); // token0
-    chai
-      .expect(positions[3])
-      .to.equal(
-        pow1IsToken0 ? wrappedNativeContract.address : pow1Contract.address,
-      ); // token1
-    chai.expect(positions[4]).to.equal(BigInt(LPPOW1_POOL_FEE)); // fee
-    chai.expect(positions[5]).to.equal(BigInt(getMinTick(LPPOW1_POOL_FEE))); // tickLower
-    chai.expect(positions[6]).to.equal(BigInt(getMaxTick(LPPOW1_POOL_FEE))); // tickUpper
-    chai.expect(positions[7]).to.equal(INITIAL_LPPOW1_AMOUNT); // liquidity
-    chai.expect(positions[8]).to.equal(0n); // feeGrowthInside0LastX128
-    chai.expect(positions[9]).to.equal(0n); // feeGrowthInside1LastX128
-    chai.expect(positions[10]).to.equal(0n); // tokensOwed0
-    chai.expect(positions[11]).to.equal(0n); // tokensOwed1
+    const position: {
+      nonce: bigint;
+      operator: `0x${string}`;
+      token0: `0x${string}`;
+      token1: `0x${string}`;
+      fee: number;
+      tickLower: number;
+      tickUpper: number;
+      liquidity: bigint;
+      feeGrowthInside0LastX128: bigint;
+      feeGrowthInside1LastX128: bigint;
+      tokensOwed0: bigint;
+      tokensOwed1: bigint;
+    } = await uniswapV3NftManagerContract.positions(POW1_LPNFT_TOKEN_ID);
+
+    chai.expect(position).to.deep.equal({
+      nonce: 0n,
+      operator: ZERO_ADDRESS,
+      token0: pow1IsToken0
+        ? pow1Contract.address
+        : wrappedNativeContract.address,
+      token1: pow1IsToken0
+        ? wrappedNativeContract.address
+        : pow1Contract.address,
+      fee: LPPOW1_POOL_FEE,
+      tickLower: getMinTick(LPPOW1_POOL_FEE),
+      tickUpper: getMaxTick(LPPOW1_POOL_FEE),
+      liquidity: INITIAL_LPPOW1_AMOUNT,
+      feeGrowthInside0LastX128: 0n,
+      feeGrowthInside1LastX128: 0n,
+      tokensOwed0: 0n,
+      tokensOwed1: 0n,
+    });
   });
 
   it("should check POW1 balances", async function (): Promise<void> {
@@ -1283,12 +1288,8 @@ describe("Token Pools", () => {
   });
 
   it("should check LPPOW5 LP-NFT position", async function (): Promise<void> {
-    const { pow5Contract, usdcContract } = deployerContracts;
-    const uniswapV3NftManagerContract: ethers.Contract = new ethers.Contract(
-      addressBook.uniswapV3NftManager!,
-      uniswapV3NftManagerAbi,
-      deployer,
-    );
+    const { pow5Contract, uniswapV3NftManagerContract, usdcContract } =
+      deployerContracts;
 
     /*
     // Calculate DeFi metrics
@@ -1308,25 +1309,35 @@ describe("Token Pools", () => {
         .toLocaleString()} LPPOW5`,
     );
 
-    const positions: ethers.Result[] =
-      await uniswapV3NftManagerContract.positions(POW5_LPNFT_TOKEN_ID);
-    chai.expect(positions.length).to.equal(12);
-    chai.expect(positions[0]).to.equal(0n); // nonce for permits
-    chai.expect(positions[1]).to.equal(ZERO_ADDRESS); // operator
-    chai
-      .expect(positions[2])
-      .to.equal(pow5IsToken0 ? pow5Contract.address : usdcContract.address); // token0
-    chai
-      .expect(positions[3])
-      .to.equal(pow5IsToken0 ? usdcContract.address : pow5Contract.address); // token1
-    chai.expect(positions[4]).to.equal(BigInt(LPPOW5_POOL_FEE)); // fee
-    chai.expect(positions[5]).to.equal(BigInt(getMinTick(LPPOW5_POOL_FEE))); // tickLower
-    chai.expect(positions[6]).to.equal(BigInt(getMaxTick(LPPOW5_POOL_FEE))); // tickUpper
-    chai.expect(positions[7]).to.equal(INITIAL_LPPOW5_AMOUNT); // liquidity
-    chai.expect(positions[8]).to.equal(0n); // feeGrowthInside0LastX128
-    chai.expect(positions[9]).to.equal(0n); // feeGrowthInside1LastX128
-    chai.expect(positions[10]).to.equal(0n); // tokensOwed0
-    chai.expect(positions[11]).to.equal(0n); // tokensOwed1
+    const position: {
+      nonce: bigint;
+      operator: `0x${string}`;
+      token0: `0x${string}`;
+      token1: `0x${string}`;
+      fee: number;
+      tickLower: number;
+      tickUpper: number;
+      liquidity: bigint;
+      feeGrowthInside0LastX128: bigint;
+      feeGrowthInside1LastX128: bigint;
+      tokensOwed0: bigint;
+      tokensOwed1: bigint;
+    } = await uniswapV3NftManagerContract.positions(POW5_LPNFT_TOKEN_ID);
+
+    chai.expect(position).to.deep.equal({
+      nonce: 0n,
+      operator: ZERO_ADDRESS,
+      token0: pow5IsToken0 ? pow5Contract.address : usdcContract.address,
+      token1: pow5IsToken0 ? usdcContract.address : pow5Contract.address,
+      fee: LPPOW5_POOL_FEE,
+      tickLower: getMinTick(LPPOW5_POOL_FEE),
+      tickUpper: getMaxTick(LPPOW5_POOL_FEE),
+      liquidity: INITIAL_LPPOW5_AMOUNT,
+      feeGrowthInside0LastX128: 0n,
+      feeGrowthInside1LastX128: 0n,
+      tokensOwed0: 0n,
+      tokensOwed1: 0n,
+    });
   });
 
   it("should check POW5 balances", async function (): Promise<void> {

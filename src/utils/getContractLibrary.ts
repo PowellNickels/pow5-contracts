@@ -37,6 +37,7 @@ import { POW1MarketPoolerContract } from "../interfaces/token/routes/pow1MarketP
 import { POW1MarketSwapperContract } from "../interfaces/token/routes/pow1MarketSwapperContract";
 import { POW5StablePoolerContract } from "../interfaces/token/routes/pow5StablePoolerContract";
 import { POW5StableSwapperContract } from "../interfaces/token/routes/pow5StableSwapperContract";
+import { NonfungiblePositionManagerContract } from "../interfaces/uniswap/nonfungiblePositionManagerContract";
 import { UniswapV3PoolContract } from "../interfaces/uniswap/pool/uniswapV3PoolContract";
 import { UniswapV3FactoryContract } from "../interfaces/uniswap/uniswapV3FactoryContract";
 import { ERC20Contract } from "../interfaces/zeppelin/token/erc20/erc20Contract";
@@ -121,6 +122,10 @@ function getContractLibrary(
     uniswapV3FactoryContract: new UniswapV3FactoryContract(
       signer,
       addressBook.uniswapV3Factory!,
+    ),
+    uniswapV3NftManagerContract: new NonfungiblePositionManagerContract(
+      signer,
+      addressBook.uniswapV3NftManager!,
     ),
     usdcContract: new ERC20Contract(signer, addressBook.usdcToken!),
     wrappedNativeContract: new WrappedNativeContract(

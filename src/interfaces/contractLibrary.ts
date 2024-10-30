@@ -33,6 +33,7 @@ import { POW1MarketPoolerContract } from "./token/routes/pow1MarketPoolerContrac
 import { POW1MarketSwapperContract } from "./token/routes/pow1MarketSwapperContract";
 import { POW5StablePoolerContract } from "./token/routes/pow5StablePoolerContract";
 import { POW5StableSwapperContract } from "./token/routes/pow5StableSwapperContract";
+import { NonfungiblePositionManagerContract } from "./uniswap/nonfungiblePositionManagerContract";
 import { UniswapV3PoolContract } from "./uniswap/pool/uniswapV3PoolContract";
 import { UniswapV3FactoryContract } from "./uniswap/uniswapV3FactoryContract";
 import { ERC20Contract } from "./zeppelin/token/erc20/erc20Contract";
@@ -65,6 +66,7 @@ interface ContractLibrary {
   reverseRepoContract: ReverseRepoContract;
   theReserveContract: TheReserveContract;
   uniswapV3FactoryContract: UniswapV3FactoryContract;
+  uniswapV3NftManagerContract: NonfungiblePositionManagerContract;
   usdcContract: ERC20Contract;
   wrappedNativeContract: WrappedNativeContract;
   wrappedNativeUsdcPoolContract: UniswapV3PoolContract;
