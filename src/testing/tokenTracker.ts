@@ -17,16 +17,12 @@ const ERC20_TRANSFER_ABI: Array<string> = [
  * @description Class to decode token routes from event logs
  */
 class TokenTracker {
-  static async getErc20Routes(
-    logs: Array<ethers.EventLog | ethers.Log>,
-  ): Promise<
-    Array<{
-      token: `0x${string}`;
-      from: `0x${string}`;
-      to: `0x${string}`;
-      value: bigint;
-    }>
-  > {
+  static getErc20Routes(logs: Array<ethers.EventLog | ethers.Log>): Array<{
+    token: `0x${string}`;
+    from: `0x${string}`;
+    to: `0x${string}`;
+    value: bigint;
+  }> {
     const tokenRoutes: Array<{
       token: `0x${string}`;
       from: `0x${string}`;

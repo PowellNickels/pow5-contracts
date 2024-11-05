@@ -180,7 +180,7 @@ describe("Token Pools", () => {
       from: `0x${string}`;
       to: `0x${string}`;
       value: bigint;
-    }> = await TokenTracker.getErc20Routes(receipt.logs);
+    }> = TokenTracker.getErc20Routes(receipt.logs);
     chai.expect(tokenRoutes.length).to.equal(1);
 
     chai.expect(tokenRoutes[0]).to.deep.equal({
@@ -221,7 +221,7 @@ describe("Token Pools", () => {
       from: `0x${string}`;
       to: `0x${string}`;
       value: bigint;
-    }> = await TokenTracker.getErc20Routes(receipt.logs);
+    }> = TokenTracker.getErc20Routes(receipt.logs);
     chai.expect(tokenRoutes.length).to.equal(1);
 
     chai.expect(tokenRoutes[0]).to.deep.equal({
@@ -249,7 +249,7 @@ describe("Token Pools", () => {
       from: `0x${string}`;
       to: `0x${string}`;
       value: bigint;
-    }> = await TokenTracker.getErc20Routes(receipt.logs);
+    }> = TokenTracker.getErc20Routes(receipt.logs);
     chai.expect(tokenRoutes.length).to.equal(1);
 
     chai.expect(tokenRoutes[0]).to.deep.equal({
@@ -578,7 +578,7 @@ describe("Token Pools", () => {
       from: `0x${string}`;
       to: `0x${string}`;
       value: bigint;
-    }> = await TokenTracker.getErc20Routes(receipt.logs);
+    }> = TokenTracker.getErc20Routes(receipt.logs);
     chai.expect(tokenRoutes.length).to.equal(2);
 
     chai.expect(tokenRoutes[0]).to.deep.equal({
@@ -624,7 +624,7 @@ describe("Token Pools", () => {
       from: `0x${string}`;
       to: `0x${string}`;
       value: bigint;
-    }> = await TokenTracker.getErc20Routes(receipt.logs);
+    }> = TokenTracker.getErc20Routes(receipt.logs);
     chai.expect(tokenRoutes.length).to.equal(2);
 
     chai.expect(tokenRoutes[0]).to.deep.equal({
@@ -851,7 +851,7 @@ describe("Token Pools", () => {
       from: `0x${string}`;
       to: `0x${string}`;
       value: bigint;
-    }> = await TokenTracker.getErc20Routes(receipt.logs);
+    }> = TokenTracker.getErc20Routes(receipt.logs);
     chai.expect(tokenRoutes.length).to.equal(10);
 
     chai.expect(tokenRoutes[0]).to.deep.equal({
@@ -1220,7 +1220,7 @@ describe("Token Pools", () => {
       from: `0x${string}`;
       to: `0x${string}`;
       value: bigint;
-    }> = await TokenTracker.getErc20Routes(receipt.logs);
+    }> = TokenTracker.getErc20Routes(receipt.logs);
     chai.expect(tokenRoutes.length).to.equal(9);
 
     chai.expect(tokenRoutes[0]).to.deep.equal({
