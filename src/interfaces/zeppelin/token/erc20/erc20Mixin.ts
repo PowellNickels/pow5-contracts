@@ -17,6 +17,11 @@ function ERC20Mixin<T extends new (...args: any[]) => {}>(Base: T) {
   return class extends BaseMixin(Base) {
     private erc20: IERC20;
 
+    private transferHandlers: Map<
+      (from: `0x${string}`, to: `0x${string}`, value: bigint) => void,
+      (from: string, to: string, value: ethers.BigNumberish) => void
+    > = new Map();
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
@@ -81,6 +86,32 @@ function ERC20Mixin<T extends new (...args: any[]) => {}>(Base: T) {
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
+    }
+
+    onTransfer(
+      callback: (from: `0x${string}`, to: `0x${string}`, value: bigint) => void,
+    ): void {
+      const handler = (
+        from: ethers.AddressLike,
+        to: ethers.AddressLike,
+        value: ethers.BigNumberish,
+      ) => {
+        callback(from as `0x${string}`, to as `0x${string}`, BigInt(value));
+      };
+
+      this.transferHandlers.set(callback, handler);
+      this.erc20.on(this.erc20.filters.Transfer(), handler);
+    }
+
+    offTransfer(
+      callback: (from: `0x${string}`, to: `0x${string}`, value: bigint) => void,
+    ): void {
+      const handler = this.transferHandlers.get(callback);
+
+      if (handler) {
+        this.erc20.off(this.erc20.filters.Transfer(), handler);
+        this.transferHandlers.delete(callback);
+      }
     }
   };
 }
