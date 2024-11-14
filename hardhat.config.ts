@@ -16,18 +16,58 @@ import "hardhat-deploy";
 import "hardhat-deploy-ethers";
 import "hardhat-gas-reporter";
 
+import dotenv from "dotenv";
+import { ethers } from "ethers";
 import { HardhatUserConfig } from "hardhat/config";
 
-// Read MNEMONIC from env variable
-const mnemonic = process.env.MNEMONIC;
+// Load environment variables from .env
+dotenv.config();
+
+// Wallets
+const MNEMONIC_DEPLOYER: string =
+  process.env.MNEMONIC_DEPLOYER ||
+  ethers.Mnemonic.entropyToPhrase(ethers.randomBytes(16));
+const MNEMONIC_DEGEN: string =
+  process.env.MNEMONIC_DEGEN ||
+  ethers.Mnemonic.entropyToPhrase(ethers.randomBytes(16));
+const MNEMONIC_PLAYER1: string =
+  process.env.MNEMONIC_PLAYER1 ||
+  ethers.Mnemonic.entropyToPhrase(ethers.randomBytes(16));
+
+// Function to get private keys
+function getPrivateKeyFromMnemonic(
+  mnemonic: string,
+  path: string = "m/44'/60'/0'/0/0",
+): string {
+  const walletMnemonic: ethers.Mnemonic = ethers.Mnemonic.fromPhrase(mnemonic);
+  const wallet: ethers.HDNodeWallet = ethers.HDNodeWallet.fromMnemonic(
+    walletMnemonic,
+    path,
+  );
+  return wallet.privateKey;
+}
+
+// Accounts
+const ACCOUNTS: string[] = [
+  getPrivateKeyFromMnemonic(MNEMONIC_DEPLOYER),
+  getPrivateKeyFromMnemonic(MNEMONIC_DEGEN),
+  getPrivateKeyFromMnemonic(MNEMONIC_PLAYER1),
+];
+
+// Gas reporter
+const REPORT_GAS: boolean = process.env.REPORT_GAS ? true : false;
 
 const config: HardhatUserConfig = {
   // Networks (may need to specify gas for public chains)
   networks: {
     hardhat: {
-      accounts: mnemonic ? { mnemonic } : undefined,
+      accounts: ACCOUNTS.map((privateKey: string) => ({
+        privateKey,
+        balance: "0",
+      })),
       allowUnlimitedContractSize: true,
       tags: [
+        "FundDeployer",
         "TestTokens",
         "UniswapV3",
         "LiquidityPools",
@@ -40,9 +80,10 @@ const config: HardhatUserConfig = {
     },
     localhost: {
       url: "http://localhost:8545",
-      accounts: mnemonic ? { mnemonic } : undefined,
+      accounts: ACCOUNTS,
       allowUnlimitedContractSize: true,
       tags: [
+        "FundDeployer",
         "TestTokens",
         "UniswapV3",
         "LiquidityPools",
@@ -56,13 +97,13 @@ const config: HardhatUserConfig = {
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.PROJECT_ID}`,
       chainId: 1,
-      accounts: mnemonic ? { mnemonic } : undefined,
+      accounts: ACCOUNTS,
       tags: [],
     },
     base: {
       url: `https://base-sepolia.infura.io/v3/${process.env.PROJECT_ID}`,
       chainId: 8453,
-      accounts: mnemonic ? { mnemonic } : undefined,
+      accounts: ACCOUNTS,
       tags: [],
     },
   },
@@ -129,7 +170,7 @@ const config: HardhatUserConfig = {
 
   // Gas reporter extension (hardhat-gas-reporter)
   gasReporter: {
-    enabled: process.env.REPORT_GAS ? true : false,
+    enabled: REPORT_GAS ? true : false,
   },
 };
 

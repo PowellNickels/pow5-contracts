@@ -69,11 +69,7 @@ describe("ERC20Nontransferable", () => {
     // deploy the contracts
     const signers: SignerWithAddress[] = await hardhat.ethers.getSigners();
     deployer = signers[0];
-
-    // Get the wallet addresses
-    const accounts: `0x${string}`[] =
-      (await hardhat.getUnnamedAccounts()) as `0x${string}`[];
-    beneficiaryAddress = accounts[1];
+    beneficiaryAddress = (await signers[1].getAddress()) as `0x${string}`;
 
     // A single fixture is used for the test suite
     contracts = await setupTest();

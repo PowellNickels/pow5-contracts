@@ -9,6 +9,7 @@
  * See the file LICENSE.txt for more information.
  */
 
+import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
 import BigNumber from "bignumber.js";
 import chai from "chai";
 import { ethers } from "ethers";
@@ -81,10 +82,10 @@ describe("Uniswap V3", () => {
   before(async function () {
     this.timeout(60 * 1000);
 
-    // Get the wallet addresses
-    const accounts: `0x${string}`[] =
-      (await hardhat.getUnnamedAccounts()) as `0x${string}`[];
-    beneficiaryAddress = accounts[1];
+    // Use hardhat to get the deployer account
+    const signers: SignerWithAddress[] = await hardhat.ethers.getSigners();
+    const beneficiary: SignerWithAddress = signers[1];
+    beneficiaryAddress = (await beneficiary.getAddress()) as `0x${string}`;
 
     // A single fixture is used for the test suite
     contracts = await setupTest();

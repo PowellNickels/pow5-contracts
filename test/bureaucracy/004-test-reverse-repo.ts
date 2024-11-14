@@ -48,6 +48,9 @@ const setupTest = hardhat.deployments.createFixture(setupFixture);
 // Test parameters
 //
 
+// Initial amount of ETH to start with
+const INITIAL_ETH: string = "1"; // 1 ETH
+
 // Initial amount of WETH to deposit into the Dutch Auction
 const INITIAL_WETH_AMOUNT: bigint =
   ethers.parseEther(INITIAL_LPPOW1_WETH_VALUE.toString()) / BigInt(ETH_PRICE); // $100 in ETH
@@ -143,6 +146,22 @@ describe("Bureau 4: Reverse Repo", () => {
     // Get the contract library
     deployerContracts = getContractLibrary(deployer, addressBook);
     beneficiaryContracts = getContractLibrary(beneficiary, addressBook);
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Test setup: Obtain ETH
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should obtain ETH", async function (): Promise<void> {
+    // Convert ETH to hex
+    const balanceInWeiHex: string = ethers.toQuantity(
+      ethers.parseEther(INITIAL_ETH),
+    );
+
+    await hardhat.network.provider.send("hardhat_setBalance", [
+      beneficiaryAddress,
+      balanceInWeiHex,
+    ]);
   });
 
   //////////////////////////////////////////////////////////////////////////////

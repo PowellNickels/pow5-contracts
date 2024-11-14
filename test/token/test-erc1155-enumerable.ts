@@ -27,6 +27,9 @@ const setupTest = hardhat.deployments.createFixture(setupFixture);
 // Test parameters
 //
 
+// Initial amount of ETH to start with
+const INITIAL_ETH: string = "1"; // 1 ETH
+
 const nftTokenId1: bigint = 0n;
 const nftTokenId2: bigint = 666n;
 const nftTokenId3: bigint = 42n;
@@ -72,6 +75,22 @@ describe("ERC1155Enumerable", () => {
       beneficiary,
       addressBook.testErc1155Enumerable!,
     );
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Test setup: Obtain ETH
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should obtain ETH", async function (): Promise<void> {
+    // Convert ETH to hex
+    const balanceInWeiHex: string = ethers.toQuantity(
+      ethers.parseEther(INITIAL_ETH),
+    );
+
+    await hardhat.network.provider.send("hardhat_setBalance", [
+      beneficiaryAddress,
+      balanceInWeiHex,
+    ]);
   });
 
   //////////////////////////////////////////////////////////////////////////////

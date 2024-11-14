@@ -13,7 +13,6 @@ import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src
 import { ethers } from "ethers";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeploymentsExtension } from "hardhat-deploy/types";
-import { getUnnamedSigners } from "hardhat-deploy-ethers/dist/src/helpers";
 
 import { ContractLibraryEthers } from "../hardhat/contractLibraryEthers";
 import {
@@ -69,7 +68,7 @@ async function setupFixture(
   await deployments.fixture();
 
   // Get the beneficiary signer
-  const signers: SignerWithAddress[] = await getUnnamedSigners(hardhat_re);
+  const signers: SignerWithAddress[] = await hardhat_re.ethers.getSigners();
   const beneficiary: SignerWithAddress = signers[1];
 
   // Get the network name
@@ -149,9 +148,9 @@ async function setupFixture(
     gameTokenSwapperAbi,
     beneficiary,
   );
-  const pow1TokenContract = new ethers.Contract(
-    addressBook.pow1Token!,
+  const pow1TokenContract = await hardhat_re.ethers.getContractAt(
     pow1TokenAbi,
+    addressBook.pow1Token!,
     beneficiary,
   );
   const pow5InterestFarmContract = new ethers.Contract(
@@ -189,9 +188,9 @@ async function setupFixture(
     gameTokenSwapperAbi,
     beneficiary,
   );
-  const pow5TokenContract = new ethers.Contract(
-    addressBook.pow5Token!,
+  const pow5TokenContract = await hardhat_re.ethers.getContractAt(
     pow5TokenAbi,
+    addressBook.pow5Token!,
     beneficiary,
   );
   const reverseRepoContract = new ethers.Contract(
@@ -204,19 +203,19 @@ async function setupFixture(
     testErc1155EnumerableAbi,
     beneficiary,
   );
-  const testLiquidityMathContract = new ethers.Contract(
-    addressBook.testLiquidityMath!,
+  const testLiquidityMathContract = await hardhat_re.ethers.getContractAt(
     testLiquidityMathAbi,
+    addressBook.testLiquidityMath!,
     beneficiary,
   );
-  const testRewardMathContract = new ethers.Contract(
-    addressBook.testRewardMath!,
+  const testRewardMathContract = await hardhat_re.ethers.getContractAt(
     testRewardMathAbi,
+    addressBook.testRewardMath!,
     beneficiary,
   );
-  const testTickMathContract = new ethers.Contract(
-    addressBook.testTickMath!,
+  const testTickMathContract = await hardhat_re.ethers.getContractAt(
     testTickMathAbi,
+    addressBook.testTickMath!,
     beneficiary,
   );
   const uniswapV3FactoryContract = new ethers.Contract(
@@ -229,9 +228,9 @@ async function setupFixture(
     uniswapV3NftDescriptorAbi,
     beneficiary,
   );
-  const uniswapV3NftManagerContract = new ethers.Contract(
-    addressBook.uniswapV3NftManager!,
+  const uniswapV3NftManagerContract = await hardhat_re.ethers.getContractAt(
     uniswapV3NftManagerAbi,
+    addressBook.uniswapV3NftManager!,
     beneficiary,
   );
   const uniswapV3StakerContract = new ethers.Contract(
@@ -239,19 +238,19 @@ async function setupFixture(
     uniswapV3StakerAbi,
     beneficiary,
   );
-  const usdcTokenContract = new ethers.Contract(
-    addressBook.usdcToken!,
+  const usdcTokenContract = await hardhat_re.ethers.getContractAt(
     usdcTokenAbi,
+    addressBook.usdcToken!,
     beneficiary,
   );
-  const wrappedNativeTokenContract = new ethers.Contract(
-    addressBook.wrappedNativeToken!,
+  const wrappedNativeTokenContract = await hardhat_re.ethers.getContractAt(
     wrappedNativeTokenAbi,
+    addressBook.wrappedNativeToken!,
     beneficiary,
   );
-  const wrappedNativeUsdcPoolContract = new ethers.Contract(
-    addressBook.wrappedNativeUsdcPool!,
+  const wrappedNativeUsdcPoolContract = await hardhat_re.ethers.getContractAt(
     uniswapV3PoolAbi,
+    addressBook.wrappedNativeUsdcPool!,
     beneficiary,
   );
   const wrappedNativeUsdcPoolFactoryContract = new ethers.Contract(

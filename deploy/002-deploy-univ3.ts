@@ -28,11 +28,17 @@ import { getNetworkName } from "../src/hardhat/hardhatUtils";
 import { AddressBook } from "../src/interfaces/addressBook";
 
 //
+// Deployment parameters
+//
+
+const DEPLOYER_ETH: string = "1"; // 1 ETH
+
+//
 // Deploy the Uniswap V3 environment
 //
 
 const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
-  const { deployments, ethers } = hardhat_re;
+  const { deployments, ethers, network } = hardhat_re;
 
   // Get the deployer signer
   const signers: SignerWithAddress[] = await getUnnamedSigners(hardhat_re);
@@ -51,6 +57,20 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
 
   // Get the contract addresses
   const addressBook: AddressBook = await getAddressBook(networkName);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Fund deployer
+  //////////////////////////////////////////////////////////////////////////////
+
+  // Convert ETH to hex
+  const balanceInWeiHex: string = ethers.toQuantity(
+    ethers.parseEther(DEPLOYER_ETH),
+  );
+
+  await network.provider.send("hardhat_setBalance", [
+    deployerAddress,
+    balanceInWeiHex,
+  ]);
 
   //////////////////////////////////////////////////////////////////////////////
   // Read W-ETH token symbol

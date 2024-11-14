@@ -26,6 +26,9 @@ const setupTest = hardhat.deployments.createFixture(setupFixture);
 // Test parameters
 //
 
+// Initial amount of ETH to start with
+const INITIAL_ETH: string = "1"; // 1 ETH
+
 // Amount of POW1 to give to the stake farm for rewards
 const POW1_REWARD_AMOUNT: bigint = ethers.parseUnits("10000", 18); // 10,000 POW1
 
@@ -93,6 +96,22 @@ describe("ERC20 Interest Farm", () => {
     // Get the contract libraries
     deployerContracts = getContractLibrary(deployer, addressBook);
     beneficiaryContracts = getContractLibrary(beneficiary, addressBook);
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Test setup: Obtain ETH
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should obtain ETH", async function (): Promise<void> {
+    // Convert ETH to hex
+    const balanceInWeiHex: string = ethers.toQuantity(
+      ethers.parseEther(INITIAL_ETH),
+    );
+
+    await hardhat.network.provider.send("hardhat_setBalance", [
+      beneficiaryAddress,
+      balanceInWeiHex,
+    ]);
   });
 
   //////////////////////////////////////////////////////////////////////////////

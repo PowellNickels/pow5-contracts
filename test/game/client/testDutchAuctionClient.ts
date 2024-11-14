@@ -35,6 +35,9 @@ const setupTest = hardhat.deployments.createFixture(setupFixture);
 // Constants
 //
 
+// Initial amount of ETH to start with
+const INITIAL_ETH: string = "1"; // 1 ETH
+
 // Initial amount of WETH to deposit into the Dutch Auction
 const INITIAL_WETH_AMOUNT: bigint =
   ethers.parseEther(INITIAL_LPPOW1_WETH_VALUE.toString()) / BigInt(ETH_PRICE); // $100 in WETH
@@ -94,6 +97,22 @@ describe("DutchAuctionClient", () => {
       dutchAuction: addressBook.dutchAuction!,
       marketToken: addressBook.wrappedNativeToken!,
     });
+  });
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Test setup: Obtain ETH
+  //////////////////////////////////////////////////////////////////////////////
+
+  it("should obtain ETH", async function (): Promise<void> {
+    // Convert ETH to hex
+    const balanceInWeiHex: string = ethers.toQuantity(
+      ethers.parseEther(INITIAL_ETH),
+    );
+
+    await hardhat.network.provider.send("hardhat_setBalance", [
+      beneficiaryAddress,
+      balanceInWeiHex,
+    ]);
   });
 
   //////////////////////////////////////////////////////////////////////////////
