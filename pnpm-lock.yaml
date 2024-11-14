@@ -15,9 +15,6 @@ importers:
       '@nomicfoundation/hardhat-ethers':
         specifier: ^3.0.8
         version: 3.0.8(ethers@6.13.4)(hardhat@2.22.15(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))(typescript@5.6.3))
-      '@nomiclabs/hardhat-ethers':
-        specifier: npm:hardhat-deploy-ethers
-        version: hardhat-deploy-ethers@0.4.2(@nomicfoundation/hardhat-ethers@3.0.8(ethers@6.13.4)(hardhat@2.22.15(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))(typescript@5.6.3)))(hardhat-deploy@0.14.0)(hardhat@2.22.15(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))(typescript@5.6.3))
       '@openzeppelin/contracts':
         specifier: ^5.1.0
         version: 5.1.0
