@@ -60,7 +60,7 @@ function UniswapV3FactoryMixin<T extends new (...args: any[]) => {}>(Base: T) {
       tokenA: `0x${string}`,
       tokenB: `0x${string}`,
       fee: number,
-    ): Promise<{ pool: `0x${string}` }> {
+    ): Promise<`0x${string}`> {
       if (!this.isSigner()) {
         throw new Error("A signer is required to perform this transaction");
       }
@@ -72,9 +72,7 @@ function UniswapV3FactoryMixin<T extends new (...args: any[]) => {}>(Base: T) {
         (await tx.wait()) as ethers.ContractTransactionReceipt;
 
       return this.getValues(receipt, "PoolCreated", (result: ethers.Result) => {
-        return {
-          pool: result.getValue("pool") as `0x${string}`,
-        };
+        return result.getValue("pool") as `0x${string}`;
       });
     }
   };

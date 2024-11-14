@@ -53,7 +53,6 @@ import {
   UNISWAP_V3_STAKER_CONTRACT,
   WRAPPED_NATIVE_TOKEN_CONTRACT,
   WRAPPED_NATIVE_USDC_POOL_CONTRACT,
-  WRAPPED_NATIVE_USDC_POOL_FACTORY_CONTRACT,
 } from "../hardhat/contracts/depends";
 import {
   TEST_ERC1155_ENUMERABLE_CONTRACT,
@@ -267,11 +266,6 @@ async function getAddressBook(networkName: string): Promise<AddressBook> {
     wrappedNativeUsdcPool: await getContractAddress(
       "wrappedNativeUsdcPool",
       WRAPPED_NATIVE_USDC_POOL_CONTRACT,
-      networkName,
-    ),
-    wrappedNativeUsdcPoolFactory: await getContractAddress(
-      "wrappedNativeUsdcPoolFactory",
-      WRAPPED_NATIVE_USDC_POOL_FACTORY_CONTRACT,
       networkName,
     ),
     wrappedNativeUsdcSwapper: await getContractAddress(

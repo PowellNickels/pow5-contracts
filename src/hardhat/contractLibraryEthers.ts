@@ -50,7 +50,6 @@ interface ContractLibraryEthers {
   usdcTokenContract: ethers.Contract;
   wrappedNativeTokenContract: ethers.Contract;
   wrappedNativeUsdcPoolContract: ethers.Contract;
-  wrappedNativeUsdcPoolFactoryContract: ethers.Contract;
   wrappedNativeUsdcSwapperContract: ethers.Contract;
   yieldHarvestContract: ethers.Contract;
 }

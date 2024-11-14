@@ -253,11 +253,6 @@ async function setupFixture(
     addressBook.wrappedNativeUsdcPool!,
     beneficiary,
   );
-  const wrappedNativeUsdcPoolFactoryContract = new ethers.Contract(
-    addressBook.wrappedNativeUsdcPoolFactory!,
-    uniV3PoolFactoryAbi,
-    beneficiary,
-  );
   const wrappedNativeUsdcSwapperContract = new ethers.Contract(
     addressBook.wrappedNativeUsdcSwapper!,
     marketStableSwapperAbi,
@@ -305,7 +300,6 @@ async function setupFixture(
     usdcTokenContract,
     wrappedNativeTokenContract,
     wrappedNativeUsdcPoolContract,
-    wrappedNativeUsdcPoolFactoryContract,
     wrappedNativeUsdcSwapperContract,
     yieldHarvestContract,
   };

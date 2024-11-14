@@ -54,7 +54,6 @@ interface AddressBook {
   usdcToken?: `0x${string}`;
   wrappedNativeToken?: `0x${string}`;
   wrappedNativeUsdcPool?: `0x${string}`;
-  wrappedNativeUsdcPoolFactory?: `0x${string}`;
   wrappedNativeUsdcSwapper?: `0x${string}`;
   yieldHarvest?: `0x${string}`;
 }

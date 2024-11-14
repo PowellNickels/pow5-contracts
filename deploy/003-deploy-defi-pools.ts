@@ -12,28 +12,23 @@
 import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
 import { ethers } from "ethers";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import {
-  DeployFunction,
-  DeployOptions,
-  DeployResult,
-} from "hardhat-deploy/types";
+import { DeployFunction } from "hardhat-deploy/types";
 import { getUnnamedSigners } from "hardhat-deploy-ethers/dist/src/helpers";
 
-import { UNI_V3_POOL_FACTORY_CONTRACT } from "../src/hardhat/contracts/dapp";
-import { uniV3PoolFactoryAbi } from "../src/hardhat/contracts/dapp";
 import {
   uniswapV3PoolAbi,
   WRAPPED_NATIVE_USDC_POOL_CONTRACT,
-  WRAPPED_NATIVE_USDC_POOL_FACTORY_CONTRACT,
 } from "../src/hardhat/contracts/depends";
 import { getAddressBook, writeAddress } from "../src/hardhat/getAddressBook";
 import { getNetworkName } from "../src/hardhat/hardhatUtils";
 import { AddressBook } from "../src/interfaces/addressBook";
+import { UniswapV3PoolContract } from "../src/interfaces/uniswap/pool/uniswapV3PoolContract";
+import { UniswapV3FactoryContract } from "../src/interfaces/uniswap/uniswapV3FactoryContract";
 import {
   USDC_ETH_LP_ETH_AMOUNT_BASE,
   USDC_ETH_LP_USDC_AMOUNT_BASE,
 } from "../src/testing/defiMetrics";
-import { UNI_V3_FEE_AMOUNT } from "../src/utils/constants";
+import { UNI_V3_FEE_AMOUNT, ZERO_ADDRESS } from "../src/utils/constants";
 import { encodePriceSqrt } from "../src/utils/fixedMath";
 
 //
@@ -41,20 +36,9 @@ import { encodePriceSqrt } from "../src/utils/fixedMath";
 //
 
 const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
-  const { deployments } = hardhat_re;
-  const { deploy } = deployments;
-
   // Get the deployer signer
   const signers: SignerWithAddress[] = await getUnnamedSigners(hardhat_re);
-  const deployer: SignerWithAddress = signers[0];
-  const deployerAddress: `0x${string}` =
-    (await deployer.getAddress()) as `0x${string}`;
-
-  const opts: DeployOptions = {
-    deterministicDeployment: true,
-    from: deployerAddress,
-    log: true,
-  };
+  const deployer: ethers.Signer = signers[0] as unknown as ethers.Signer;
 
   // Get the network name
   const networkName: string = getNetworkName();
@@ -66,46 +50,36 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Create WETH/USDC pool
   //////////////////////////////////////////////////////////////////////////////
 
-  // Deploy Uniswap V3 pool factory
-  console.log(`Deploying ${WRAPPED_NATIVE_USDC_POOL_FACTORY_CONTRACT}`);
+  // Create contract
+  const uniswapV3FactoryContract: UniswapV3FactoryContract =
+    new UniswapV3FactoryContract(deployer, addressBook.uniswapV3Factory!);
 
-  const wrappedNativeUsdcPoolFactoryReceipt: DeployResult = await deploy(
-    WRAPPED_NATIVE_USDC_POOL_FACTORY_CONTRACT,
-    {
-      ...opts,
-      contract: UNI_V3_POOL_FACTORY_CONTRACT,
-      args: [
-        addressBook.uniswapV3Factory!,
-        addressBook.wrappedNativeToken!,
-        addressBook.usdcToken!,
-        UNI_V3_FEE_AMOUNT.LOW,
-      ],
-    },
-  );
+  // Check if pool has been created
+  let wrappedNativeUsdcPoolAddress: `0x${string}` =
+    await uniswapV3FactoryContract.getPool(
+      addressBook.wrappedNativeToken!,
+      addressBook.usdcToken!,
+      UNI_V3_FEE_AMOUNT.LOW,
+    );
 
-  addressBook.wrappedNativeUsdcPoolFactory =
-    wrappedNativeUsdcPoolFactoryReceipt.address as `0x${string}`;
+  // Create pool if it doesn't exist
+  if (wrappedNativeUsdcPoolAddress == ZERO_ADDRESS) {
+    wrappedNativeUsdcPoolAddress = await uniswapV3FactoryContract.createPool(
+      addressBook.wrappedNativeToken!,
+      addressBook.usdcToken!,
+      UNI_V3_FEE_AMOUNT.LOW,
+    );
 
-  // Read Uniswap V3 pool address
-  const wrappedNativeUsdcPoolFactoryContract = new ethers.Contract(
-    addressBook.wrappedNativeUsdcPoolFactory!,
-    uniV3PoolFactoryAbi,
-    deployer,
-  );
-  const wrappedNativeUsdcPoolAddress: `0x${string}` =
-    await wrappedNativeUsdcPoolFactoryContract.uniswapV3Pool();
-  addressBook.wrappedNativeUsdcPool = wrappedNativeUsdcPoolAddress;
+    // Store pool address
+    addressBook.wrappedNativeUsdcPool = wrappedNativeUsdcPoolAddress;
+  }
 
   // Read token order
-  const wrappedNativeUsdcPoolContract = new ethers.Contract(
-    addressBook.wrappedNativeUsdcPool!,
-    uniswapV3PoolAbi,
-    deployer,
-  );
-  const token0: `0x${string}` =
-    (await wrappedNativeUsdcPoolContract.token0()) as `0x${string}`;
-  const token1: `0x${string}` =
-    (await wrappedNativeUsdcPoolContract.token1()) as `0x${string}`;
+  const wrappedNativeUsdcPoolContract: UniswapV3PoolContract =
+    new UniswapV3PoolContract(deployer, addressBook.wrappedNativeUsdcPool!);
+
+  const token0: `0x${string}` = await wrappedNativeUsdcPoolContract.token0();
+  const token1: `0x${string}` = await wrappedNativeUsdcPoolContract.token1();
 
   if (addressBook.wrappedNativeToken === token0) {
     console.log(`WETH is token0 (${addressBook.wrappedNativeToken})`);
@@ -124,43 +98,26 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Initialize WETH/USDC pool
   //////////////////////////////////////////////////////////////////////////////
 
-  // The initial sqrt price [sqrt(amountToken1/amountToken0)] as a Q64.96 value
-  let sqrtPriceX96: bigint;
-  if (wethIsToken0) {
-    sqrtPriceX96 = encodePriceSqrt(
-      USDC_ETH_LP_USDC_AMOUNT_BASE,
-      USDC_ETH_LP_ETH_AMOUNT_BASE,
-    );
-  } else {
-    sqrtPriceX96 = encodePriceSqrt(
-      USDC_ETH_LP_ETH_AMOUNT_BASE,
-      USDC_ETH_LP_USDC_AMOUNT_BASE,
-    );
-  }
+  // Check if pool is initialized
+  let sqrtPriceX96: bigint = (await wrappedNativeUsdcPoolContract.slot0())
+    .sqrtPriceX96;
 
-  // Initialize pool
-  console.log(`Initializing ${WRAPPED_NATIVE_USDC_POOL_CONTRACT}`);
-  const initializeTx: Promise<ethers.ContractTransactionResponse> =
-    wrappedNativeUsdcPoolContract.initialize(sqrtPriceX96);
+  // Initialize POW1 pool if not initialized
+  if (sqrtPriceX96 === 0n) {
+    // Calculate price
+    sqrtPriceX96 = encodePriceSqrt(
+      wethIsToken0 ? USDC_ETH_LP_USDC_AMOUNT_BASE : USDC_ETH_LP_ETH_AMOUNT_BASE,
+      wethIsToken0 ? USDC_ETH_LP_ETH_AMOUNT_BASE : USDC_ETH_LP_USDC_AMOUNT_BASE,
+    );
 
-  // Failure is not fatal, pool may already have been initialized
-  try {
-    await (await initializeTx).wait();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (err) {
-    console.log(`${WRAPPED_NATIVE_USDC_POOL_CONTRACT} is already initialized`);
+    // Initialize pool
+    console.log(`Initializing ${WRAPPED_NATIVE_USDC_POOL_CONTRACT}`);
+    await wrappedNativeUsdcPoolContract.initialize(sqrtPriceX96);
   }
 
   //////////////////////////////////////////////////////////////////////////////
   // Record addresses
   //////////////////////////////////////////////////////////////////////////////
-
-  writeAddress(
-    networkName,
-    WRAPPED_NATIVE_USDC_POOL_FACTORY_CONTRACT,
-    addressBook.wrappedNativeUsdcPoolFactory!,
-    uniV3PoolFactoryAbi,
-  );
 
   writeAddress(
     networkName,

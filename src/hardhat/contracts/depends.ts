@@ -30,8 +30,6 @@ const WRAPPED_NATIVE_TOKEN_CONTRACT: string = "WETH";
 
 // Deployed contract aliases (sort by constant)
 const WRAPPED_NATIVE_USDC_POOL_CONTRACT: string = "WrappedNativeUsdcPool";
-const WRAPPED_NATIVE_USDC_POOL_FACTORY_CONTRACT: string =
-  "WrappedNativeUsdcPoolFactory";
 
 export {
   erc20Abi,
@@ -49,5 +47,4 @@ export {
   UNISWAP_V3_STAKER_CONTRACT,
   WRAPPED_NATIVE_TOKEN_CONTRACT,
   WRAPPED_NATIVE_USDC_POOL_CONTRACT,
-  WRAPPED_NATIVE_USDC_POOL_FACTORY_CONTRACT,
 };
