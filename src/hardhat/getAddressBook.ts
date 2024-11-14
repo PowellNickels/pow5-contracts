@@ -40,7 +40,7 @@ import {
   POW5_STABLE_POOL_CONTRACT,
   POW5_STABLE_POOL_FACTORY_CONTRACT,
   POW5_STABLE_POOLER_CONTRACT,
-  POW5_SWAPPER_CONTRACT,
+  POW5_STABLE_SWAPPER_CONTRACT,
   POW5_TOKEN_CONTRACT,
   REVERSE_REPO_CONTRACT,
   THE_RESERVE_CONTRACT,
@@ -181,7 +181,7 @@ async function getAddressBook(networkName: string): Promise<AddressBook> {
     ),
     pow5StableSwapper: await getContractAddress(
       "pow5StableSwapper",
-      POW5_SWAPPER_CONTRACT,
+      POW5_STABLE_SWAPPER_CONTRACT,
       networkName,
     ),
     pow5Token: await getContractAddress(

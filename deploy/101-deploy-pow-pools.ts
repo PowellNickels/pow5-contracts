@@ -21,7 +21,7 @@ import {
   POW5_STABLE_POOL_CONTRACT,
   POW5_STABLE_POOL_FACTORY_CONTRACT,
   POW5_STABLE_POOLER_CONTRACT,
-  POW5_SWAPPER_CONTRACT,
+  POW5_STABLE_SWAPPER_CONTRACT,
   UNI_V3_POOL_FACTORY_CONTRACT,
 } from "../src/hardhat/contracts/dapp";
 import { uniswapV3PoolAbi } from "../src/hardhat/contracts/depends";
@@ -158,15 +158,18 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
   // Deploy POW5StableSwapper
   //
 
-  console.log(`Deploying ${POW5_SWAPPER_CONTRACT}`);
-  const pow5StableSwapperTx = await deployments.deploy(POW5_SWAPPER_CONTRACT, {
-    ...opts,
-    args: [
-      addressBook.pow5Token!, // gameToken
-      addressBook.usdcToken!, // assetToken
-      addressBook.pow5StablePool!, // uniswapV3Pool
-    ],
-  });
+  console.log(`Deploying ${POW5_STABLE_SWAPPER_CONTRACT}`);
+  const pow5StableSwapperTx = await deployments.deploy(
+    POW5_STABLE_SWAPPER_CONTRACT,
+    {
+      ...opts,
+      args: [
+        addressBook.pow5Token!, // gameToken
+        addressBook.usdcToken!, // assetToken
+        addressBook.pow5StablePool!, // uniswapV3Pool
+      ],
+    },
+  );
   addressBook.pow5StableSwapper = pow5StableSwapperTx.address as `0x${string}`;
 
   //
