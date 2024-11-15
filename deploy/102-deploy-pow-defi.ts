@@ -178,7 +178,7 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
         deployer, // owner
         addressBook.lpSft!, // sftToken
         addressBook.pow1Token!, // rewardToken
-        addressBook.lpPow1Token!, // lpToken
+        addressBook.lpPow5Token!, // lpToken
         POW5_LPSFT_LEND_FARM_REWARD_RATE, // rewardRate
       ],
     },
