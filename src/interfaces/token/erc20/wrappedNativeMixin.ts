@@ -33,22 +33,32 @@ function WrappedNativeMixin<T extends new (...args: any[]) => {}>(Base: T) {
     }
 
     async deposit(wad: bigint): Promise<ethers.ContractTransactionReceipt> {
-      return this.withSigner(async () => {
-        const tx: ethers.ContractTransactionResponse =
-          await this.wrappedNative.deposit({
-            value: wad,
-          });
+      return (
+        await this.depositAsync(wad)
+      ).wait() as Promise<ethers.ContractTransactionReceipt>;
+    }
 
-        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+    async depositAsync(
+      wad: bigint,
+    ): Promise<ethers.ContractTransactionResponse> {
+      return this.withSigner(async () => {
+        return await this.wrappedNative.deposit({
+          value: wad,
+        });
       });
     }
 
     async withdraw(wad: bigint): Promise<ethers.ContractTransactionReceipt> {
-      return this.withSigner(async () => {
-        const tx: ethers.ContractTransactionResponse =
-          await this.wrappedNative.withdraw(wad);
+      return (
+        await this.withdrawAsync(wad)
+      ).wait() as Promise<ethers.ContractTransactionReceipt>;
+    }
 
-        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+    async withdrawAsync(
+      wad: bigint,
+    ): Promise<ethers.ContractTransactionResponse> {
+      return this.withSigner(async () => {
+        return await this.wrappedNative.withdraw(wad);
       });
     }
   };

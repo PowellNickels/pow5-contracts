@@ -6,25 +6,70 @@
  * See the file LICENSE.txt for more information.
  */
 
+import dotenv from "dotenv";
 import { ethers } from "ethers";
 
+import testnet from "../../src/networks/testnet.json";
 import { extractJSONFromURI } from "../../src/utils/lpNftUtils";
+import {
+  DEFI_MANAGER_CONTRACT,
+  DUTCH_AUCTION_CONTRACT,
+  LIQUIDITY_FORGE_CONTRACT,
+  LPNFT_CONTRACT,
+  LPPOW1_TOKEN_CONTRACT,
+  LPPOW5_TOKEN_CONTRACT,
+  LPSFT_CONTRACT,
+  MARKET_STABLE_SWAPPER_CONTRACT,
+  NOLPSFT_CONTRACT,
+  NOPOW5_TOKEN_CONTRACT,
+  POW1_LPNFT_STAKE_FARM_CONTRACT,
+  POW1_LPSFT_LEND_FARM_CONTRACT,
+  POW1_MARKET_POOL_FACTORY_CONTRACT,
+  POW1_MARKET_POOLER_CONTRACT,
+  POW1_TOKEN_CONTRACT,
+  POW5_INTEREST_FARM_CONTRACT,
+  POW5_LPNFT_STAKE_FARM_CONTRACT,
+  POW5_LPSFT_LEND_FARM_CONTRACT,
+  POW5_STABLE_POOL_FACTORY_CONTRACT,
+  POW5_STABLE_POOLER_CONTRACT,
+  POW5_STABLE_SWAPPER_CONTRACT,
+  POW5_TOKEN_CONTRACT,
+  REVERSE_REPO_CONTRACT,
+  THE_RESERVE_CONTRACT,
+  YIELD_HARVEST_CONTRACT,
+} from "../hardhat/contracts/dapp";
+import {
+  UNISWAP_V3_FACTORY_CONTRACT,
+  UNISWAP_V3_NFT_MANAGER_CONTRACT,
+  UNISWAP_V3_STAKER_CONTRACT,
+  WRAPPED_NATIVE_TOKEN_CONTRACT,
+} from "../hardhat/contracts/depends";
+import { USDC_CONTRACT } from "../hardhat/contracts/testing";
 import { getAddressBook } from "../hardhat/getAddressBook";
 import { AddressBook } from "../interfaces/addressBook";
-import { ContractLibrary } from "../interfaces/contractLibrary";
+import { LPSFTContract } from "../interfaces/token/erc1155/lpSftContract";
+import { UniswapV3FactoryContract } from "../interfaces/uniswap/uniswapV3FactoryContract";
 import { ETH_PRICE } from "../testing/defiMetrics";
 import {
   INITIAL_LPPOW1_WETH_VALUE,
   INITIAL_POW1_SUPPLY,
+  LPPOW1_POOL_FEE,
+  LPPOW5_POOL_FEE,
+  UNI_V3_FEE_AMOUNT,
 } from "../utils/constants";
-import { getContractLibrary } from "../utils/getContractLibrary";
 import { DutchAuctionManager } from "./admin/dutchAuctionManager";
 import { PermissionManager } from "./admin/permissionManager";
 import { PoolManager } from "./admin/poolManager";
 
+// Load environment variables from .env
+dotenv.config();
+
 ////////////////////////////////////////////////////////////////////////////////
 // Constants
 ////////////////////////////////////////////////////////////////////////////////
+
+// Chain ID of testnet
+const TESTNET_CHAIN_ID: bigint = 13371337n;
 
 /**
  * @description The JSON-RPC URL for the Ethereum node
@@ -37,6 +82,22 @@ const JSON_RPC_URL: string =
  */
 const INITIAL_WETH_AMOUNT: bigint =
   ethers.parseEther(INITIAL_LPPOW1_WETH_VALUE.toString()) / BigInt(ETH_PRICE); // $100 in ETH
+
+////////////////////////////////////////////////////////////////////////////////
+// Exports
+////////////////////////////////////////////////////////////////////////////////
+
+interface ContractExport {
+  contracts: {
+    [contractName: string]: {
+      address: `0x${string}`;
+    };
+  };
+}
+
+const EXPORTS: Record<string, ContractExport> = {
+  testnet: testnet as ContractExport,
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Entry point
@@ -61,7 +122,7 @@ async function main(): Promise<void> {
   let deployer: ethers.Signer;
 
   // Load mnemonic or private key from environment variables or configuration
-  const mnemonic: string | undefined = process.env.MNEMONIC;
+  const mnemonic: string | undefined = process.env.MNEMONIC_DEPLOYER;
 
   if (mnemonic) {
     // Create the deployer wallet using mnemonic
@@ -106,27 +167,108 @@ async function initializeGame(
   const network: ethers.Network = await provider.getNetwork();
 
   // Get the network name
-  const networkName: string =
-    network.chainId === 1337n || network.chainId === 31337n
-      ? "localhost"
-      : network.name;
+  let networkName: string = "";
+
+  if (network.chainId === 1337n || network.chainId === 31337n) {
+    networkName = "localhost";
+  } else if (network.chainId === TESTNET_CHAIN_ID) {
+    networkName = "testnet";
+  }
 
   // Log the chain properties
   console.log("Chain ID:", network.chainId.toString());
   console.log("Chain Name:", networkName);
 
   // Get the address book for the network
-  const addressBook: AddressBook = await getAddressBook(networkName);
+  let addressBook: AddressBook = {};
 
-  // Instantiate contracts
-  const deployerContracts: ContractLibrary = getContractLibrary(
-    deployer,
-    addressBook,
-  );
+  if (networkName == "localhost") {
+    addressBook = await getAddressBook(networkName);
+  } else if (networkName in EXPORTS) {
+    const contracts: {
+      [contractName: string]: {
+        address: `0x${string}`;
+      };
+    } = EXPORTS[networkName]["contracts"];
+
+    addressBook = {
+      defiManager: contracts[DEFI_MANAGER_CONTRACT]["address"],
+      dutchAuction: contracts[DUTCH_AUCTION_CONTRACT]["address"],
+      liquidityForge: contracts[LIQUIDITY_FORGE_CONTRACT]["address"],
+      lpNft: contracts[LPNFT_CONTRACT]["address"],
+      lpPow1Token: contracts[LPPOW1_TOKEN_CONTRACT]["address"],
+      lpPow5Token: contracts[LPPOW5_TOKEN_CONTRACT]["address"],
+      lpSft: contracts[LPSFT_CONTRACT]["address"],
+      noLpSft: contracts[NOLPSFT_CONTRACT]["address"],
+      noPow5Token: contracts[NOPOW5_TOKEN_CONTRACT]["address"],
+      pow1LpNftStakeFarm: contracts[POW1_LPNFT_STAKE_FARM_CONTRACT]["address"],
+      pow1LpSftLendFarm: contracts[POW1_LPSFT_LEND_FARM_CONTRACT]["address"],
+      pow1MarketPooler: contracts[POW1_MARKET_POOLER_CONTRACT]["address"],
+      pow1MarketPoolFactory:
+        contracts[POW1_MARKET_POOL_FACTORY_CONTRACT]["address"],
+      pow1MarketSwapper: contracts[POW1_MARKET_POOLER_CONTRACT]["address"],
+      pow1Token: contracts[POW1_TOKEN_CONTRACT]["address"],
+      pow5InterestFarm: contracts[POW5_INTEREST_FARM_CONTRACT]["address"],
+      pow5LpNftStakeFarm: contracts[POW5_LPNFT_STAKE_FARM_CONTRACT]["address"],
+      pow5LpSftLendFarm: contracts[POW5_LPSFT_LEND_FARM_CONTRACT]["address"],
+      pow5StablePooler: contracts[POW5_STABLE_POOLER_CONTRACT]["address"],
+      pow5StablePoolFactory:
+        contracts[POW5_STABLE_POOL_FACTORY_CONTRACT]["address"],
+      pow5StableSwapper: contracts[POW5_STABLE_SWAPPER_CONTRACT]["address"],
+      pow5Token: contracts[POW5_TOKEN_CONTRACT]["address"],
+      reverseRepo: contracts[REVERSE_REPO_CONTRACT]["address"],
+      theReserve: contracts[THE_RESERVE_CONTRACT]["address"],
+      wrappedNativeUsdcSwapper:
+        contracts[MARKET_STABLE_SWAPPER_CONTRACT]["address"],
+      yieldHarvest: contracts[YIELD_HARVEST_CONTRACT]["address"],
+    };
+
+    // Get dependencies, if available
+    if (UNISWAP_V3_FACTORY_CONTRACT in contracts) {
+      addressBook.uniswapV3Factory =
+        contracts[UNISWAP_V3_FACTORY_CONTRACT]["address"];
+    }
+    if (UNISWAP_V3_NFT_MANAGER_CONTRACT in contracts) {
+      addressBook.uniswapV3NftManager =
+        contracts[UNISWAP_V3_NFT_MANAGER_CONTRACT]["address"];
+    }
+    if (UNISWAP_V3_STAKER_CONTRACT in contracts) {
+      addressBook.uniswapV3Staker =
+        contracts[UNISWAP_V3_STAKER_CONTRACT]["address"];
+    }
+    if (USDC_CONTRACT in contracts) {
+      addressBook.usdcToken = contracts[USDC_CONTRACT]["address"];
+    }
+    if (WRAPPED_NATIVE_TOKEN_CONTRACT in contracts) {
+      addressBook.wrappedNativeToken =
+        contracts[WRAPPED_NATIVE_TOKEN_CONTRACT]["address"];
+    }
+
+    // Get pool addresses
+    const uniswapV3FactoryContract: UniswapV3FactoryContract =
+      new UniswapV3FactoryContract(deployer, addressBook.uniswapV3Factory!);
+    addressBook.pow1MarketPool = await uniswapV3FactoryContract.getPool(
+      addressBook.pow1Token!,
+      addressBook.wrappedNativeToken!,
+      LPPOW1_POOL_FEE,
+    );
+    addressBook.pow5StablePool = await uniswapV3FactoryContract.getPool(
+      addressBook.pow5Token!,
+      addressBook.usdcToken!,
+      LPPOW5_POOL_FEE,
+    );
+    addressBook.wrappedNativeUsdcPool = await uniswapV3FactoryContract.getPool(
+      addressBook.wrappedNativeToken!,
+      addressBook.usdcToken!,
+      UNI_V3_FEE_AMOUNT.LOW,
+    );
+  }
 
   //////////////////////////////////////////////////////////////////////////////
   // Initialize Uniswap V3 Pools
   //////////////////////////////////////////////////////////////////////////////
+
+  console.log("Initializing Uniswap V3 pools...");
 
   const poolManager: PoolManager = new PoolManager(deployer, {
     pow1Token: addressBook.pow1Token!,
@@ -137,12 +279,13 @@ async function initializeGame(
     pow5StablePool: addressBook.pow5StablePool!,
   });
 
-  const poolTransactions: Promise<Array<ethers.ContractTransactionReceipt>> =
-    poolManager.initializePools();
+  await poolManager.initializePools();
 
   //////////////////////////////////////////////////////////////////////////////
   // Grant Roles
   //////////////////////////////////////////////////////////////////////////////
+
+  console.log("Granting roles...");
 
   const permissionManager: PermissionManager = new PermissionManager(deployer, {
     pow1Token: addressBook.pow1Token!,
@@ -164,8 +307,7 @@ async function initializeGame(
     pow5InterestFarm: addressBook.pow5InterestFarm!,
   });
 
-  const roleTransactions: Promise<Array<ethers.ContractTransactionReceipt>> =
-    permissionManager.initializeRoles();
+  await permissionManager.initializeRoles();
 
   //////////////////////////////////////////////////////////////////////////////
   // Initialize Dutch Auction
@@ -180,8 +322,6 @@ async function initializeGame(
     },
   );
 
-  let initializeTx: Promise<ethers.ContractTransactionReceipt> | null = null;
-
   // Check if the Dutch Auction is initialized
   const isInitialized: boolean = await dutchAuctionManager.isInitialized();
   if (isInitialized) {
@@ -190,9 +330,7 @@ async function initializeGame(
     console.log("Initializing Dutch Auction...");
 
     // Initialize DutchAuction
-    initializeTx = dutchAuctionManager.initialize(
-      poolTransactions,
-      roleTransactions,
+    await dutchAuctionManager.initialize(
       INITIAL_POW1_SUPPLY,
       INITIAL_WETH_AMOUNT,
       beneficiaryAddress,
@@ -208,7 +346,7 @@ async function initializeGame(
     console.log("Creating initial LP-NFTs for sale...");
 
     // Create initial LP-NFTs for sale
-    await dutchAuctionManager.createInitialAuctions(initializeTx);
+    await dutchAuctionManager.createInitialAuctions();
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -216,7 +354,10 @@ async function initializeGame(
   //////////////////////////////////////////////////////////////////////////////
 
   {
-    const { lpSftContract } = deployerContracts;
+    const lpSftContract: LPSFTContract = new LPSFTContract(
+      deployer,
+      addressBook.lpSft!,
+    );
 
     console.log("Inspecting LP-SFT...");
 

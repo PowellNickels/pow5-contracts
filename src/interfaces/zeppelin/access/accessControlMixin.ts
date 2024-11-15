@@ -44,11 +44,17 @@ function AccessControlMixin<T extends new (...args: any[]) => {}>(Base: T) {
       role: string,
       account: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
-      return this.withSigner(async () => {
-        const tx: ethers.ContractTransactionResponse =
-          await this.accessControl.grantRole(role, account);
+      return (
+        await this.grantRoleAsync(role, account)
+      ).wait() as Promise<ethers.ContractTransactionReceipt>;
+    }
 
-        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+    async grantRoleAsync(
+      role: string,
+      account: `0x${string}`,
+    ): Promise<ethers.ContractTransactionResponse> {
+      return this.withSigner(async () => {
+        return await this.accessControl.grantRole(role, account);
       });
     }
 
@@ -56,11 +62,17 @@ function AccessControlMixin<T extends new (...args: any[]) => {}>(Base: T) {
       role: string,
       account: `0x${string}`,
     ): Promise<ethers.ContractTransactionReceipt> {
-      return this.withSigner(async () => {
-        const tx: ethers.ContractTransactionResponse =
-          await this.accessControl.revokeRole(role, account);
+      return (
+        await this.revokeRoleAsync(role, account)
+      ).wait() as Promise<ethers.ContractTransactionReceipt>;
+    }
 
-        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+    async revokeRoleAsync(
+      role: string,
+      account: `0x${string}`,
+    ): Promise<ethers.ContractTransactionResponse> {
+      return this.withSigner(async () => {
+        return this.accessControl.revokeRole(role, account);
       });
     }
 
@@ -68,11 +80,17 @@ function AccessControlMixin<T extends new (...args: any[]) => {}>(Base: T) {
       role: string,
       callerConfirmation: string,
     ): Promise<ethers.ContractTransactionReceipt> {
-      return this.withSigner(async () => {
-        const tx: ethers.ContractTransactionResponse =
-          await this.accessControl.renounceRole(role, callerConfirmation);
+      return (
+        await this.renounceRoleAsync(role, callerConfirmation)
+      ).wait() as Promise<ethers.ContractTransactionReceipt>;
+    }
 
-        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+    async renounceRoleAsync(
+      role: string,
+      callerConfirmation: string,
+    ): Promise<ethers.ContractTransactionResponse> {
+      return this.withSigner(async () => {
+        return this.accessControl.renounceRole(role, callerConfirmation);
       });
     }
   };

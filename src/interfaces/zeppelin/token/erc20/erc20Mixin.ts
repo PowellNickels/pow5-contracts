@@ -65,13 +65,17 @@ function ERC20Mixin<T extends new (...args: any[]) => {}>(Base: T) {
       spender: `0x${string}`,
       value: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
-      return this.withSigner(async () => {
-        const tx: ethers.ContractTransactionResponse = await this.erc20.approve(
-          spender,
-          value,
-        );
+      return (
+        await this.approveAsync(spender, value)
+      ).wait() as Promise<ethers.ContractTransactionReceipt>;
+    }
 
-        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+    async approveAsync(
+      spender: `0x${string}`,
+      value: bigint,
+    ): Promise<ethers.ContractTransactionResponse> {
+      return this.withSigner(async () => {
+        return await this.erc20.approve(spender, value);
       });
     }
 

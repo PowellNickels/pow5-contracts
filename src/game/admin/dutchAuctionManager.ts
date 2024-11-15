@@ -67,8 +67,6 @@ class DutchAuctionManager {
    * Returns approval promises and a lambda to execute spending transactions
    * after approvals.
    *
-   * @param poolSetup - Promise for pool setup transactions
-   * @param roleSetup - Promise for role setup transactions
    * @param initialPow1 - The amount of POW1 tokens to spend
    * @param initialMarketToken - The amount of the market token to spend
    * @param lpSftReceiver - The address that receives the first LP-SFT
@@ -77,14 +75,11 @@ class DutchAuctionManager {
    * resolves to the transaction receipt
    */
   async initialize(
-    poolSetup: Promise<Array<ethers.ContractTransactionReceipt>>,
-    roleSetup: Promise<Array<ethers.ContractTransactionReceipt>>,
     initialPow1: bigint,
     initialMarketToken: bigint,
     lpSftReceiver: `0x${string}`,
   ): Promise<ethers.ContractTransactionReceipt> {
-    const approvalPromises: Array<Promise<ethers.ContractTransactionReceipt>> =
-      [];
+    const setupPromises: Array<Promise<ethers.ContractTransactionReceipt>> = [];
 
     // Approve Dutch Auction spending POW1, if needed
     const pow1Allowance: bigint = await this.pow1Contract.allowance(
@@ -92,11 +87,14 @@ class DutchAuctionManager {
       this.dutchAuctionContract.address,
     );
     if (pow1Allowance < initialPow1) {
-      approvalPromises.push(
-        this.pow1Contract.approve(
+      const tx: ethers.ContractTransactionResponse =
+        await this.pow1Contract.approveAsync(
           this.addresses.dutchAuction,
           initialPow1 - pow1Allowance,
-        ),
+        );
+
+      setupPromises.push(
+        tx.wait() as Promise<ethers.ContractTransactionReceipt>,
       );
     }
 
@@ -105,8 +103,13 @@ class DutchAuctionManager {
       (await this.admin.getAddress()) as `0x${string}`,
     );
     if (wethBalance < initialMarketToken) {
-      approvalPromises.push(
-        this.marketTokenContract.deposit(initialMarketToken - wethBalance),
+      const tx: ethers.ContractTransactionResponse =
+        await this.marketTokenContract.depositAsync(
+          initialMarketToken - wethBalance,
+        );
+
+      setupPromises.push(
+        tx.wait() as Promise<ethers.ContractTransactionReceipt>,
       );
     }
 
@@ -117,16 +120,19 @@ class DutchAuctionManager {
         this.dutchAuctionContract.address,
       );
     if (marketTokenAllowance < initialMarketToken) {
-      approvalPromises.push(
-        this.marketTokenContract.approve(
+      const tx: ethers.ContractTransactionResponse =
+        await this.marketTokenContract.approveAsync(
           this.addresses.dutchAuction,
           initialMarketToken - marketTokenAllowance,
-        ),
+        );
+
+      setupPromises.push(
+        tx.wait() as Promise<ethers.ContractTransactionReceipt>,
       );
     }
 
     // Wait for all setup transactions to complete
-    await Promise.all([poolSetup, roleSetup, Promise.all(approvalPromises)]);
+    await Promise.all(setupPromises);
 
     return this.dutchAuctionContract.initialize(
       initialPow1,
@@ -139,27 +145,21 @@ class DutchAuctionManager {
     return this.dutchAuctionContract.isInitialized();
   }
 
-  async createInitialAuctions(
-    initializeTx: Promise<ethers.ContractTransactionReceipt> | null,
-  ): Promise<ethers.ContractTransactionReceipt> {
-    // Wait for initial tokens to be spent
-    if (initializeTx) {
-      await initializeTx;
-    }
-
-    const pendingTransactions: Array<
-      Promise<ethers.ContractTransactionReceipt>
-    > = [];
+  async createInitialAuctions(): Promise<ethers.ContractTransactionReceipt> {
+    const setupTransactions: Array<Promise<ethers.ContractTransactionReceipt>> =
+      [];
 
     // Get dust for LP-NFT creation, if needed
     const marketTokenBalance = await this.marketTokenContract.balanceOf(
       (await this.admin.getAddress()) as `0x${string}`,
     );
     if (marketTokenBalance < INITIAL_WETH_DUST) {
-      pendingTransactions.push(
-        this.marketTokenContract.deposit(
-          INITIAL_WETH_DUST - marketTokenBalance,
-        ),
+      const tx = await this.marketTokenContract.depositAsync(
+        INITIAL_WETH_DUST - marketTokenBalance,
+      );
+
+      setupTransactions.push(
+        tx.wait() as Promise<ethers.ContractTransactionReceipt>,
       );
     }
 
@@ -169,16 +169,18 @@ class DutchAuctionManager {
       this.addresses.dutchAuction,
     );
     if (marketTokenAllowance < INITIAL_WETH_DUST) {
-      pendingTransactions.push(
-        this.marketTokenContract.approve(
-          this.addresses.dutchAuction,
-          INITIAL_WETH_DUST - marketTokenAllowance,
-        ),
+      const tx = await this.marketTokenContract.approveAsync(
+        this.addresses.dutchAuction,
+        INITIAL_WETH_DUST - marketTokenAllowance,
+      );
+
+      setupTransactions.push(
+        tx.wait() as Promise<ethers.ContractTransactionReceipt>,
       );
     }
 
     // Wait for all pending transactions to complete
-    await Promise.all(pendingTransactions);
+    await Promise.all(setupTransactions);
 
     // Set auction count
     return this.dutchAuctionContract.setAuctionCount(

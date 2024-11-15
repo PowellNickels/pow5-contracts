@@ -159,4 +159,6 @@ jobs:
           kill $(cat dev_chain_pid.txt)
 
       - name: pnpm test
+        env:
+          WEB_SOCKET_URL: ${{ secrets.WEB_SOCKET_URL }}
         run: pnpm test

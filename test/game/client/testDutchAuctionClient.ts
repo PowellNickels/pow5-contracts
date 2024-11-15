@@ -146,8 +146,7 @@ describe("DutchAuctionClient", () => {
       stableToken: addressBook.usdcToken!,
       pow5StablePool: addressBook.pow5StablePool!,
     });
-    const poolSetup: Promise<Array<ethers.ContractTransactionReceipt>> =
-      poolManager.initializePools();
+    await poolManager.initializePools();
 
     // Initialize roles
     const permissionManager: PermissionManager = new PermissionManager(
@@ -172,8 +171,7 @@ describe("DutchAuctionClient", () => {
         pow5InterestFarm: addressBook.pow5InterestFarm!,
       },
     );
-    const roleSetup: Promise<Array<ethers.ContractTransactionReceipt>> =
-      permissionManager.initializeRoles();
+    await permissionManager.initializeRoles();
 
     // Initialize Dutch Auction
     const dutchAuctionManager: DutchAuctionManager = new DutchAuctionManager(
@@ -184,17 +182,14 @@ describe("DutchAuctionClient", () => {
         dutchAuction: addressBook.dutchAuction!,
       },
     );
-    const initializationTx: Promise<ethers.ContractTransactionReceipt> =
-      dutchAuctionManager.initialize(
-        poolSetup,
-        roleSetup,
-        INITIAL_POW1_SUPPLY,
-        INITIAL_WETH_AMOUNT,
-        beneficiaryAddress,
-      );
+    await dutchAuctionManager.initialize(
+      INITIAL_POW1_SUPPLY,
+      INITIAL_WETH_AMOUNT,
+      beneficiaryAddress,
+    );
 
     // Create first LP-NFTs for sale
-    await dutchAuctionManager.createInitialAuctions(initializationTx);
+    await dutchAuctionManager.createInitialAuctions();
   });
 
   //////////////////////////////////////////////////////////////////////////////

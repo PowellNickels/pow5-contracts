@@ -57,6 +57,10 @@ const ACCOUNTS: string[] = [
 // Gas reporter
 const REPORT_GAS: boolean = process.env.REPORT_GAS ? true : false;
 
+// The JSON-RPC URL for the Ethereum node
+const JSON_RPC_URL: string =
+  process.env.JSON_RPC_URL || "http://localhost:8545";
+
 const config: HardhatUserConfig = {
   // Networks (may need to specify gas for public chains)
   networks: {
@@ -84,6 +88,21 @@ const config: HardhatUserConfig = {
       allowUnlimitedContractSize: true,
       tags: [
         "FundDeployer",
+        "TestTokens",
+        "UniswapV3",
+        "LiquidityPools",
+        "POWTokens",
+        "POWPools",
+        "POWDeFi",
+        "POWBureaucracy",
+        "Tests",
+      ],
+    },
+    testnet: {
+      url: JSON_RPC_URL,
+      accounts: ACCOUNTS,
+      allowUnlimitedContractSize: true,
+      tags: [
         "TestTokens",
         "UniswapV3",
         "LiquidityPools",

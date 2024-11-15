@@ -138,6 +138,7 @@ class PermissionManager {
     const pow5InterestFarmContract: POW5InterestFarmContract =
       new POW5InterestFarmContract(this.admin, this.addresses.pow5InterestFarm);
 
+    // Role assignments
     const roleAssignments: RoleGroup[] = [
       // Dutch Auction
       {
@@ -214,28 +215,32 @@ class PermissionManager {
     for (const roleGroup of roleAssignments) {
       for (const [address, assignments] of Object.entries(roleGroup)) {
         for (const assignment of assignments) {
-          await this.grantRole(
-            assignment.contract,
-            assignment.role,
-            address as `0x${string}`,
-            transactions,
+          // Skip if the role is already assigned
+          if (
+            await assignment.contract.hasRole(
+              assignment.role,
+              address as `0x${string}`,
+            )
+          ) {
+            continue;
+          }
+
+          // Assign the role
+          const transaction: ethers.ContractTransactionResponse =
+            await assignment.contract.grantRoleAsync(
+              assignment.role,
+              address as `0x${string}`,
+            );
+
+          // Record the transaction
+          transactions.push(
+            transaction.wait() as Promise<ethers.ContractTransactionReceipt>,
           );
         }
       }
     }
 
     return Promise.all(transactions);
-  }
-
-  private async grantRole(
-    contract: AccessControlContract,
-    role: string,
-    address: `0x${string}`,
-    transactions: Array<Promise<ethers.ContractTransactionReceipt>>,
-  ): Promise<void> {
-    if (!(await contract.hasRole(role, address))) {
-      transactions.push(contract.grantRole(role, address));
-    }
   }
 }
 

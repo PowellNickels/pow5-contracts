@@ -100,27 +100,29 @@ class PoolManager {
 
     // Initialize POW1 pool if not initialized
     if (pow1SqrtPriceX96 === 0n) {
+      const tx: ethers.ContractTransactionResponse = await this.initializePool(
+        pow1MarketPoolContract,
+        this.addresses.pow1Token,
+        this.addresses.marketToken,
+        INITIAL_POW1_SUPPLY,
+        INITIAL_MARKET_SUPPLY,
+      );
       transactions.push(
-        this.initializePool(
-          pow1MarketPoolContract,
-          this.addresses.pow1Token,
-          this.addresses.marketToken,
-          INITIAL_POW1_SUPPLY,
-          INITIAL_MARKET_SUPPLY,
-        ),
+        tx.wait() as Promise<ethers.ContractTransactionReceipt>,
       );
     }
 
     // Initialize POW5 pool if not initialized
     if (pow5SqrtPriceX96 === 0n) {
+      const tx: ethers.ContractTransactionResponse = await this.initializePool(
+        pow5StablePoolContract,
+        this.addresses.pow5Token,
+        this.addresses.stableToken,
+        INITIAL_POW5_AMOUNT,
+        INITIAL_STABLE_SUPPLY,
+      );
       transactions.push(
-        this.initializePool(
-          pow5StablePoolContract,
-          this.addresses.pow5Token,
-          this.addresses.stableToken,
-          INITIAL_POW5_AMOUNT,
-          INITIAL_STABLE_SUPPLY,
-        ),
+        tx.wait() as Promise<ethers.ContractTransactionReceipt>,
       );
     }
 
@@ -150,7 +152,7 @@ class PoolManager {
     assetTokenAddress: `0x${string}`,
     gameTokenSupply: bigint,
     assetTokenSupply: bigint,
-  ): Promise<ethers.ContractTransactionReceipt> {
+  ): Promise<ethers.ContractTransactionResponse> {
     // Get pool token order
     let gameIsToken0: boolean;
 
@@ -176,7 +178,7 @@ class PoolManager {
     }
 
     // Initialize the Uniswap V3 pool
-    return poolContract.initialize(
+    return poolContract.initializeAsync(
       encodePriceSqrt(
         gameIsToken0 ? assetTokenSupply : gameTokenSupply,
         gameIsToken0 ? gameTokenSupply : assetTokenSupply,

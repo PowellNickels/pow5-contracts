@@ -37,11 +37,16 @@ function UniswapV3PoolActionsMixin<T extends new (...args: any[]) => {}>(
     async initialize(
       sqrtPriceX96: bigint,
     ): Promise<ethers.ContractTransactionReceipt> {
-      return this.withSigner(async () => {
-        const tx: ethers.ContractTransactionResponse =
-          await this.uniswapV3PoolActions.initialize(sqrtPriceX96);
+      return (
+        await this.initializeAsync(sqrtPriceX96)
+      ).wait() as Promise<ethers.ContractTransactionReceipt>;
+    }
 
-        return (await tx.wait()) as ethers.ContractTransactionReceipt;
+    async initializeAsync(
+      sqrtPriceX96: bigint,
+    ): Promise<ethers.ContractTransactionResponse> {
+      return this.withSigner(async () => {
+        return await this.uniswapV3PoolActions.initialize(sqrtPriceX96);
       });
     }
 
