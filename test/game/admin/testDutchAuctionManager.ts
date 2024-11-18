@@ -8,7 +8,6 @@
 
 import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/dist/src/signer-with-address";
 import chai from "chai";
-import { ethers } from "ethers";
 import * as hardhat from "hardhat";
 
 import { DutchAuctionManager } from "../../../src/game/admin/dutchAuctionManager";
@@ -17,14 +16,8 @@ import { PoolManager } from "../../../src/game/admin/poolManager";
 import { getAddressBook } from "../../../src/hardhat/getAddressBook";
 import { getNetworkName } from "../../../src/hardhat/hardhatUtils";
 import { AddressBook } from "../../../src/interfaces/addressBook";
-import { WrappedNativeContract } from "../../../src/interfaces/token/erc20/wrappedNativeContract";
 import { LPSFTContract } from "../../../src/interfaces/token/erc1155/lpSftContract";
-import { ETH_PRICE } from "../../../src/testing/defiMetrics";
 import { setupFixture } from "../../../src/testing/setupFixture";
-import {
-  INITIAL_LPPOW1_WETH_VALUE,
-  INITIAL_POW1_SUPPLY,
-} from "../../../src/utils/constants";
 import { extractJSONFromURI } from "../../../src/utils/lpNftUtils";
 
 // Setup Hardhat
@@ -33,10 +26,6 @@ const setupTest = hardhat.deployments.createFixture(setupFixture);
 //
 // Constants
 //
-
-// Initial amount of WETH to deposit into the Dutch Auction
-const INITIAL_WETH_AMOUNT: bigint =
-  ethers.parseEther(INITIAL_LPPOW1_WETH_VALUE.toString()) / BigInt(ETH_PRICE); // $100 in WETH
 
 // Token ID of initial minted LP-NFT/L-SFT
 const POW1_LPNFT_TOKEN_ID: bigint = 1n;
@@ -76,21 +65,6 @@ describe("DutchAuctionManager", () => {
 
     // Get the address book
     addressBook = await getAddressBook(networkName);
-  });
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Spec: Obtain W-ETH to initialize DutchAuction
-  //////////////////////////////////////////////////////////////////////////////
-
-  it("should obtain W-ETH to initialize DutchAuction", async function (): Promise<void> {
-    this.timeout(60 * 1000);
-
-    // Create contract
-    const wrappedNativeContract: WrappedNativeContract =
-      new WrappedNativeContract(deployer, addressBook.wrappedNativeToken!);
-
-    // Deposit ETH into W-ETH
-    await wrappedNativeContract.deposit(INITIAL_WETH_AMOUNT);
   });
 
   //////////////////////////////////////////////////////////////////////////////
@@ -145,11 +119,7 @@ describe("DutchAuctionManager", () => {
         dutchAuction: addressBook.dutchAuction!,
       },
     );
-    await dutchAuctionManager.initialize(
-      INITIAL_POW1_SUPPLY,
-      INITIAL_WETH_AMOUNT,
-      beneficiaryAddress,
-    );
+    await dutchAuctionManager.initialize(beneficiaryAddress);
 
     // Create first LP-NFTs for sale
     await dutchAuctionManager.createInitialAuctions();

@@ -18,15 +18,10 @@ import { DutchAuctionClient } from "../../../src/game/client/dutchAuctionClient"
 import { getAddressBook } from "../../../src/hardhat/getAddressBook";
 import { getNetworkName } from "../../../src/hardhat/hardhatUtils";
 import { AddressBook } from "../../../src/interfaces/addressBook";
-import { WrappedNativeContract } from "../../../src/interfaces/token/erc20/wrappedNativeContract";
 import { ETH_PRICE } from "../../../src/testing/defiMetrics";
 import { setupFixture } from "../../../src/testing/setupFixture";
 import { TokenTracker } from "../../../src/testing/tokenTracker";
-import {
-  INITIAL_LPPOW1_WETH_VALUE,
-  INITIAL_POW1_SUPPLY,
-  LPPOW1_DECIMALS,
-} from "../../../src/utils/constants";
+import { LPPOW1_DECIMALS } from "../../../src/utils/constants";
 
 // Setup Hardhat
 const setupTest = hardhat.deployments.createFixture(setupFixture);
@@ -37,10 +32,6 @@ const setupTest = hardhat.deployments.createFixture(setupFixture);
 
 // Initial amount of ETH to start with
 const INITIAL_ETH: string = "1"; // 1 ETH
-
-// Initial amount of WETH to deposit into the Dutch Auction
-const INITIAL_WETH_AMOUNT: bigint =
-  ethers.parseEther(INITIAL_LPPOW1_WETH_VALUE.toString()) / BigInt(ETH_PRICE); // $100 in WETH
 
 // Token IDs of LP-NFTs for sale
 const POW1_LPNFT_FIRST_TOKEN_ID: bigint = 2n;
@@ -116,21 +107,6 @@ describe("DutchAuctionClient", () => {
   });
 
   //////////////////////////////////////////////////////////////////////////////
-  // Test setup: Obtain W-ETH to initialize DutchAuction
-  //////////////////////////////////////////////////////////////////////////////
-
-  it("should obtain W-ETH to initialize DutchAuction", async function (): Promise<void> {
-    this.timeout(60 * 1000);
-
-    // Create contract
-    const wrappedNativeContract: WrappedNativeContract =
-      new WrappedNativeContract(deployer, addressBook.wrappedNativeToken!);
-
-    // Deposit ETH into W-ETH
-    await wrappedNativeContract.deposit(INITIAL_WETH_AMOUNT);
-  });
-
-  //////////////////////////////////////////////////////////////////////////////
   // Test setup: Initialize Dutch Auction
   //////////////////////////////////////////////////////////////////////////////
 
@@ -182,11 +158,7 @@ describe("DutchAuctionClient", () => {
         dutchAuction: addressBook.dutchAuction!,
       },
     );
-    await dutchAuctionManager.initialize(
-      INITIAL_POW1_SUPPLY,
-      INITIAL_WETH_AMOUNT,
-      beneficiaryAddress,
-    );
+    await dutchAuctionManager.initialize(beneficiaryAddress);
 
     // Create first LP-NFTs for sale
     await dutchAuctionManager.createInitialAuctions();

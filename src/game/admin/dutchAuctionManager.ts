@@ -11,6 +11,11 @@ import { ethers } from "ethers";
 import { DutchAuctionContract } from "../../interfaces/bureaucracy/dutchAuction/dutchAuctionContract";
 import { WrappedNativeContract } from "../../interfaces/token/erc20/wrappedNativeContract";
 import { ERC20Contract } from "../../interfaces/zeppelin/token/erc20/erc20Contract";
+import { ETH_PRICE } from "../../testing/defiMetrics";
+import {
+  INITIAL_LPPOW1_WETH_VALUE,
+  INITIAL_POW1_SUPPLY,
+} from "../../utils/constants";
 
 //////////////////////////////////////////////////////////////////////////////
 // Constants
@@ -21,6 +26,10 @@ const INITIAL_AUCTION_COUNT: number = 3;
 
 // Amount of WETH dust to use for auction creation
 const INITIAL_WETH_DUST: bigint = 1_000n; // 1,000 wei
+
+// Initial amount of WETH to deposit into the Dutch Auction
+const INITIAL_WETH_AMOUNT: bigint =
+  ethers.parseEther(INITIAL_LPPOW1_WETH_VALUE.toString()) / BigInt(ETH_PRICE); // $100 in ETH
 
 //////////////////////////////////////////////////////////////////////////////
 // Types
@@ -67,130 +76,166 @@ class DutchAuctionManager {
    * Returns approval promises and a lambda to execute spending transactions
    * after approvals.
    *
-   * @param initialPow1 - The amount of POW1 tokens to spend
-   * @param initialMarketToken - The amount of the market token to spend
    * @param lpSftReceiver - The address that receives the first LP-SFT
    *
-   * @returns {Promise<ethers.ContractTransactionReceipt>} A promise that
-   * resolves to the transaction receipt
+   * @returns {Promise<ethers.ContractTransactionReceipt | null>} A promise that
+   * resolves to the transaction receipt, or null if the Dutch Auction is already
+   * initialized.
    */
   async initialize(
-    initialPow1: bigint,
-    initialMarketToken: bigint,
     lpSftReceiver: `0x${string}`,
-  ): Promise<ethers.ContractTransactionReceipt> {
-    const setupPromises: Array<Promise<ethers.ContractTransactionReceipt>> = [];
+  ): Promise<ethers.ContractTransactionReceipt | null> {
+    // Check if the Dutch Auction is initialized
+    const isInitialized: boolean =
+      await this.dutchAuctionContract.isInitialized();
+    if (!isInitialized) {
+      const setupPromises: Array<Promise<ethers.ContractTransactionReceipt>> =
+        [];
 
-    // Approve Dutch Auction spending POW1, if needed
-    const pow1Allowance: bigint = await this.pow1Contract.allowance(
-      (await this.admin.getAddress()) as `0x${string}`,
-      this.dutchAuctionContract.address,
-    );
-    if (pow1Allowance < initialPow1) {
-      const tx: ethers.ContractTransactionResponse =
-        await this.pow1Contract.approveAsync(
-          this.addresses.dutchAuction,
-          initialPow1 - pow1Allowance,
-        );
+      // Approve Dutch Auction spending POW1, if needed
+      await this._approvePow1(INITIAL_POW1_SUPPLY, setupPromises);
 
-      setupPromises.push(
-        tx.wait() as Promise<ethers.ContractTransactionReceipt>,
+      // Obtain market token, if needed
+      await this._depositMarketToken(INITIAL_WETH_AMOUNT, setupPromises);
+
+      // Approve Dutch Auction spending market token, if needed
+      await this._approveMarketToken(INITIAL_WETH_AMOUNT, setupPromises);
+
+      // Wait for all setup transactions to complete
+      await Promise.all(setupPromises);
+
+      return this.dutchAuctionContract.initialize(
+        INITIAL_POW1_SUPPLY,
+        INITIAL_WETH_AMOUNT,
+        lpSftReceiver,
       );
     }
 
-    // Deposit WETH if needed
-    const wethBalance: bigint = await this.marketTokenContract.balanceOf(
-      (await this.admin.getAddress()) as `0x${string}`,
-    );
-    if (wethBalance < initialMarketToken) {
-      const tx: ethers.ContractTransactionResponse =
-        await this.marketTokenContract.depositAsync(
-          initialMarketToken - wethBalance,
-        );
-
-      setupPromises.push(
-        tx.wait() as Promise<ethers.ContractTransactionReceipt>,
-      );
-    }
-
-    // Approve Dutch Auction spending market token, if needed
-    const marketTokenAllowance: bigint =
-      await this.marketTokenContract.allowance(
-        (await this.admin.getAddress()) as `0x${string}`,
-        this.dutchAuctionContract.address,
-      );
-    if (marketTokenAllowance < initialMarketToken) {
-      const tx: ethers.ContractTransactionResponse =
-        await this.marketTokenContract.approveAsync(
-          this.addresses.dutchAuction,
-          initialMarketToken - marketTokenAllowance,
-        );
-
-      setupPromises.push(
-        tx.wait() as Promise<ethers.ContractTransactionReceipt>,
-      );
-    }
-
-    // Wait for all setup transactions to complete
-    await Promise.all(setupPromises);
-
-    return this.dutchAuctionContract.initialize(
-      initialPow1,
-      initialMarketToken,
-      lpSftReceiver,
-    );
+    return null;
   }
 
   async isInitialized(): Promise<boolean> {
     return this.dutchAuctionContract.isInitialized();
   }
 
-  async createInitialAuctions(): Promise<ethers.ContractTransactionReceipt> {
-    const setupTransactions: Array<Promise<ethers.ContractTransactionReceipt>> =
-      [];
+  async createInitialAuctions(): Promise<ethers.ContractTransactionReceipt | null> {
+    // Check number of auctions
+    const auctionCount: number =
+      await this.dutchAuctionContract.getAuctionCount();
+    if (auctionCount < INITIAL_AUCTION_COUNT) {
+      const setupTransactions: Array<
+        Promise<ethers.ContractTransactionReceipt>
+      > = [];
 
-    // Get dust for LP-NFT creation, if needed
-    const marketTokenBalance = await this.marketTokenContract.balanceOf(
-      (await this.admin.getAddress()) as `0x${string}`,
-    );
-    if (marketTokenBalance < INITIAL_WETH_DUST) {
-      const tx = await this.marketTokenContract.depositAsync(
-        INITIAL_WETH_DUST - marketTokenBalance,
-      );
+      // Get dust for LP-NFT creation, if needed
+      await this._getDust(INITIAL_WETH_DUST, setupTransactions);
 
-      setupTransactions.push(
-        tx.wait() as Promise<ethers.ContractTransactionReceipt>,
-      );
-    }
+      // Approve spending dust for LP-NFT creation, if needed
+      await this._approveMarketToken(INITIAL_WETH_DUST, setupTransactions);
 
-    // Approve spending dust for LP-NFT creation, if needed
-    const marketTokenAllowance = await this.marketTokenContract.allowance(
-      (await this.admin.getAddress()) as `0x${string}`,
-      this.addresses.dutchAuction,
-    );
-    if (marketTokenAllowance < INITIAL_WETH_DUST) {
-      const tx = await this.marketTokenContract.approveAsync(
-        this.addresses.dutchAuction,
-        INITIAL_WETH_DUST - marketTokenAllowance,
-      );
+      // Wait for all pending transactions to complete
+      await Promise.all(setupTransactions);
 
-      setupTransactions.push(
-        tx.wait() as Promise<ethers.ContractTransactionReceipt>,
+      // Set auction count
+      return this.dutchAuctionContract.setAuctionCount(
+        INITIAL_AUCTION_COUNT,
+        INITIAL_WETH_DUST,
       );
     }
 
-    // Wait for all pending transactions to complete
-    await Promise.all(setupTransactions);
-
-    // Set auction count
-    return this.dutchAuctionContract.setAuctionCount(
-      INITIAL_AUCTION_COUNT,
-      INITIAL_WETH_DUST,
-    );
+    return null;
   }
 
   async getCurrentAuctionCount(): Promise<number> {
     return this.dutchAuctionContract.getAuctionCount();
+  }
+
+  private async _approvePow1(
+    amount: bigint,
+    setupPromises: Array<Promise<ethers.ContractTransactionReceipt>>,
+  ): Promise<void> {
+    // Check current allowance
+    const pow1Allowance: bigint = await this.pow1Contract.allowance(
+      (await this.admin.getAddress()) as `0x${string}`,
+      this.dutchAuctionContract.address,
+    );
+
+    // Approve spending POW1, if needed
+    if (pow1Allowance < amount) {
+      const tx: ethers.ContractTransactionResponse =
+        await this.pow1Contract.approveAsync(
+          this.dutchAuctionContract.address,
+          amount - pow1Allowance,
+        );
+      setupPromises.push(
+        tx.wait() as Promise<ethers.ContractTransactionReceipt>,
+      );
+    }
+  }
+
+  private async _depositMarketToken(
+    amount: bigint,
+    setupPromises: Array<Promise<ethers.ContractTransactionReceipt>>,
+  ): Promise<void> {
+    // Check current balance
+    const marketTokenBalance: bigint = await this.marketTokenContract.balanceOf(
+      (await this.admin.getAddress()) as `0x${string}`,
+    );
+
+    // Deposit market token, if needed
+    if (marketTokenBalance < amount) {
+      const tx: ethers.ContractTransactionResponse =
+        await this.marketTokenContract.depositAsync(
+          amount - marketTokenBalance,
+        );
+      setupPromises.push(
+        tx.wait() as Promise<ethers.ContractTransactionReceipt>,
+      );
+    }
+  }
+
+  private async _approveMarketToken(
+    amount: bigint,
+    setupPromises: Array<Promise<ethers.ContractTransactionReceipt>>,
+  ): Promise<void> {
+    // Check current allowance
+    const marketTokenAllowance: bigint =
+      await this.marketTokenContract.allowance(
+        (await this.admin.getAddress()) as `0x${string}`,
+        this.addresses.dutchAuction,
+      );
+
+    // Approve spending market token, if needed
+    if (marketTokenAllowance < amount) {
+      const tx: ethers.ContractTransactionResponse =
+        await this.marketTokenContract.approveAsync(
+          this.addresses.dutchAuction,
+          amount - marketTokenAllowance,
+        );
+      setupPromises.push(
+        tx.wait() as Promise<ethers.ContractTransactionReceipt>,
+      );
+    }
+  }
+
+  private async _getDust(
+    amount: bigint,
+    setupPromises: Array<Promise<ethers.ContractTransactionReceipt>>,
+  ): Promise<void> {
+    // Check current balance
+    const marketTokenBalance = await this.marketTokenContract.balanceOf(
+      (await this.admin.getAddress()) as `0x${string}`,
+    );
+
+    // Get dust for LP-NFT creation, if needed
+    if (marketTokenBalance < amount) {
+      const tx = await this.marketTokenContract.depositAsync(
+        amount - marketTokenBalance,
+      );
+      setupPromises.push(
+        tx.wait() as Promise<ethers.ContractTransactionReceipt>,
+      );
+    }
   }
 }
 

@@ -49,10 +49,7 @@ import { getAddressBook } from "../hardhat/getAddressBook";
 import { AddressBook } from "../interfaces/addressBook";
 import { LPSFTContract } from "../interfaces/token/erc1155/lpSftContract";
 import { UniswapV3FactoryContract } from "../interfaces/uniswap/uniswapV3FactoryContract";
-import { ETH_PRICE } from "../testing/defiMetrics";
 import {
-  INITIAL_LPPOW1_WETH_VALUE,
-  INITIAL_POW1_SUPPLY,
   LPPOW1_POOL_FEE,
   LPPOW5_POOL_FEE,
   UNI_V3_FEE_AMOUNT,
@@ -60,6 +57,7 @@ import {
 import { DutchAuctionManager } from "./admin/dutchAuctionManager";
 import { PermissionManager } from "./admin/permissionManager";
 import { PoolManager } from "./admin/poolManager";
+import { DutchAuctionClient } from "./client/dutchAuctionClient";
 
 // Load environment variables from .env
 dotenv.config();
@@ -76,12 +74,6 @@ const TESTNET_CHAIN_ID: bigint = 13371337n;
  */
 const JSON_RPC_URL: string =
   process.env.JSON_RPC_URL || "http://localhost:8545";
-
-/**
- * @description Initial amount of WETH to deposit into the Dutch Auction
- */
-const INITIAL_WETH_AMOUNT: bigint =
-  ethers.parseEther(INITIAL_LPPOW1_WETH_VALUE.toString()) / BigInt(ETH_PRICE); // $100 in ETH
 
 ////////////////////////////////////////////////////////////////////////////////
 // Exports
@@ -118,22 +110,32 @@ async function main(): Promise<void> {
     JSON_RPC_URL,
   );
 
-  // Get the deployer wallet
+  // Get the wallets
   let deployer: ethers.Signer;
+  let beneficiary: ethers.Signer;
 
   // Load mnemonic or private key from environment variables or configuration
-  const mnemonic: string | undefined = process.env.MNEMONIC_DEPLOYER;
+  const deployerMnemonic: string | undefined = process.env.MNEMONIC_DEPLOYER;
+  const beneficiaryMnemonic: string | undefined = process.env.MNEMONIC_DEGEN;
 
-  if (mnemonic) {
+  if (deployerMnemonic) {
     // Create the deployer wallet using mnemonic
-    deployer = ethers.Wallet.fromPhrase(mnemonic).connect(provider);
+    deployer = ethers.Wallet.fromPhrase(deployerMnemonic).connect(provider);
   } else {
     // Use the first account as the deployer
     deployer = await provider.getSigner(0);
   }
+  if (beneficiaryMnemonic) {
+    // Create the beneficiary wallet using mnemonic
+    beneficiary =
+      ethers.Wallet.fromPhrase(beneficiaryMnemonic).connect(provider);
+  } else {
+    // Use the second account as the deployer
+    beneficiary = await provider.getSigner(1);
+  }
 
   // Proceed with the rest of your script using the deployer wallet
-  await initializeGame(deployer, provider);
+  await initializeGame(deployer, beneficiary, provider);
 }
 
 /**
@@ -144,6 +146,7 @@ async function main(): Promise<void> {
  */
 async function initializeGame(
   deployer: ethers.Signer,
+  beneficiary: ethers.Signer,
   provider: ethers.JsonRpcProvider,
 ): Promise<void> {
   //////////////////////////////////////////////////////////////////////////////
@@ -155,9 +158,9 @@ async function initializeGame(
   console.log(`Deployer address: ${deployerAddress}`);
 
   // Use deployer for the beneficiary
-  const beneficiary: ethers.Signer = deployer;
   const beneficiaryAddress: `0x${string}` =
     (await beneficiary.getAddress()) as `0x${string}`;
+  console.log(`Beneficiary address: ${beneficiaryAddress}`);
 
   //////////////////////////////////////////////////////////////////////////////
   // Load ABIs and Addresses
@@ -322,31 +325,20 @@ async function initializeGame(
     },
   );
 
-  // Check if the Dutch Auction is initialized
-  const isInitialized: boolean = await dutchAuctionManager.isInitialized();
-  if (isInitialized) {
-    console.log("Dutch Auction already initialized");
+  // Initialize DutchAuction
+  console.log("Initializing Dutch Auction...");
+  if ((await dutchAuctionManager.initialize(beneficiaryAddress)) !== null) {
+    console.log("Dutch Auction initialized");
   } else {
-    console.log("Initializing Dutch Auction...");
-
-    // Initialize DutchAuction
-    await dutchAuctionManager.initialize(
-      INITIAL_POW1_SUPPLY,
-      INITIAL_WETH_AMOUNT,
-      beneficiaryAddress,
-    );
+    console.log("Dutch Auction already initialized");
   }
 
-  // Check if initial LP-NFTs have been minted
-  const auctionCount: number =
-    await dutchAuctionManager.getCurrentAuctionCount();
-  if (auctionCount > 0) {
-    console.log("Initial LP-NFTs already minted");
+  // Create initial LP-NFTs
+  console.log("Creating initial LP-NFTs...");
+  if ((await dutchAuctionManager.createInitialAuctions()) !== null) {
+    console.log("Initial LP-NFTs minted");
   } else {
-    console.log("Creating initial LP-NFTs for sale...");
-
-    // Create initial LP-NFTs for sale
-    await dutchAuctionManager.createInitialAuctions();
+    console.log("Initial LP-NFTs already minted");
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -383,6 +375,31 @@ async function initializeGame(
       console.log(`LP-NFT image: ${nftContent.image}`);
     }
   }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Inspect Dutch Auction
+  //////////////////////////////////////////////////////////////////////////////
+
+  const dutchAuctionClient: DutchAuctionClient = new DutchAuctionClient(
+    deployer,
+    {
+      dutchAuction: addressBook.dutchAuction!,
+      marketToken: addressBook.wrappedNativeToken!,
+    },
+  );
+
+  console.log("Inspecting Dutch Auction...");
+
+  const currentAuctionStates: {
+    lpNftTokenId: bigint;
+    startPriceBips: bigint;
+    endPriceBips: bigint;
+    startTime: bigint;
+    salePrice: bigint;
+  }[] = await dutchAuctionClient.getCurrentAuctionStates();
+
+  console.log("Current auction states:");
+  console.table(currentAuctionStates);
 
   console.log("Game initialization complete.");
 }
