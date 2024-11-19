@@ -1,12 +1,3 @@
 {
-  "address": "0xAcdD380f8EEF8529f41dcCa4a3425A7350BdF4C8",
-  "abi": [
-    "constructor(address,bytes32)",
-    "function WETH9() view returns (address)",
-    "function flipRatio(address,address,uint256) view returns (bool)",
-    "function nativeCurrencyLabel() view returns (string)",
-    "function nativeCurrencyLabelBytes() view returns (bytes32)",
-    "function tokenRatioPriority(address,uint256) view returns (int256)",
-    "function tokenURI(address,uint256) view returns (string)"
-  ]
+  "address": "0xAcdD380f8EEF8529f41dcCa4a3425A7350BdF4C8"
 }
