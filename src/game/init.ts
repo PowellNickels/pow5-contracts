@@ -10,7 +10,6 @@ import dotenv from "dotenv";
 import { ethers } from "ethers";
 
 import testnet from "../../src/networks/testnet.json";
-import { extractJSONFromURI } from "../../src/utils/lpNftUtils";
 import {
   DEFI_MANAGER_CONTRACT,
   DUTCH_AUCTION_CONTRACT,
@@ -47,9 +46,13 @@ import {
 import { USDC_CONTRACT } from "../hardhat/contracts/testing";
 import { getAddressBook } from "../hardhat/getAddressBook";
 import { AddressBook } from "../interfaces/addressBook";
+import { LiquidityForgeContract } from "../interfaces/bureaucracy/liquidityForgeContract";
 import { LPSFTContract } from "../interfaces/token/erc1155/lpSftContract";
 import { UniswapV3FactoryContract } from "../interfaces/uniswap/uniswapV3FactoryContract";
+import { ERC20Contract } from "../interfaces/zeppelin/token/erc20/erc20Contract";
+import { ETH_PRICE } from "../testing/defiMetrics";
 import {
+  INITIAL_POW5_AMOUNT,
   LPPOW1_POOL_FEE,
   LPPOW5_POOL_FEE,
   UNI_V3_FEE_AMOUNT,
@@ -74,6 +77,12 @@ const TESTNET_CHAIN_ID: bigint = 13371337n;
  */
 const JSON_RPC_URL: string =
   process.env.JSON_RPC_URL || "http://localhost:8545";
+
+// Token IDs of initial LP-NFT
+const INITIAL_POW1_LPNFT_TOKEN_ID: bigint = 1n;
+
+// Get some ETH for beneficiary's gas fees
+const BENEFICIARY_ETH: bigint = ethers.parseEther("10") / BigInt(ETH_PRICE); // $10 in ETH
 
 ////////////////////////////////////////////////////////////////////////////////
 // Exports
@@ -161,6 +170,22 @@ async function initializeGame(
   const beneficiaryAddress: `0x${string}` =
     (await beneficiary.getAddress()) as `0x${string}`;
   console.log(`Beneficiary address: ${beneficiaryAddress}`);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Get some gas money for the beneficiary
+  //////////////////////////////////////////////////////////////////////////////
+
+  // Get beneficiary ETH balance
+  const beneficiaryBalance: bigint =
+    await provider.getBalance(beneficiaryAddress);
+
+  // Set beneficiary ETH balance, if needed
+  if (beneficiaryBalance < BENEFICIARY_ETH) {
+    await provider.send("hardhat_setBalance", [
+      beneficiaryAddress,
+      `0x${BENEFICIARY_ETH.toString(16)}`,
+    ]);
+  }
 
   //////////////////////////////////////////////////////////////////////////////
   // Load ABIs and Addresses
@@ -342,38 +367,67 @@ async function initializeGame(
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // Inspect LP-SFT
+  // Initialize Yield Harvest
   //////////////////////////////////////////////////////////////////////////////
 
-  {
-    const lpSftContract: LPSFTContract = new LPSFTContract(
-      deployer,
-      addressBook.lpSft!,
+  const lpSftContract: LPSFTContract = new LPSFTContract(
+    beneficiary,
+    addressBook.lpSft!,
+  );
+
+  // Check if we own the LP-SFT
+  const lpSftBalance: bigint = await lpSftContract.balanceOf(
+    beneficiaryAddress,
+    INITIAL_POW1_LPNFT_TOKEN_ID,
+  );
+
+  // Transfer the LP-SFT to Yield Harvest, if needed
+  if (lpSftBalance === 1n) {
+    console.log("Initializing Yield Harvest...");
+
+    // Lend LP-SFT to YieldHarvest
+    await lpSftContract.safeTransferFrom(
+      beneficiaryAddress,
+      addressBook.yieldHarvest!,
+      INITIAL_POW1_LPNFT_TOKEN_ID,
+      1n,
     );
+  } else {
+    console.log("Yield Harvest already initialized");
+  }
 
-    console.log("Inspecting LP-SFT...");
+  //////////////////////////////////////////////////////////////////////////////
+  // Initialize Liquidity Forge
+  //////////////////////////////////////////////////////////////////////////////
 
-    const tokenIds: bigint[] =
-      await lpSftContract.getTokenIds(beneficiaryAddress);
+  // Create contracts
+  const liquidityForgeContract: LiquidityForgeContract =
+    new LiquidityForgeContract(beneficiary, addressBook.liquidityForge!);
+  const noPow5Contract: ERC20Contract = new ERC20Contract(
+    beneficiary,
+    addressBook.noPow5Token!,
+  );
 
-    console.log(
-      `LP-SFT token IDs:`,
-      tokenIds.map((x) => x),
+  // Get LP-SFT address
+  const lpSftAddress: `0x${string}` = await lpSftContract.tokenIdToAddress(
+    INITIAL_POW1_LPNFT_TOKEN_ID,
+  );
+
+  // Get NOPOW5 balance of LP-SFT
+  const noPow5Balance: bigint = await noPow5Contract.balanceOf(lpSftAddress);
+
+  // Borrow more POW5, if needed
+  if (noPow5Balance < INITIAL_POW5_AMOUNT) {
+    console.log("Initializing Liquidity Forge...");
+
+    // Borrow POW5 from LiquidityForge
+    await liquidityForgeContract.borrowPow5(
+      INITIAL_POW1_LPNFT_TOKEN_ID, // tokenId
+      INITIAL_POW5_AMOUNT - noPow5Balance, // amount
+      beneficiaryAddress, // receiver
     );
-
-    if (tokenIds.length > 0) {
-      const tokenId: bigint = tokenIds[0];
-
-      // Check token URI
-      const nftTokenUri: string = await lpSftContract.uri(tokenId);
-
-      // Content should be valid JSON and structure
-      const nftContent = extractJSONFromURI(nftTokenUri);
-      if (!nftContent) {
-        throw new Error("Failed to extract JSON from URI");
-      }
-      console.log(`LP-NFT image: ${nftContent.image}`);
-    }
+  } else {
+    console.log("Liquidity Forge already initialized");
   }
 
   //////////////////////////////////////////////////////////////////////////////

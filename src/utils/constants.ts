@@ -97,9 +97,9 @@ const INITIAL_LPPOW5_USDC_VALUE: number = 100; // $100
 const INITIAL_LPPOW1_AMOUNT: bigint = 20_036_097_492_521_525_709n; // 2,004 LPPOW1
 
 /**
- * @description The initial POW5 amount, LPPOW1 * 99 / 100
+ * @description The initial POW5 amount
  */
-const INITIAL_POW5_AMOUNT: bigint = INITIAL_LPPOW1_AMOUNT; // 100% of LPPOW1
+const INITIAL_POW5_AMOUNT: bigint = ethers.parseUnits("2000", POW5_DECIMALS); // 2,000 POW5
 
 /**
  * @description The initial LPPOW5 liquidity amount, sqrt(POW5 * USDC)

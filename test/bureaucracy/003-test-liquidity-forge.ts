@@ -246,7 +246,7 @@ describe("Bureau 3: Liquidity Forge", () => {
     try {
       await liquidityForgeContract.borrowPow5(
         LPPOW1_LPNFT_TOKEN_ID, // tokenId
-        INITIAL_POW5_AMOUNT + 1n, // amount
+        INITIAL_LPPOW1_AMOUNT + 1n, // amount
         beneficiaryAddress, // receiver
       );
       chai.assert.fail("Expected an error");
@@ -255,7 +255,7 @@ describe("Bureau 3: Liquidity Forge", () => {
     }
   });
 
-  it("should check POW1 LP-sFT LPPOW balance", async function (): Promise<void> {
+  it("should check POW1 LP-SFT LPPOW balance", async function (): Promise<void> {
     this.timeout(60 * 1000);
 
     // Calculate DeFi properties
