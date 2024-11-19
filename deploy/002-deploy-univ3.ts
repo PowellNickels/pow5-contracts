@@ -20,7 +20,6 @@ import {
   UNISWAP_V3_NFT_DESCRIPTOR_CONTRACT,
   UNISWAP_V3_NFT_MANAGER_CONTRACT,
   UNISWAP_V3_STAKER_CONTRACT,
-  uniswapV3NftDescriptorAbi,
   wrappedNativeTokenAbi,
 } from "../src/hardhat/contracts/depends";
 import { getAddressBook, writeAddress } from "../src/hardhat/getAddressBook";
@@ -209,7 +208,6 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
     networkName,
     UNISWAP_V3_NFT_DESCRIPTOR_CONTRACT,
     addressBook.uniswapV3NftDescriptor!,
-    uniswapV3NftDescriptorAbi,
   );
 };
 

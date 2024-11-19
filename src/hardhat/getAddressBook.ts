@@ -347,7 +347,6 @@ function writeAddress(
   networkName: string,
   contractName: string,
   address: `0x${string}`,
-  abi: { [key: string]: any },
 ): void {
   console.log(`Deployed ${contractName} to ${address}`);
 
@@ -361,7 +360,7 @@ function writeAddress(
 
   // Write the file
   const addressFile = `${__dirname}/../../deployments/${networkName}/${contractName}.json`;
-  fs.writeFileSync(addressFile, JSON.stringify({ address, abi }, undefined, 2));
+  fs.writeFileSync(addressFile, JSON.stringify({ address }, undefined, 2));
 
   // Save the address
   addressBook[networkName][contractName as keyof AddressBook] = address;

@@ -24,7 +24,6 @@ import {
   POW5_STABLE_SWAPPER_CONTRACT,
   UNI_V3_POOL_FACTORY_CONTRACT,
 } from "../src/hardhat/contracts/dapp";
-import { uniswapV3PoolAbi } from "../src/hardhat/contracts/depends";
 import { getAddressBook, writeAddress } from "../src/hardhat/getAddressBook";
 import { getNetworkName } from "../src/hardhat/hardhatUtils";
 import { AddressBook } from "../src/interfaces/addressBook";
@@ -222,13 +221,11 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
     networkName,
     POW1_MARKET_POOL_CONTRACT,
     addressBook.pow1MarketPool!,
-    uniswapV3PoolAbi,
   );
   writeAddress(
     networkName,
     POW5_STABLE_POOL_CONTRACT,
     addressBook.pow5StablePool!,
-    uniswapV3PoolAbi,
   );
 };
 

@@ -15,10 +15,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { getUnnamedSigners } from "hardhat-deploy-ethers/dist/src/helpers";
 
-import {
-  uniswapV3PoolAbi,
-  WRAPPED_NATIVE_USDC_POOL_CONTRACT,
-} from "../src/hardhat/contracts/depends";
+import { WRAPPED_NATIVE_USDC_POOL_CONTRACT } from "../src/hardhat/contracts/depends";
 import { getAddressBook, writeAddress } from "../src/hardhat/getAddressBook";
 import { getNetworkName } from "../src/hardhat/hardhatUtils";
 import { AddressBook } from "../src/interfaces/addressBook";
@@ -123,7 +120,6 @@ const func: DeployFunction = async (hardhat_re: HardhatRuntimeEnvironment) => {
     networkName,
     WRAPPED_NATIVE_USDC_POOL_CONTRACT,
     addressBook.wrappedNativeUsdcPool!,
-    uniswapV3PoolAbi,
   );
 };
 
