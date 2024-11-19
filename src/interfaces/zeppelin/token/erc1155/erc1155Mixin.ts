@@ -64,11 +64,17 @@ function ERC1155Mixin<T extends new (...args: any[]) => {}>(Base: T) {
       to: `0x${string}`,
       id: bigint,
       value: bigint,
-      data: Uint8Array,
+      data?: Uint8Array,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.erc1155.safeTransferFrom(from, to, id, value, data);
+          await this.erc1155.safeTransferFrom(
+            from,
+            to,
+            id,
+            value,
+            data ? data : new Uint8Array(),
+          );
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });
@@ -79,11 +85,17 @@ function ERC1155Mixin<T extends new (...args: any[]) => {}>(Base: T) {
       to: `0x${string}`,
       ids: bigint[],
       values: bigint[],
-      data: Uint8Array,
+      data?: Uint8Array,
     ): Promise<ethers.ContractTransactionReceipt> {
       return this.withSigner(async () => {
         const tx: ethers.ContractTransactionResponse =
-          await this.erc1155.safeBatchTransferFrom(from, to, ids, values, data);
+          await this.erc1155.safeBatchTransferFrom(
+            from,
+            to,
+            ids,
+            values,
+            data ? data : new Uint8Array(),
+          );
 
         return (await tx.wait()) as ethers.ContractTransactionReceipt;
       });

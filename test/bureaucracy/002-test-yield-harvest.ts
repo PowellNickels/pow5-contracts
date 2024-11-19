@@ -248,7 +248,6 @@ describe("Bureau 2: Yield Harvest", () => {
       yieldHarvestContract.address,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
-      new Uint8Array(),
     );
   });
 
@@ -281,7 +280,6 @@ describe("Bureau 2: Yield Harvest", () => {
       yieldHarvestContract.address,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
-      new Uint8Array(),
     );
   });
 

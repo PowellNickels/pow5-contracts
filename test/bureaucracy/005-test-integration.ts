@@ -309,7 +309,6 @@ describe("Bureau integration test", () => {
       yieldHarvestContract.address,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
-      new Uint8Array(),
     );
   });
 

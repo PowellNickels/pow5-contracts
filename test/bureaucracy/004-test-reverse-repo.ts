@@ -288,7 +288,6 @@ describe("Bureau 4: Reverse Repo", () => {
       yieldHarvestContract.address,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
-      new Uint8Array(),
     );
   });
 
@@ -1221,7 +1220,6 @@ describe("Bureau 4: Reverse Repo", () => {
       yieldHarvestContract.address,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
-      new Uint8Array(),
     );
   });
 

@@ -230,7 +230,6 @@ describe("Bureau 3: Liquidity Forge", () => {
       addressBook.yieldHarvest!,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
-      new Uint8Array(),
     );
   });
 
@@ -331,7 +330,6 @@ describe("Bureau 3: Liquidity Forge", () => {
         addressBook.yieldHarvest!,
         LPPOW1_LPNFT_TOKEN_ID,
         1n,
-        new Uint8Array(),
       );
       chai.assert.fail("Expected an error");
     } catch (error: unknown) {
@@ -401,7 +399,6 @@ describe("Bureau 3: Liquidity Forge", () => {
       addressBook.yieldHarvest!,
       LPPOW1_LPNFT_TOKEN_ID,
       1n,
-      new Uint8Array(),
     );
   });
 

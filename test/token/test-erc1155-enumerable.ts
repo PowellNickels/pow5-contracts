@@ -378,7 +378,6 @@ describe("ERC1155Enumerable", () => {
         deployerAddress,
         [nftTokenId3, nftTokenId1],
         [1n, 1n],
-        new Uint8Array(),
       );
     chai.expect(receipt).to.not.be.null;
 
@@ -469,7 +468,6 @@ describe("ERC1155Enumerable", () => {
       deployerAddress,
       nftTokenId2,
       1n,
-      new Uint8Array(),
     );
   });
 
