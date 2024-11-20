@@ -623,7 +623,7 @@
       ]
     },
     "DutchAuction": {
-      "address": "0x7366ED5C79eD26f9bD06ff18dc915e9d70E9651C",
+      "address": "0x3abB99C34D7759df606904E9591c959897c94983",
       "abi": [
         {
           "inputs": [
@@ -1052,6 +1052,25 @@
               "internalType": "bytes32",
               "name": "",
               "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "lpNftTokenId",
+              "type": "uint256"
+            }
+          ],
+          "name": "getTokenUri",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
             }
           ],
           "stateMutability": "view",
