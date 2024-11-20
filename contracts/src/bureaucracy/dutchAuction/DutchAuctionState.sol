@@ -19,10 +19,17 @@ import {IDutchAuctionState} from "../../interfaces/bureaucracy/dutchAuction/IDut
 
 import {VRGDA} from "../../utils/auction/VRGDA.sol";
 
+import {DutchAuctionRoutes} from "./DutchAuctionRoutes.sol";
+
 /**
  * @title Bureau of the Dutch Auction
  */
-contract DutchAuctionState is IDutchAuctionState, ERC721Holder, ERC1155Holder {
+abstract contract DutchAuctionState is
+  IDutchAuctionState,
+  ERC721Holder,
+  ERC1155Holder,
+  DutchAuctionRoutes
+{
   using EnumerableSet for EnumerableSet.UintSet;
 
   //////////////////////////////////////////////////////////////////////////////
@@ -70,7 +77,13 @@ contract DutchAuctionState is IDutchAuctionState, ERC721Holder, ERC1155Holder {
    */
   function supportsInterface(
     bytes4 interfaceId
-  ) public view virtual override(IERC165, ERC1155Holder) returns (bool) {
+  )
+    public
+    view
+    virtual
+    override(IERC165, ERC1155Holder, DutchAuctionRoutes)
+    returns (bool)
+  {
     return
       super.supportsInterface(interfaceId) ||
       interfaceId == type(IERC721Receiver).interfaceId ||
@@ -203,5 +216,14 @@ contract DutchAuctionState is IDutchAuctionState, ERC721Holder, ERC1155Holder {
     }
 
     return currentPriceBips;
+  }
+
+  /**
+   * @dev See {IDutchAuctionState-getTokenUri}
+   */
+  function getTokenUri(
+    uint256 lpNftTokenId
+  ) external view override returns (string memory) {
+    return _routes.uniswapV3NftManager.tokenURI(lpNftTokenId);
   }
 }

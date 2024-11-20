@@ -119,6 +119,10 @@ function DutchAuctionStateMixin<T extends new (...args: any[]) => {}>(Base: T) {
     async getCurrentPriceBips(lpNftTokenId: bigint): Promise<bigint> {
       return await this.dutchAuctionState.getCurrentPriceBips(lpNftTokenId);
     }
+
+    async getTokenUri(lpNftTokenId: bigint): Promise<string> {
+      return await this.dutchAuctionState.getTokenUri(lpNftTokenId);
+    }
   };
 }
 

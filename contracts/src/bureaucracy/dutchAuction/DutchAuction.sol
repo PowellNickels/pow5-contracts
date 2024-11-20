@@ -11,7 +11,6 @@ pragma solidity 0.8.28;
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {Context} from "@openzeppelin/contracts/utils/Context.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 import {IDutchAuction} from "../../interfaces/bureaucracy/dutchAuction/IDutchAuction.sol";
 import {ITheReserveRoutes} from "../../interfaces/bureaucracy/theReserve/ITheReserveRoutes.sol";
@@ -44,7 +43,7 @@ contract DutchAuction is DutchAuctionAdminActions, DutchAuctionActions {
     // Initialize auction settings
     _auctionSettings = AuctionSettings({
       priceDecayRate: DECAY_CONSTANT,
-      mintDustAmount: 1_000,
+      mintDustAmount: 1_000, // TODO
       priceIncrement: GROWTH_RATE,
       initialPriceBips: INITIAL_PRICE_BIPS,
       minPriceBips: MIN_PRICE_BIPS,

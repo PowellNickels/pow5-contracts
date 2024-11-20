@@ -15,29 +15,30 @@ import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
+import {IDutchAuctionErrors} from "../../interfaces/bureaucracy/dutchAuction/IDutchAuctionErrors.sol";
+import {IDutchAuctionEvents} from "../../interfaces/bureaucracy/dutchAuction/IDutchAuctionEvents.sol";
 import {INonfungiblePositionManager} from "../../../interfaces/uniswap-v3-periphery/INonfungiblePositionManager.sol";
 
 import {IDutchAuction} from "../../interfaces/bureaucracy/dutchAuction/IDutchAuction.sol";
 
-import {DutchAuctionRoutes} from "./DutchAuctionRoutes.sol";
 import {DutchAuctionState} from "./DutchAuctionState.sol";
 
 /**
  * @title Bureau of the Dutch Auction, Base Functionality
  */
 abstract contract DutchAuctionBase is
-  IDutchAuction,
+  IDutchAuctionErrors,
+  IDutchAuctionEvents,
   AccessControl,
   ReentrancyGuard,
-  DutchAuctionRoutes,
   DutchAuctionState
 {
   using EnumerableSet for EnumerableSet.UintSet;
   using SafeERC20 for IERC20;
 
   //////////////////////////////////////////////////////////////////////////////
-  // Implementation of {IERC165} via {IDutchAuction}, {AccessControl},
-  // {DutchAuctionRoutes} and {IDutchAuctionState}
+  // Implementation of {IERC165} via {IDutchAuction}, {AccessControl}
+  // and {IDutchAuctionState}
   //////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -49,7 +50,7 @@ abstract contract DutchAuctionBase is
     public
     view
     virtual
-    override(IERC165, AccessControl, DutchAuctionRoutes, DutchAuctionState)
+    override(AccessControl, DutchAuctionState)
     returns (bool)
   {
     return

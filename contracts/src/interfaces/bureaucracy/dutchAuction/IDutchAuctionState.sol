@@ -105,4 +105,15 @@ interface IDutchAuctionState is IERC165 {
   function getCurrentPriceBips(
     uint256 lpNftTokenId
   ) external view returns (uint256 currentPriceBips);
+
+  /**
+   * @dev Get the token URI for an LP-NFT
+   *
+   * @param lpNftTokenId The LP-NFT token ID
+   *
+   * @return tokenUri The URI of the LP-NFT
+   */
+  function getTokenUri(
+    uint256 lpNftTokenId
+  ) external view returns (string memory);
 }

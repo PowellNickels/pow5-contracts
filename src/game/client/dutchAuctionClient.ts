@@ -99,6 +99,10 @@ class DutchAuctionClient {
     return this.dutchAuctionContract.getCurrentPriceBips(lpNftTokenId);
   }
 
+  async getTokenUri(lpNftTokenId: bigint): Promise<string> {
+    return this.dutchAuctionContract.getTokenUri(lpNftTokenId);
+  }
+
   async purchase(
     lpNftTokenId: bigint,
     pow1Amount: bigint,
