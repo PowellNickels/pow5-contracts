@@ -14,7 +14,6 @@ import { ethers } from "ethers";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeploymentsExtension } from "hardhat-deploy/types";
 
-import { ContractLibraryEthers } from "../hardhat/contractLibraryEthers";
 import {
   defiManagerAbi,
   dutchAuctionAbi,
@@ -36,7 +35,7 @@ import {
   uniV3PoolFactoryAbi,
   uniV3StakeFarmAbi,
   yieldHarvestAbi,
-} from "../hardhat/contracts/dapp";
+} from "../abi/dapp";
 import {
   uniswapV3FactoryAbi,
   uniswapV3NftDescriptorAbi,
@@ -44,14 +43,15 @@ import {
   uniswapV3PoolAbi,
   uniswapV3StakerAbi,
   wrappedNativeTokenAbi,
-} from "../hardhat/contracts/depends";
+} from "../abi/depends";
 import {
   testErc1155EnumerableAbi,
   testLiquidityMathAbi,
   testRewardMathAbi,
   testTickMathAbi,
   usdcTokenAbi,
-} from "../hardhat/contracts/testing";
+} from "../abi/testing";
+import { ContractLibraryEthers } from "../hardhat/contractLibraryEthers";
 import { getAddressBook } from "../hardhat/getAddressBook";
 import { getNetworkName } from "../hardhat/hardhatUtils";
 import { AddressBook } from "../interfaces/addressBook";

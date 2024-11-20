@@ -17,6 +17,7 @@ import * as hardhat from "hardhat";
 
 import baseAddresses from "../addresses/base.json";
 import mainnetAddresses from "../addresses/mainnet.json";
+import { AddressBook } from "../interfaces/addressBook";
 import {
   DEFI_MANAGER_CONTRACT,
   DUTCH_AUCTION_CONTRACT,
@@ -45,7 +46,7 @@ import {
   REVERSE_REPO_CONTRACT,
   THE_RESERVE_CONTRACT,
   YIELD_HARVEST_CONTRACT,
-} from "../hardhat/contracts/dapp";
+} from "../names/dapp";
 import {
   UNISWAP_V3_FACTORY_CONTRACT,
   UNISWAP_V3_NFT_DESCRIPTOR_CONTRACT,
@@ -53,7 +54,7 @@ import {
   UNISWAP_V3_STAKER_CONTRACT,
   WRAPPED_NATIVE_TOKEN_CONTRACT,
   WRAPPED_NATIVE_USDC_POOL_CONTRACT,
-} from "../hardhat/contracts/depends";
+} from "../names/depends";
 import {
   TEST_ERC1155_ENUMERABLE_CONTRACT,
   TEST_LIQUIDITY_MATH_CONTRACT,
@@ -63,8 +64,7 @@ import {
   TEST_STRING_UTILS_CONTRACT,
   TEST_TICK_MATH_CONTRACT,
   USDC_CONTRACT,
-} from "../hardhat/contracts/testing";
-import { AddressBook } from "../interfaces/addressBook";
+} from "../names/testing";
 
 //
 // Address book instance

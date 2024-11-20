@@ -12,6 +12,9 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction, DeployOptions } from "hardhat-deploy/types";
 
+import { getAddressBook, writeAddress } from "../src/hardhat/getAddressBook";
+import { getNetworkName } from "../src/hardhat/hardhatUtils";
+import { AddressBook } from "../src/interfaces/addressBook";
 import {
   MARKET_STABLE_SWAPPER_CONTRACT,
   POW1_MARKET_POOL_CONTRACT,
@@ -23,10 +26,7 @@ import {
   POW5_STABLE_POOLER_CONTRACT,
   POW5_STABLE_SWAPPER_CONTRACT,
   UNI_V3_POOL_FACTORY_CONTRACT,
-} from "../src/hardhat/contracts/dapp";
-import { getAddressBook, writeAddress } from "../src/hardhat/getAddressBook";
-import { getNetworkName } from "../src/hardhat/hardhatUtils";
-import { AddressBook } from "../src/interfaces/addressBook";
+} from "../src/names/dapp";
 import { LPPOW1_POOL_FEE, LPPOW5_POOL_FEE } from "../src/utils/constants";
 
 //

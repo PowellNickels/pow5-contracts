@@ -14,17 +14,17 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction, DeployOptions } from "hardhat-deploy/types";
 import { getUnnamedSigners } from "hardhat-deploy-ethers/dist/src/helpers";
 
+import { wrappedNativeTokenAbi } from "../src/abi/depends";
+import { getAddressBook, writeAddress } from "../src/hardhat/getAddressBook";
+import { getNetworkName } from "../src/hardhat/hardhatUtils";
+import { AddressBook } from "../src/interfaces/addressBook";
 import {
   NFT_DESCRIPTOR_CONTRACT,
   UNISWAP_V3_FACTORY_CONTRACT,
   UNISWAP_V3_NFT_DESCRIPTOR_CONTRACT,
   UNISWAP_V3_NFT_MANAGER_CONTRACT,
   UNISWAP_V3_STAKER_CONTRACT,
-  wrappedNativeTokenAbi,
-} from "../src/hardhat/contracts/depends";
-import { getAddressBook, writeAddress } from "../src/hardhat/getAddressBook";
-import { getNetworkName } from "../src/hardhat/hardhatUtils";
-import { AddressBook } from "../src/interfaces/addressBook";
+} from "../src/names/depends";
 
 //
 // Deployment parameters

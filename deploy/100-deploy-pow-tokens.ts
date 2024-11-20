@@ -12,6 +12,9 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction, DeployOptions } from "hardhat-deploy/types";
 
+import { getAddressBook } from "../src/hardhat/getAddressBook";
+import { getNetworkName } from "../src/hardhat/hardhatUtils";
+import { AddressBook } from "../src/interfaces/addressBook";
 import {
   LPNFT_CONTRACT,
   LPPOW1_TOKEN_CONTRACT,
@@ -21,10 +24,7 @@ import {
   NOPOW5_TOKEN_CONTRACT,
   POW1_TOKEN_CONTRACT,
   POW5_TOKEN_CONTRACT,
-} from "../src/hardhat/contracts/dapp";
-import { getAddressBook } from "../src/hardhat/getAddressBook";
-import { getNetworkName } from "../src/hardhat/hardhatUtils";
-import { AddressBook } from "../src/interfaces/addressBook";
+} from "../src/names/dapp";
 
 //
 // Deploy the Uniswap V3 pool factory and token routes

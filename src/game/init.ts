@@ -10,6 +10,12 @@ import dotenv from "dotenv";
 import { ethers } from "ethers";
 
 import testnet from "../../src/networks/testnet.json";
+import { getAddressBook } from "../hardhat/getAddressBook";
+import { AddressBook } from "../interfaces/addressBook";
+import { LiquidityForgeContract } from "../interfaces/bureaucracy/liquidityForgeContract";
+import { LPSFTContract } from "../interfaces/token/erc1155/lpSftContract";
+import { UniswapV3FactoryContract } from "../interfaces/uniswap/uniswapV3FactoryContract";
+import { ERC20Contract } from "../interfaces/zeppelin/token/erc20/erc20Contract";
 import {
   DEFI_MANAGER_CONTRACT,
   DUTCH_AUCTION_CONTRACT,
@@ -36,20 +42,14 @@ import {
   REVERSE_REPO_CONTRACT,
   THE_RESERVE_CONTRACT,
   YIELD_HARVEST_CONTRACT,
-} from "../hardhat/contracts/dapp";
+} from "../names/dapp";
 import {
   UNISWAP_V3_FACTORY_CONTRACT,
   UNISWAP_V3_NFT_MANAGER_CONTRACT,
   UNISWAP_V3_STAKER_CONTRACT,
   WRAPPED_NATIVE_TOKEN_CONTRACT,
-} from "../hardhat/contracts/depends";
-import { USDC_CONTRACT } from "../hardhat/contracts/testing";
-import { getAddressBook } from "../hardhat/getAddressBook";
-import { AddressBook } from "../interfaces/addressBook";
-import { LiquidityForgeContract } from "../interfaces/bureaucracy/liquidityForgeContract";
-import { LPSFTContract } from "../interfaces/token/erc1155/lpSftContract";
-import { UniswapV3FactoryContract } from "../interfaces/uniswap/uniswapV3FactoryContract";
-import { ERC20Contract } from "../interfaces/zeppelin/token/erc20/erc20Contract";
+} from "../names/depends";
+import { USDC_CONTRACT } from "../names/testing";
 import { ETH_PRICE } from "../testing/defiMetrics";
 import {
   INITIAL_POW5_AMOUNT,

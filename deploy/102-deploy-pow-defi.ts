@@ -10,6 +10,9 @@ import { ethers } from "ethers";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction, DeployOptions } from "hardhat-deploy/types";
 
+import { getAddressBook } from "../src/hardhat/getAddressBook";
+import { getNetworkName } from "../src/hardhat/hardhatUtils";
+import { AddressBook } from "../src/interfaces/addressBook";
 import {
   DEFI_MANAGER_CONTRACT,
   ERC20_INTEREST_FARM_CONTRACT,
@@ -21,10 +24,7 @@ import {
   POW5_LPNFT_STAKE_FARM_CONTRACT,
   POW5_LPSFT_LEND_FARM_CONTRACT,
   UNIV3_STAKE_FARM_CONTRACT,
-} from "../src/hardhat/contracts/dapp";
-import { getAddressBook } from "../src/hardhat/getAddressBook";
-import { getNetworkName } from "../src/hardhat/hardhatUtils";
-import { AddressBook } from "../src/interfaces/addressBook";
+} from "../src/names/dapp";
 import { POW1_DECIMALS } from "../src/utils/constants";
 
 //

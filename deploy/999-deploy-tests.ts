@@ -12,6 +12,9 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction, DeployOptions } from "hardhat-deploy/types";
 
+import { getAddressBook } from "../src/hardhat/getAddressBook";
+import { getNetworkName } from "../src/hardhat/hardhatUtils";
+import { AddressBook } from "../src/interfaces/addressBook";
 import {
   TEST_ERC1155_ENUMERABLE_CONTRACT,
   TEST_LIQUIDITY_MATH_CONTRACT,
@@ -20,10 +23,7 @@ import {
   TEST_REWARD_MATH_CONTRACT,
   TEST_STRING_UTILS_CONTRACT,
   TEST_TICK_MATH_CONTRACT,
-} from "../src/hardhat/contracts/testing";
-import { getAddressBook } from "../src/hardhat/getAddressBook";
-import { getNetworkName } from "../src/hardhat/hardhatUtils";
-import { AddressBook } from "../src/interfaces/addressBook";
+} from "../src/names/testing";
 
 //
 // Deploy test contracts

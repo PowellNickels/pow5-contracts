@@ -13,7 +13,8 @@
 /artifacts
 /cache
 /deployments/localhost
-/src/abi
+/src/abi/contracts
+/src/abi/@openzeppelin
 /src/networks/localhost.json
 /src/types
 

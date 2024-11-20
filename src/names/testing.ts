@@ -9,14 +9,7 @@
  * See the file LICENSE.txt for more information.
  */
 
-// Contract ABIs and artifacts (sort by path)
-import usdcTokenAbi from "../../abi/contracts/test/token/erc20/USDC.sol/USDC.json";
-import testErc1155EnumerableAbi from "../../abi/contracts/test/token/erc1155/extensions/TestERC1155Enumerable.sol/TestERC1155Enumerable.json";
-import testLiquidityMathAbi from "../../abi/contracts/test/utils/math/TestLiquidityMath.sol/TestLiquidityMath.json";
-import testRewardMathAbi from "../../abi/contracts/test/utils/math/TestRewardMath.sol/TestRewardMath.json";
-import testTickMathAbi from "../../abi/contracts/test/utils/math/TestTickMath.sol/TestTickMath.json";
-
-// Contract names (sort by constant)
+// Contract names
 const TEST_ERC1155_ENUMERABLE_CONTRACT: string = "TestERC1155Enumerable";
 const TEST_LIQUIDITY_MATH_CONTRACT: string = "TestLiquidityMath";
 const TEST_POW1_MARKET_STAKER_CONTRACT: string = "TestPOW1MarketStaker";
@@ -27,11 +20,6 @@ const TEST_TICK_MATH_CONTRACT: string = "TestTickMath";
 const USDC_CONTRACT: string = "USDC";
 
 export {
-  testErc1155EnumerableAbi,
-  testLiquidityMathAbi,
-  testRewardMathAbi,
-  testTickMathAbi,
-  usdcTokenAbi,
   TEST_ERC1155_ENUMERABLE_CONTRACT,
   TEST_LIQUIDITY_MATH_CONTRACT,
   TEST_POW1_MARKET_STAKER_CONTRACT,

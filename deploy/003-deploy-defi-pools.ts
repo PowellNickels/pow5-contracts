@@ -15,12 +15,12 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { getUnnamedSigners } from "hardhat-deploy-ethers/dist/src/helpers";
 
-import { WRAPPED_NATIVE_USDC_POOL_CONTRACT } from "../src/hardhat/contracts/depends";
 import { getAddressBook, writeAddress } from "../src/hardhat/getAddressBook";
 import { getNetworkName } from "../src/hardhat/hardhatUtils";
 import { AddressBook } from "../src/interfaces/addressBook";
 import { UniswapV3PoolContract } from "../src/interfaces/uniswap/pool/uniswapV3PoolContract";
 import { UniswapV3FactoryContract } from "../src/interfaces/uniswap/uniswapV3FactoryContract";
+import { WRAPPED_NATIVE_USDC_POOL_CONTRACT } from "../src/names/depends";
 import {
   USDC_ETH_LP_ETH_AMOUNT_BASE,
   USDC_ETH_LP_USDC_AMOUNT_BASE,

@@ -12,11 +12,11 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction, DeployOptions } from "hardhat-deploy/types";
 
-import { WRAPPED_NATIVE_TOKEN_CONTRACT } from "../src/hardhat/contracts/depends";
-import { USDC_CONTRACT } from "../src/hardhat/contracts/testing";
 import { getAddressBook } from "../src/hardhat/getAddressBook";
 import { getNetworkName } from "../src/hardhat/hardhatUtils";
 import { AddressBook } from "../src/interfaces/addressBook";
+import { WRAPPED_NATIVE_TOKEN_CONTRACT } from "../src/names/depends";
+import { USDC_CONTRACT } from "../src/names/testing";
 
 //
 // Deploy test token contracts
