@@ -357,7 +357,7 @@ describe("DutchAuctionClient", () => {
   it('should purchase LP-NFT with token ID "2"', async function (): Promise<void> {
     this.timeout(60 * 1000);
 
-    const receipt: ethers.ContractTransactionReceipt =
+    const receipt: ethers.ContractTransactionReceipt | null =
       await dutchAuctionClient.purchase(
         POW1_LPNFT_FIRST_TOKEN_ID,
         0n,
@@ -365,13 +365,14 @@ describe("DutchAuctionClient", () => {
         deployerAddress,
         beneficiaryAddress,
       );
+    chai.expect(receipt).to.not.equal(null);
 
     const tokenRoutes: Array<{
       token: `0x${string}`;
       from: `0x${string}`;
       to: `0x${string}`;
       value: bigint;
-    }> = TokenTracker.getErc20Routes(receipt.logs);
+    }> = TokenTracker.getErc20Routes(receipt!.logs);
 
     let lpPow1Amount: bigint = 0n;
 

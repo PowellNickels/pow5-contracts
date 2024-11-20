@@ -29,12 +29,12 @@ type Addresses = {
  * @description Client to interact with the Dutch Auction
  */
 class DutchAuctionClient {
-  private client: ethers.Signer;
+  private client: ethers.Signer | ethers.Provider;
   private addresses: Addresses;
   private dutchAuctionContract: DutchAuctionContract;
   private wrappedNativeContract: WrappedNativeContract;
 
-  constructor(client: ethers.Signer, addresses: Addresses) {
+  constructor(client: ethers.Signer | ethers.Provider, addresses: Addresses) {
     this.client = client;
     this.addresses = addresses;
     this.dutchAuctionContract = new DutchAuctionContract(
@@ -105,7 +105,11 @@ class DutchAuctionClient {
     marketTokenAmount: bigint,
     beneficiary: `0x${string}`,
     receiver: `0x${string}`,
-  ): Promise<ethers.ContractTransactionReceipt> {
+  ): Promise<ethers.ContractTransactionReceipt | null> {
+    if (!("getAddress" in this.client)) {
+      return null;
+    }
+
     const pendingTransactions: Array<
       Promise<ethers.ContractTransactionReceipt>
     > = [];
