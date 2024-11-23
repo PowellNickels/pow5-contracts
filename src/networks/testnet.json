@@ -7708,9 +7708,6 @@
         }
       ]
     },
-    "NonfungibleTokenPositionDescriptor": {
-      "address": "0xAcdD380f8EEF8529f41dcCa4a3425A7350BdF4C8"
-    },
     "POW1": {
       "address": "0x3414381EF8d64a2c0E8eC785553534122312787e",
       "abi": [
@@ -9845,9 +9842,6 @@
         }
       ]
     },
-    "POW1Pool": {
-      "address": "0x46d9B8725ab865D443df4716f145812F27d8Bb4c"
-    },
     "POW1PoolFactory": {
       "address": "0x432da3e72E06474037D9aF7abe821c818A4Aa300",
       "abi": [
@@ -11921,9 +11915,6 @@
           "type": "function"
         }
       ]
-    },
-    "POW5Pool": {
-      "address": "0x9483CB5C595C41Fd131DFbac2D6Ff6aCF21cCa74"
     },
     "POW5PoolFactory": {
       "address": "0xd36dd49e8f79FDdf33a35d1a898E936579c1d586",
@@ -15342,9 +15333,6 @@
           "type": "receive"
         }
       ]
-    },
-    "WrappedNativeUsdcPool": {
-      "address": "0xA6f1CB939ae89b0a44702bebBE4Cd925c9591028"
     },
     "YieldHarvest": {
       "address": "0x7d49d84221468D1ED0BaB162402EbA19F90e2992",
