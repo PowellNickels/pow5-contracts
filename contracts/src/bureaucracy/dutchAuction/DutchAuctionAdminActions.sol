@@ -156,7 +156,7 @@ abstract contract DutchAuctionAdminActions is
   function setAuctionCount(
     uint32 auctionCount,
     uint256 marketTokenDust
-  ) external override {
+  ) external override nonReentrant {
     // Validate access
     _checkRole(DEFAULT_ADMIN_ROLE);
 

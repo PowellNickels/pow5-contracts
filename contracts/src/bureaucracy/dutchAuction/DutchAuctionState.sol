@@ -36,7 +36,7 @@ abstract contract DutchAuctionState is
   // Constants
   //////////////////////////////////////////////////////////////////////////////
 
-  uint256 internal constant INITIAL_PRICE_BIPS = 2e14; // 0.02%
+  uint256 internal constant INITIAL_PRICE_BIPS = 1e18; // 100%
   uint256 internal constant MIN_PRICE_BIPS = 1e14; // 0.01%
   uint256 internal constant MAX_PRICE_BIPS = 1e18; // 100%
   uint256 internal constant GROWTH_RATE = 1e18; // 100% increase in price per sale
